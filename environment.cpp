@@ -143,6 +143,25 @@ Expression power(const std::vector<Expression> & args) {
     return Expression(result);
 }
 
+//Milestone 0 - ln
+Expression ln(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadNumber())) {
+            if(args[0].head().asNumber() >= 0) {
+                result = log(args[0].head().asNumber());
+            } else {
+                throw SemanticError("Error in call for Square Root: Negative number.");
+            }
+        } else {
+            throw SemanticError("Error in call for Square Root: Invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call for Square Root: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
 Environment::Environment(){
 
   reset();
@@ -239,4 +258,6 @@ void Environment::reset(){
     envmap.emplace("sqrt", EnvResult(ProcedureType, sqrt));
     //Procedure: pow
     envmap.emplace("^", EnvResult(ProcedureType, power));
+    //Procedure: ln
+    envmap.emplace("ln", EnvResult(ProcedureType, ln));
 }
