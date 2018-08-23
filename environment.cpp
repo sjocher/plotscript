@@ -195,5 +195,8 @@ void Environment::reset(){
   envmap.emplace("*", EnvResult(ProcedureType, mul)); 
 
   // Procedure: div;
-  envmap.emplace("/", EnvResult(ProcedureType, div)); 
+  envmap.emplace("/", EnvResult(ProcedureType, div));
+    
+  // Milestone 0 Code
+  envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
 }
