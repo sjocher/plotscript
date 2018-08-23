@@ -128,6 +128,21 @@ Expression sqrt(const std::vector<Expression> & args) {
 
 //Milestone 0 - ^
 
+Expression power(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args, 2)) {
+        if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
+            result = pow(args[0].head().asNumber(), args[1].head().asNumber());
+        }
+        else{
+            throw SemanticError("Error in call to division: invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call to exponent: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
 Environment::Environment(){
 
   reset();
@@ -222,4 +237,6 @@ void Environment::reset(){
     envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
     // Procedure: sqrt
     envmap.emplace("sqrt", EnvResult(ProcedureType, sqrt));
+    //Procedure: pow
+    envmap.emplace("^", EnvResult(ProcedureType, power));
 }
