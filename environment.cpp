@@ -107,6 +107,27 @@ Expression div(const std::vector<Expression> & args){
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
 
+//Milestone 0 - Square Root
+Expression sqrt(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadNumber())) {
+            if(args[0].head().asNumber() >= 0) {
+                result = sqrt(args[0].head().asNumber());
+            } else {
+                throw SemanticError("Error in call for Square Root: Negative number.");
+            }
+        } else {
+            throw SemanticError("Error in call for Square Root: Invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call for Square Root: Invalid number of arguments.");
+    }
+    return Expression(result);
+};
+
+//Milestone 0 - ^
+
 Environment::Environment(){
 
   reset();
@@ -179,24 +200,26 @@ Reset the environment to the default state. First remove all entries and
 then re-add the default ones.
  */
 void Environment::reset(){
-
-  envmap.clear();
+    envmap.clear();
   
-  // Built-In value of pi
-  envmap.emplace("pi", EnvResult(ExpressionType, Expression(PI)));
+    // Built-In value of pi
+    envmap.emplace("pi", EnvResult(ExpressionType, Expression(PI)));
 
-  // Procedure: add;
-  envmap.emplace("+", EnvResult(ProcedureType, add)); 
+    // Procedure: add;
+    envmap.emplace("+", EnvResult(ProcedureType, add));
 
-  // Procedure: subneg;
-  envmap.emplace("-", EnvResult(ProcedureType, subneg)); 
+    // Procedure: subneg;
+    envmap.emplace("-", EnvResult(ProcedureType, subneg));
 
-  // Procedure: mul;
-  envmap.emplace("*", EnvResult(ProcedureType, mul)); 
+    // Procedure: mul;
+    envmap.emplace("*", EnvResult(ProcedureType, mul));
 
-  // Procedure: div;
-  envmap.emplace("/", EnvResult(ProcedureType, div));
-    
-  // Milestone 0 Code
-  envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
+    // Procedure: div;
+    envmap.emplace("/", EnvResult(ProcedureType, div));
+  
+    // Milestone 0
+    // Built-In value of e
+    envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
+    // Procedure: sqrt
+    envmap.emplace("sqrt", EnvResult(ProcedureType, sqrt));
 }
