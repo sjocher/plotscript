@@ -151,13 +151,58 @@ Expression ln(const std::vector<Expression> & args) {
             if(args[0].head().asNumber() >= 0) {
                 result = log(args[0].head().asNumber());
             } else {
-                throw SemanticError("Error in call for Square Root: Negative number.");
+                throw SemanticError("Error in call for Natural Log: Negative number.");
             }
         } else {
-            throw SemanticError("Error in call for Square Root: Invalid argument.");
+            throw SemanticError("Error in call for Natural Log: Invalid argument.");
         }
     } else {
-        throw SemanticError("Error in call for Square Root: Invalid number of arguments.");
+        throw SemanticError("Error in call for Natural Log: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
+Expression sine(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args, 1)) {
+        if( (args[0].isHeadNumber())){
+            result = sin(args[0].head().asNumber());
+        }
+        else{
+            throw SemanticError("Error in call to Sine: invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call to Sine: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
+Expression cosine(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args, 1)) {
+        if( (args[0].isHeadNumber())){
+            result = cos(args[0].head().asNumber());
+        }
+        else{
+            throw SemanticError("Error in call to Cosine: invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call to Cosine: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
+Expression tangent(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args, 1)) {
+        if( (args[0].isHeadNumber())){
+            result = tan(args[0].head().asNumber());
+        }
+        else{
+            throw SemanticError("Error in call to Tanget: invalid argument.");
+        }
+    } else {
+        throw SemanticError("Error in call to Tangent: Invalid number of arguments.");
     }
     return Expression(result);
 }
@@ -260,4 +305,10 @@ void Environment::reset(){
     envmap.emplace("^", EnvResult(ProcedureType, power));
     //Procedure: ln
     envmap.emplace("ln", EnvResult(ProcedureType, ln));
+    //Procedure: Sine
+    envmap.emplace("sin", EnvResult(ProcedureType, sine));
+    //Procedure: Cosine
+    envmap.emplace("cos", EnvResult(ProcedureType, cosine));
+    //Procedure: Tangent
+    envmap.emplace("tan", EnvResult(ProcedureType, tangent));
 }
