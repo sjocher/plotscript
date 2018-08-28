@@ -16,6 +16,9 @@ public:
 
   /// Construct a default Atom of type None
   Atom();
+    
+  /// Milestone - 0 An Atom of type complex with two values (real, imaginary)
+  Atom(double value1, double value2);
 
   /// Construct an Atom of type Number with value
   Atom(double value);
@@ -43,12 +46,18 @@ public:
 
   /// predicate to determine if an Atom is of type Symbol
   bool isSymbol() const noexcept;
+    
+    /// Milestone 0 : Predicate to determine if an atom is of type Complex
+    bool isComplex() const noexcept;
 
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
 
   /// value of Atom as a number, returns empty-string if not a Symbol
   std::string asSymbol() const noexcept;
+    
+  /// Milestone 0 - value of Atom as a complex, returns empty-string if not a Symbol
+    std::string asComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom & right) const noexcept;
@@ -56,7 +65,8 @@ public:
 private:
 
   // internal enum of known types
-  enum Type {NoneKind, NumberKind, SymbolKind};
+  // Milestone - 0 : added ComplexKind
+  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
 
   // track the type
   Type m_type;
@@ -73,6 +83,9 @@ private:
 
   // helper to set type and value of Symbol
   void setSymbol(const std::string & value);
+    
+  // helper to set the type and value of a complex
+    void setComplex(double value1, double value2);
 };
 
 /// inequality comparison for Atom
