@@ -311,4 +311,7 @@ void Environment::reset(){
     envmap.emplace("cos", EnvResult(ProcedureType, cosine));
     //Procedure: Tangent
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
+    // Imaginary Number
+    //envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
+    
 }

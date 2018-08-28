@@ -9,7 +9,6 @@
 Expression::Expression(){}
 
 Expression::Expression(const Atom & a){
-
   m_head = a;
 }
 
@@ -51,8 +50,7 @@ bool Expression::isHeadNumber() const noexcept{
 
 bool Expression::isHeadSymbol() const noexcept{
   return m_head.isSymbol();
-}  
-
+}
 
 void Expression::append(const Atom & a){
   m_tail.emplace_back(a);
