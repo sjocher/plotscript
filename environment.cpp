@@ -26,6 +26,34 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
+Expression real(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadComplex())) {
+            result = args[0].head().getComReal();
+        } else {
+            throw SemanticError("Error in call for real: argument is not a complex number.");
+        }
+    } else {
+        throw SemanticError("Error in call for real: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
+Expression imag(const std::vector<Expression> & args) {
+    double result = 0;
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadComplex())) {
+            result = args[0].head().getComImag();
+        } else {
+            throw SemanticError("Error in call for real: argument is not a complex number.");
+        }
+    } else {
+        throw SemanticError("Error in call for real: Invalid number of arguments.");
+    }
+    return Expression(result);
+}
+
 Expression add(const std::vector<Expression> & args){
   // check all aruments are numbers, while adding
   double result = 0, imagi = 0;
@@ -320,4 +348,7 @@ void Environment::reset(){
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
     // Imaginary Number
     envmap.emplace("I", EnvResult(ExpressionType, Expression(Imaginary)));
+    //real and imag
+    envmap.emplace("real", EnvResult(ProcedureType, real));
+    envmap.emplace("imag", EnvResult(ProcedureType, imag));
 }
