@@ -27,18 +27,25 @@ Expression default_proc(const std::vector<Expression> & args){
 };
 
 Expression add(const std::vector<Expression> & args){
-
   // check all aruments are numbers, while adding
-  double result = 0;
+  double result = 0, imagi = 0;
+  bool complex = false;
   for( auto & a :args){
     if(a.isHeadNumber()){
       result += a.head().asNumber();      
+    } else if(a.isHeadComplex()) {
+        complex = true;
+        result += a.head().getComReal();
+        imagi += a.head().getComImag();
     }
     else{
       throw SemanticError("Error in call to add, argument not a number");
     }
   }
-
+  if(complex) {
+      Atom a(result, imagi);
+      return Expression(a);
+  }
   return Expression(result);
 };
 
@@ -313,6 +320,4 @@ void Environment::reset(){
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
     // Imaginary Number
     envmap.emplace("I", EnvResult(ExpressionType, Expression(Imaginary)));
-    envmap.emplace("i", EnvResult(ExpressionType, Expression(Imaginary)));
-    
 }

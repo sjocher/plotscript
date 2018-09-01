@@ -33,14 +33,13 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     
     {
         INFO("Complex Constructor");
-        Atom a(0,1);
+        Atom a(4,1);
         Atom b;
         b = a;
         REQUIRE(!a.isNone());
         REQUIRE(!a.isNumber());
         REQUIRE(!a.isSymbol());
         REQUIRE(b.isComplex());
-        REQUIRE(b.asComplex() == "0,1");
     }
 
 

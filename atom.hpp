@@ -52,6 +52,9 @@ public:
 
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
+    
+  double getComReal() const noexcept;
+  double getComImag() const noexcept;
 
   /// value of Atom as a number, returns empty-string if not a Symbol
   std::string asSymbol() const noexcept;

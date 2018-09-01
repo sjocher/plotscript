@@ -115,6 +115,14 @@ void Atom::setSymbol(const std::string & value) {
   new (&stringValue) std::string(value);
 }
 
+double Atom::getComImag() const noexcept {
+    return complexValue;
+}
+
+double Atom::getComReal() const noexcept {
+    return numberValue;
+}
+
 double Atom::asNumber() const noexcept {
   return (m_type == NumberKind) ? numberValue : 0.0;  
 }
@@ -186,7 +194,7 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
     out << a.asSymbol();
   }
     if(a.isComplex()) {
-        out << a.asComplex();
+    out << a.asComplex();
     }
   return out;
 }
