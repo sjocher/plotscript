@@ -130,7 +130,8 @@ std::string Atom::asSymbol() const noexcept{
 std::string Atom::asComplex() const noexcept {
     std::string result;
     if(m_type == ComplexKind) {
-        result = '(' + numberValue + ',' + complexValue + ')';
+        result = std::to_string((int)numberValue) + "," + std::to_string((int)complexValue);
+        //result = std::to_string((int)numberValue);
     }
     return result;
 }

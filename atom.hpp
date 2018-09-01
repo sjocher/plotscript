@@ -75,10 +75,12 @@ private:
   // when setting non POD values (see setSymbol)
   union {
     double numberValue;
-    double complexValue;
     std::string stringValue;
   };
-
+    //Not working inside Union, will ask for help
+    //#NEEDASSISTANCE
+    double complexValue;
+  
   // helper to set type and value of Number
   void setNumber(double value);
 

@@ -106,7 +106,7 @@ Expression div(const std::vector<Expression> & args){
 
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
-const double I = 0;
+const Atom Imaginary(0,1);
 
 //Milestone 0 - Square Root
 Expression sqrt(const std::vector<Expression> & args) {
@@ -312,6 +312,7 @@ void Environment::reset(){
     //Procedure: Tangent
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
     // Imaginary Number
-    envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
+    envmap.emplace("I", EnvResult(ExpressionType, Expression(Imaginary)));
+    envmap.emplace("i", EnvResult(ExpressionType, Expression(Imaginary)));
     
 }
