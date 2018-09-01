@@ -116,7 +116,7 @@ Expression subneg(const std::vector<Expression> & args){
     } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
         complex = true;
         result = args[0].head().asNumber() - args[1].head().getComReal();
-        imagi = args[1].head().getComImag();
+        imagi = -args[1].head().getComImag();
     } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
         complex = true;
         result = args[0].head().getComReal() - args[1].head().asNumber();
@@ -124,7 +124,7 @@ Expression subneg(const std::vector<Expression> & args){
     } else if(args[0].isHeadComplex() && args[1].isHeadComplex())  {
         complex = true;
         result = args[0].head().getComReal() - args[1].head().getComReal();
-        result = args[0].head().getComImag() - args[1].head().getComImag();
+        imagi = args[0].head().getComImag() - args[1].head().getComImag();
     }
     else{      
       throw SemanticError("Error in call to subtraction: invalid argument.");
