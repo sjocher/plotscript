@@ -93,3 +93,5 @@ TEST_CASE( "Test semeantic errors", "[environment]" ) {
   }
 }
 
+//Milestone 0 : Task 3 Tests
+

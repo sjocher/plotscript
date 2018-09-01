@@ -106,6 +106,7 @@ Expression div(const std::vector<Expression> & args){
 
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
+const double I = 0;
 
 //Milestone 0 - Square Root
 Expression sqrt(const std::vector<Expression> & args) {
@@ -228,7 +229,6 @@ bool Environment::is_exp(const Atom & sym) const{
 Expression Environment::get_exp(const Atom & sym) const{
 
   Expression exp;
-  
   if(sym.isSymbol()){
     auto result = envmap.find(sym.asSymbol());
     if((result != envmap.end()) && (result->second.type == ExpressionType)){
@@ -312,6 +312,6 @@ void Environment::reset(){
     //Procedure: Tangent
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
     // Imaginary Number
-    //envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
+    envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
     
 }

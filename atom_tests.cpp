@@ -30,6 +30,12 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNumber());
     REQUIRE(a.isSymbol());
   }
+    
+    {
+        INFO("Complex Constructor");
+        Atom a(0,1);
+        REQUIRE(a.isComplex());
+    }
 
 
   {

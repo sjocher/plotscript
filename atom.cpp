@@ -11,8 +11,11 @@ Atom::Atom(double value){
   setNumber(value);
 }
 
+Atom::Atom(double real, double image) {
+    setComplex(real, image);
+}
+
 Atom::Atom(const Token & token): Atom() {
-    
   // is token a number?
   double temp;
   std::istringstream iss(token.asString());
@@ -41,6 +44,9 @@ Atom::Atom(const Atom & x): Atom(){
   else if(x.isSymbol()){
     setSymbol(x.stringValue);
   }
+  else if(x.isComplex()) {
+      setComplex(x.numberValue, x.complexValue);
+  }
 }
 
 Atom & Atom::operator=(const Atom & x) {
@@ -54,6 +60,9 @@ Atom & Atom::operator=(const Atom & x) {
     }
     else if(x.m_type == SymbolKind){
       setSymbol(x.stringValue);
+    }
+    else if(x.m_type == ComplexKind) {
+        setComplex(x.numberValue, x.complexValue);
     }
   }
   return *this;
@@ -76,6 +85,16 @@ bool Atom::isNumber() const noexcept {
 
 bool Atom::isSymbol() const noexcept {
   return m_type == SymbolKind;
+}
+
+bool Atom::isComplex() const noexcept {
+    return m_type == ComplexKind;
+}
+
+void Atom::setComplex(double real, double image) {
+    m_type = ComplexKind;
+    numberValue = real;
+    complexValue = image;
 }
 
 void Atom::setNumber(double value) {
@@ -108,6 +127,14 @@ std::string Atom::asSymbol() const noexcept{
   return result;
 }
 
+std::string Atom::asComplex() const noexcept {
+    std::string result;
+    if(m_type == ComplexKind) {
+        result = '(' + numberValue + ',' + complexValue + ')';
+    }
+    return result;
+}
+
 bool Atom::operator==(const Atom & right) const noexcept{
   
   if(m_type != right.m_type) return false;
@@ -133,6 +160,10 @@ bool Atom::operator==(const Atom & right) const noexcept{
       return stringValue == right.stringValue;
     }
     break;
+      case ComplexKind:
+          if(right.m_type != ComplexKind) return false;
+          if(right.numberValue == numberValue && right.complexValue == complexValue) return true;
+          break;
   default:
     return false;
   }
@@ -153,5 +184,8 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
   if(a.isSymbol()){
     out << a.asSymbol();
   }
+    if(a.isComplex()) {
+        out << a.asComplex();
+    }
   return out;
 }

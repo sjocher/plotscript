@@ -22,6 +22,9 @@ public:
 
   /// Construct an Atom of type Symbol named value
   Atom(const std::string & value);
+    
+  /// Construct an Atom of type complex with two doubles
+  Atom(double real, double image);
 
   /// Construct an Atom directly from a Token
   Atom(const Token & token);
@@ -43,12 +46,18 @@ public:
 
   /// predicate to determine if an Atom is of type Symbol
   bool isSymbol() const noexcept;
+    
+  /// predicate to determine if an Atom is of type Complex
+  bool isComplex() const noexcept;
 
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
 
   /// value of Atom as a number, returns empty-string if not a Symbol
   std::string asSymbol() const noexcept;
+    
+  /// value of Atom as complex, returns empty-string if not a complex
+  std::string asComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom & right) const noexcept;
@@ -57,7 +66,7 @@ private:
 
   // internal enum of known types
   // Milestone - 0 : added ComplexKind
-  enum Type {NoneKind, NumberKind, SymbolKind};
+  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
 
   // track the type
   Type m_type;
@@ -66,6 +75,7 @@ private:
   // when setting non POD values (see setSymbol)
   union {
     double numberValue;
+    double complexValue;
     std::string stringValue;
   };
 
@@ -74,6 +84,9 @@ private:
 
   // helper to set type and value of Symbol
   void setSymbol(const std::string & value);
+    
+  // helper to set type and value of Complex
+    void setComplex(double real, double image);
 };
 
 /// inequality comparison for Atom
