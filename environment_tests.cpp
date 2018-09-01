@@ -92,6 +92,3 @@ TEST_CASE( "Test semeantic errors", "[environment]" ) {
     REQUIRE_THROWS_AS(exp.eval(env), SemanticError);
   }
 }
-
-//Milestone 0 : Task 3 Tests
-

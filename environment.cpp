@@ -95,12 +95,16 @@ Expression mul(const std::vector<Expression> & args){
 
 Expression subneg(const std::vector<Expression> & args){
 
-  double result = 0;
-
+  double result = 0, imagi = 0;
+    bool complex = false;
   // preconditions
   if(nargs_equal(args,1)){
     if(args[0].isHeadNumber()){
       result = -args[0].head().asNumber();
+    } else if(args[0].isHeadComplex()) {
+        complex = true;
+        result = -args[0].head().getComReal();
+        imagi = -args[0].head().getComImag();
     }
     else{
       throw SemanticError("Error in call to negate: invalid argument.");
@@ -109,6 +113,18 @@ Expression subneg(const std::vector<Expression> & args){
   else if(nargs_equal(args,2)){
     if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
       result = args[0].head().asNumber() - args[1].head().asNumber();
+    } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
+        complex = true;
+        result = args[0].head().asNumber() - args[1].head().getComReal();
+        imagi = args[1].head().getComImag();
+    } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
+        complex = true;
+        result = args[0].head().getComReal() - args[1].head().asNumber();
+        imagi = args[0].head().getComImag();
+    } else if(args[0].isHeadComplex() && args[1].isHeadComplex())  {
+        complex = true;
+        result = args[0].head().getComReal() - args[1].head().getComReal();
+        result = args[0].head().getComImag() - args[1].head().getComImag();
     }
     else{      
       throw SemanticError("Error in call to subtraction: invalid argument.");
@@ -117,7 +133,10 @@ Expression subneg(const std::vector<Expression> & args){
   else{
     throw SemanticError("Error in call to subtraction or negation: invalid number of arguments.");
   }
-
+    if(complex) {
+        Atom a(result, imagi);
+        return Expression(a);
+    }
   return Expression(result);
 };
 
@@ -346,9 +365,10 @@ void Environment::reset(){
     envmap.emplace("cos", EnvResult(ProcedureType, cosine));
     //Procedure: Tangent
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
-    // Imaginary Number
+    //Built-In Value of I
     envmap.emplace("I", EnvResult(ExpressionType, Expression(Imaginary)));
-    //real and imag
+    //Procedure: real
     envmap.emplace("real", EnvResult(ProcedureType, real));
+    //Procedure: imag
     envmap.emplace("imag", EnvResult(ProcedureType, imag));
 }
