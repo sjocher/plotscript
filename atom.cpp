@@ -45,7 +45,7 @@ Atom::Atom(const Atom & x): Atom(){
     setSymbol(x.stringValue);
   }
   else if(x.isComplex()) {
-      setComplex(x.cm.real, x.cm.imaginary);
+      setComplex(x.getComReal(), x.getComImag());
   }
 }
 
@@ -62,7 +62,7 @@ Atom & Atom::operator=(const Atom & x) {
       setSymbol(x.stringValue);
     }
     else if(x.m_type == ComplexKind) {
-        setComplex(x.cm.real, x.cm.imaginary);
+        setComplex(x.getComReal(), x.getComImag());
     }
   }
   return *this;
@@ -93,8 +93,7 @@ bool Atom::isComplex() const noexcept {
 
 void Atom::setComplex(double real, double image) {
     m_type = ComplexKind;
-    cm.real = real;
-    cm.imaginary = image;
+    complexNumber = (real, image);
 }
 
 void Atom::setNumber(double value) {
@@ -116,11 +115,11 @@ void Atom::setSymbol(const std::string & value) {
 }
 
 double Atom::getComImag() const noexcept {
-    return cm.imaginary;
+    return imag(complexNumber);
 }
 
 double Atom::getComReal() const noexcept {
-    return cm.real;
+    return real(complexNumber);
 }
 
 double Atom::asNumber() const noexcept {
@@ -135,13 +134,8 @@ std::string Atom::asSymbol() const noexcept{
   return result;
 }
 
-std::string Atom::asComplex() const noexcept {
-    std::string result;
-    if(m_type == ComplexKind) {
-        result = std::to_string((int)cm.real) + "," + std::to_string((int)cm.imaginary);
-        //result = std::to_string((int)numberValue);
-    }
-    return result;
+std::complex<double> Atom::asComplex() const noexcept {
+    return (m_type == ComplexKind) ? complexNumber : 0.0;
 }
 
 bool Atom::operator==(const Atom & right) const noexcept{
@@ -171,7 +165,7 @@ bool Atom::operator==(const Atom & right) const noexcept{
     break;
       case ComplexKind:
           if(right.m_type != ComplexKind) return false;
-          if(right.cm.real == cm.real && right.cm.imaginary == cm.imaginary) return true;
+          if(right.complexNumber == complexNumber) return true;
           break;
   default:
     return false;

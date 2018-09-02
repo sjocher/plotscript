@@ -5,6 +5,7 @@ Defines the Atom type and associated functions.
 #define ATOM_HPP
 
 #include "token.hpp"
+#include <complex>
 
 /*! \class Atom
 \brief A variant type that may be a Number or Symbol or the default type None.
@@ -60,7 +61,7 @@ public:
   std::string asSymbol() const noexcept;
     
   /// value of Atom as complex, returns empty-string if not a complex
-  std::string asComplex() const noexcept;
+  std::complex<double> asComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom & right) const noexcept;
@@ -73,17 +74,11 @@ private:
 
   // track the type
   Type m_type;
-
-    //struct for complex number
-    struct complexNumber {
-        double real;
-        double imaginary;
-    };
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
   union {
     double numberValue;
-    complexNumber cm;
+    std::complex<double> complexNumber;
     std::string stringValue;
   };
     
