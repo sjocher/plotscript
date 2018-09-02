@@ -79,7 +79,6 @@ private:
         double real;
         double imaginary;
     };
-    
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
   union {

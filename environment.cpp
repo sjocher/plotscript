@@ -78,7 +78,6 @@ Expression add(const std::vector<Expression> & args){
 };
 
 Expression mul(const std::vector<Expression> & args){
- 
   // check all aruments are numbers, while multiplying
   double result = 1, imagi = 0;
     bool complex = false;
@@ -89,7 +88,6 @@ Expression mul(const std::vector<Expression> & args){
         //needs work
         complex = true;
         result *= a.head().getComReal();
-        imagi *= a.head().getComImag();
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
