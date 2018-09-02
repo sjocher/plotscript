@@ -78,7 +78,7 @@ Expression add(const std::vector<Expression> & args){
 
 Expression mul(const std::vector<Expression> & args){
   // check all aruments are numbers, while multiplying
-    std::complex<double> result = 1;
+  double result = 1, imagi = 0;
     bool complex = false;
   for( auto & a :args){
     if(a.isHeadNumber()){
@@ -86,17 +86,18 @@ Expression mul(const std::vector<Expression> & args){
     } else if(a.isHeadComplex()) {
         //needs work
         complex = true;
-        result *= a.head().asComplex();
+        result = ((result * a.head().getComReal()) - (imagi * a.head().getComImag()));
+        imagi = ((result * a.head().getComReal()) + (imagi * a.head().getComReal()));
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
     }
   }
     if(complex) {
-        Atom a(real(result), imag(result));
+        Atom a(result, imagi);
         return Expression(a);
     }
-  return Expression(real(result));
+  return Expression(result);
 };
 
 Expression subneg(const std::vector<Expression> & args){
@@ -115,8 +116,8 @@ Expression subneg(const std::vector<Expression> & args){
     }
   }
   else if(nargs_equal(args,2)){
-    if((args[0].isHeadNumber() || args[0].isHeadComplex()) && (args[1].isHeadNumber() || args[1].isHeadComplex()) ){
-      result = args[0].head().asComplex() - args[1].head().asComplex();
+    if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
+      result = args[0].head().asNumber() - args[1].head().asNumber();
     }
     else{      
       throw SemanticError("Error in call to subtraction: invalid argument.");
@@ -133,11 +134,12 @@ Expression subneg(const std::vector<Expression> & args){
 };
 
 Expression div(const std::vector<Expression> & args){
-  std::complex<double> result = 0;
-    bool complex = false;
+
+  double result = 0;  
+
   if(nargs_equal(args,2)){
-    if((args[0].isHeadNumber() || args[0].isHeadComplex()) && (args[1].isHeadNumber() || args[1].isHeadComplex()) ){
-      result = args[0].head().asComplex() / args[1].head().asComplex();
+    if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
+      result = args[0].head().asNumber() / args[1].head().asNumber();
     }
     else{      
       throw SemanticError("Error in call to division: invalid argument.");
@@ -146,11 +148,7 @@ Expression div(const std::vector<Expression> & args){
   else{
     throw SemanticError("Error in call to division: invalid number of arguments.");
   }
-    if(complex) {
-        Atom a(real(result), imag(result));
-        return Expression(a);
-    }
-  return Expression(real(result));
+  return Expression(result);
 };
 
 const double PI = std::atan2(0, -1);
