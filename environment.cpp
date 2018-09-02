@@ -30,7 +30,7 @@ Expression real(const std::vector<Expression> & args) {
     double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
-            result = args[0].head().getComReal();
+            result = real(args[0].head().asComplex());
         } else {
             throw SemanticError("Error in call for real: argument is not a complex number.");
         }
@@ -44,7 +44,7 @@ Expression imag(const std::vector<Expression> & args) {
     double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
-            result = args[0].head().getComImag();
+            result = imag(args[0].head().asComplex());
         } else {
             throw SemanticError("Error in call for real: argument is not a complex number.");
         }
@@ -101,7 +101,6 @@ Expression mul(const std::vector<Expression> & args){
 };
 
 Expression subneg(const std::vector<Expression> & args){
-
     std::complex<double> result = 0;
     bool complex = false;
   // preconditions
@@ -110,6 +109,7 @@ Expression subneg(const std::vector<Expression> & args){
       result = -args[0].head().asNumber();
     } else if(args[0].isHeadComplex()) {
         complex = true;
+        result = -args[0].head().asComplex();
     }
     else{
       throw SemanticError("Error in call to negate: invalid argument.");
@@ -126,7 +126,11 @@ Expression subneg(const std::vector<Expression> & args){
   else{
     throw SemanticError("Error in call to subtraction or negation: invalid number of arguments.");
   }
-  return Expression(result);
+    if(complex) {
+        Atom a(real(result), imag(result));
+        return Expression(a);
+    }
+  return Expression(real(result));
 };
 
 Expression div(const std::vector<Expression> & args){

@@ -63,6 +63,8 @@ public:
     
   /// value of Atom as complex, returns empty-string if not a complex
   std::complex<double> asComplex() const noexcept;
+    
+  std::string printComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom & right) const noexcept;
