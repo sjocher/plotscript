@@ -74,16 +74,20 @@ private:
   // track the type
   Type m_type;
 
+    //struct for complex number
+    struct complexNumber {
+        double real;
+        double imaginary;
+    };
+    
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
   union {
     double numberValue;
+    complexNumber cm;
     std::string stringValue;
   };
-    //Not working inside Union, will ask for help
-    //#NEEDASSISTANCE
-    double complexValue;
-  
+    
   // helper to set type and value of Number
   void setNumber(double value);
 

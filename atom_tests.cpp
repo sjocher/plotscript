@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include "atom.hpp"
+#include <iostream>
 
 TEST_CASE( "Test constructors", "[atom]" ) {
 
@@ -40,6 +41,7 @@ TEST_CASE( "Test constructors", "[atom]" ) {
         REQUIRE(!a.isNumber());
         REQUIRE(!a.isSymbol());
         REQUIRE(b.isComplex());
+        REQUIRE(a.asComplex() == "4,1");
     }
 
 

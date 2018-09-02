@@ -80,16 +80,25 @@ Expression add(const std::vector<Expression> & args){
 Expression mul(const std::vector<Expression> & args){
  
   // check all aruments are numbers, while multiplying
-  double result = 1;
+  double result = 1, imagi = 0;
+    bool complex = false;
   for( auto & a :args){
     if(a.isHeadNumber()){
       result *= a.head().asNumber();      
+    } else if(a.isHeadComplex()) {
+        //needs work
+        complex = true;
+        result *= a.head().getComReal();
+        imagi *= a.head().getComImag();
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
     }
   }
-
+    if(complex) {
+        Atom a(result, imagi);
+        return Expression(a);
+    }
   return Expression(result);
 };
 
