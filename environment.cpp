@@ -56,25 +56,24 @@ Expression imag(const std::vector<Expression> & args) {
 
 Expression add(const std::vector<Expression> & args){
   // check all aruments are numbers, while adding
-  double result = 0, imagi = 0;
+  std::complex<double> result = 0;
   bool complex = false;
-  for( auto & a :args){
+  for(auto & a :args){
     if(a.isHeadNumber()){
       result += a.head().asNumber();      
     } else if(a.isHeadComplex()) {
         complex = true;
-        result += a.head().getComReal();
-        imagi += a.head().getComImag();
+        result += a.head().asComplex();
     }
     else{
       throw SemanticError("Error in call to add, argument not a number");
     }
   }
   if(complex) {
-      Atom a(result, imagi);
+      Atom a(real(result), imag(result));
       return Expression(a);
   }
-  return Expression(result);
+  return Expression(real(result));
 };
 
 Expression mul(const std::vector<Expression> & args){
@@ -103,7 +102,7 @@ Expression mul(const std::vector<Expression> & args){
 
 Expression subneg(const std::vector<Expression> & args){
 
-  double result = 0, imagi = 0;
+    std::complex<double> result = 0;
     bool complex = false;
   // preconditions
   if(nargs_equal(args,1)){
@@ -111,8 +110,6 @@ Expression subneg(const std::vector<Expression> & args){
       result = -args[0].head().asNumber();
     } else if(args[0].isHeadComplex()) {
         complex = true;
-        result = -args[0].head().getComReal();
-        imagi = -args[0].head().getComImag();
     }
     else{
       throw SemanticError("Error in call to negate: invalid argument.");
@@ -121,18 +118,6 @@ Expression subneg(const std::vector<Expression> & args){
   else if(nargs_equal(args,2)){
     if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
       result = args[0].head().asNumber() - args[1].head().asNumber();
-    } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
-        complex = true;
-        result = args[0].head().asNumber() - args[1].head().getComReal();
-        imagi = -args[1].head().getComImag();
-    } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
-        complex = true;
-        result = args[0].head().getComReal() - args[1].head().asNumber();
-        imagi = args[0].head().getComImag();
-    } else if(args[0].isHeadComplex() && args[1].isHeadComplex())  {
-        complex = true;
-        result = args[0].head().getComReal() - args[1].head().getComReal();
-        imagi = args[0].head().getComImag() - args[1].head().getComImag();
     }
     else{      
       throw SemanticError("Error in call to subtraction: invalid argument.");
@@ -141,10 +126,6 @@ Expression subneg(const std::vector<Expression> & args){
   else{
     throw SemanticError("Error in call to subtraction or negation: invalid number of arguments.");
   }
-    if(complex) {
-        Atom a(result, imagi);
-        return Expression(a);
-    }
   return Expression(result);
 };
 
@@ -168,7 +149,7 @@ Expression div(const std::vector<Expression> & args){
 
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
-const Atom Imaginary(0,1);
+const Atom I(0,1);
 
 //Milestone 0 - Square Root
 Expression sqrt(const std::vector<Expression> & args) {
@@ -374,7 +355,7 @@ void Environment::reset(){
     //Procedure: Tangent
     envmap.emplace("tan", EnvResult(ProcedureType, tangent));
     //Built-In Value of I
-    envmap.emplace("I", EnvResult(ExpressionType, Expression(Imaginary)));
+    envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
     //Procedure: real
     envmap.emplace("real", EnvResult(ProcedureType, real));
     //Procedure: imag

@@ -24,7 +24,7 @@ public:
   /// Construct an Atom of type Symbol named value
   Atom(const std::string & value);
     
-  /// Construct an Atom of type complex with two doubles
+  /// Construct an Atom of type Complex with two doubles
   Atom(double real, double image);
 
   /// Construct an Atom directly from a Token
@@ -53,6 +53,7 @@ public:
 
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
+    
     
   double getComReal() const noexcept;
   double getComImag() const noexcept;

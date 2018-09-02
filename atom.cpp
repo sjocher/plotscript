@@ -93,7 +93,7 @@ bool Atom::isComplex() const noexcept {
 
 void Atom::setComplex(double real, double image) {
     m_type = ComplexKind;
-    complexNumber = (real, image);
+    complexNumber = std::complex<double>(real, image);
 }
 
 void Atom::setNumber(double value) {
@@ -135,6 +135,11 @@ std::string Atom::asSymbol() const noexcept{
 }
 
 std::complex<double> Atom::asComplex() const noexcept {
+    /* std::string result;
+     if(m_type == ComplexKind) {
+     result = (std::to_string((int)real(complexNumber)) + "," + std::to_string((int)imag(complexNumber)));
+     }
+     return result;*/
     return (m_type == ComplexKind) ? complexNumber : 0.0;
 }
 
