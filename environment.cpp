@@ -87,7 +87,8 @@ Expression mul(const std::vector<Expression> & args){
     } else if(a.isHeadComplex()) {
         //needs work
         complex = true;
-        result *= a.head().getComReal();
+        result = ((result * a.head().getComReal()) - (imagi * a.head().getComImag()));
+        imagi = ((result * a.head().getComReal()) + (imagi * a.head().getComReal()));
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
