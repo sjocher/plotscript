@@ -27,7 +27,7 @@ Expression default_proc(const std::vector<Expression> & args){
 };
 
 Expression real(const std::vector<Expression> & args) {
-    double result = 0;
+    std::complex<double> result(0,0);
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = real(args[0].head().asComplex());
@@ -37,11 +37,12 @@ Expression real(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    return Expression(result);
+    Atom a(real(result), imag(result));
+    return Expression(a);
 }
 
 Expression imag(const std::vector<Expression> & args) {
-    double result = 0;
+    std::complex<double> result(0,0);
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = imag(args[0].head().asComplex());
@@ -51,7 +52,53 @@ Expression imag(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    return Expression(result);
+    Atom a(real(result), imag(result));
+    return Expression(a);
+}
+
+Expression mag(const std::vector<Expression> & args) {
+    std::complex<double> result(0,0);
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadComplex())) {
+            result = abs(args[0].head().asComplex());
+        } else {
+            throw SemanticError("Error in call for real: argument is not a complex number.");
+        }
+    } else {
+        throw SemanticError("Error in call for real: Invalid number of arguments.");
+    }
+    Atom a(real(result), imag(result));
+    return Expression(a);
+}
+
+Expression arg(const std::vector<Expression> & args) {
+    std::complex<double> result(0,0);
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadComplex())) {
+            result = arg(args[0].head().asComplex());
+        } else {
+            throw SemanticError("Error in call for real: argument is not a complex number.");
+        }
+    } else {
+        throw SemanticError("Error in call for real: Invalid number of arguments.");
+    }
+    Atom a(real(result), imag(result));
+    return Expression(a);
+}
+
+Expression conj(const std::vector<Expression> & args) {
+    std::complex<double> result(0,0);
+    if(nargs_equal(args,1)) {
+        if((args[0].isHeadComplex())) {
+            result = conj(args[0].head().asComplex());
+        } else {
+            throw SemanticError("Error in call for real: argument is not a complex number.");
+        }
+    } else {
+        throw SemanticError("Error in call for real: Invalid number of arguments.");
+    }
+    Atom a(real(result), imag(result));
+    return Expression(a);
 }
 
 Expression add(const std::vector<Expression> & args){
@@ -205,10 +252,20 @@ Expression sqrt(const std::vector<Expression> & args) {
 //Milestone 0 - ^
 
 Expression power(const std::vector<Expression> & args) {
-    double result = 0;
+    std::complex<double> result(0,0);
+    bool complex = false;
     if(nargs_equal(args, 2)) {
         if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
             result = pow(args[0].head().asNumber(), args[1].head().asNumber());
+        } else if(args[0].isHeadComplex() && args[1].isHeadComplex()) {
+            complex = true;
+            result = pow(args[0].head().asComplex(), args[1].head().asComplex());
+        } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
+            complex = true;
+            result = pow(args[0].head().asComplex(), args[1].head().asNumber());
+        } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
+            complex = true;
+            result = pow(args[0].head().asNumber(), args[1].head().asComplex());
         }
         else{
             throw SemanticError("Error in call to division: invalid argument.");
@@ -216,7 +273,11 @@ Expression power(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call to exponent: Invalid number of arguments.");
     }
-    return Expression(result);
+    if(complex) {
+        Atom a(real(result), imag(result));
+        return Expression(a);
+    }
+    return Expression(real(result));
 }
 
 //Milestone 0 - ln
@@ -392,4 +453,10 @@ void Environment::reset(){
     envmap.emplace("real", EnvResult(ProcedureType, real));
     //Procedure: imag
     envmap.emplace("imag", EnvResult(ProcedureType, imag));
+    //Procedure: mag
+    envmap.emplace("mag", EnvResult(ProcedureType, mag));
+    //Procedure: arg
+    envmap.emplace("arg", EnvResult(ProcedureType, arg));
+    //Procedure: conj
+    envmap.emplace("conj", EnvResult(ProcedureType, conj));
 }
