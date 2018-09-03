@@ -176,21 +176,30 @@ const Atom I(0,1);
 
 //Milestone 0 - Square Root
 Expression sqrt(const std::vector<Expression> & args) {
-    double result = 0;
+    std::complex<double> result(0,0);
+    bool complex = false;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadNumber())) {
             if(args[0].head().asNumber() >= 0) {
                 result = sqrt(args[0].head().asNumber());
             } else {
-                throw SemanticError("Error in call for Square Root: Negative number.");
+                result = sqrt(std::complex<double>(args[0].head().asNumber(),0));
+                complex = true;
             }
+        } else if (args[0].isHeadComplex()) {
+            complex = true;
+            result = sqrt(args[0].head().asComplex());
         } else {
             throw SemanticError("Error in call for Square Root: Invalid argument.");
         }
     } else {
         throw SemanticError("Error in call for Square Root: Invalid number of arguments.");
     }
-    return Expression(result);
+    if(complex) {
+        Atom a(real(result), imag(result));
+        return Expression(a);
+    }
+    return Expression(real(result));
 };
 
 //Milestone 0 - ^
