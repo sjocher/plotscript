@@ -56,7 +56,7 @@ Expression imag(const std::vector<Expression> & args) {
 
 Expression add(const std::vector<Expression> & args){
   // check all aruments are numbers, while adding
-  std::complex<double> result = 0;
+  std::complex<double> result(0,0);
   bool complex = false;
   for(auto & a :args){
     if(a.isHeadNumber()){
@@ -99,7 +99,7 @@ Expression mul(const std::vector<Expression> & args){
 };
 
 Expression subneg(const std::vector<Expression> & args){
-    std::complex<double> result = 0;
+    std::complex<double> result(0,0);
     bool complex = false;
   // preconditions
   if(nargs_equal(args,1)){
@@ -141,10 +141,20 @@ Expression subneg(const std::vector<Expression> & args){
 };
 
 Expression div(const std::vector<Expression> & args){
-  double result = 0;
+    std::complex<double> result(0,0);
+    bool complex = false;
   if(nargs_equal(args,2)){
     if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
       result = args[0].head().asNumber() / args[1].head().asNumber();
+    } else if(args[0].isHeadComplex() && args[1].isHeadComplex()) {
+        complex = true;
+        result = args[0].head().asComplex() / args[1].head().asComplex();
+    } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
+        complex = true;
+        result = args[0].head().asComplex() / args[1].head().asNumber();
+    } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
+        complex = true;
+        result = args[0].head().asNumber() / args[1].head().asComplex();
     }
     else{      
       throw SemanticError("Error in call to division: invalid argument.");
@@ -153,7 +163,11 @@ Expression div(const std::vector<Expression> & args){
   else{
     throw SemanticError("Error in call to division: invalid number of arguments.");
   }
-  return Expression(result);
+    if(complex) {
+        Atom a(real(result), imag(result));
+        return Expression(a);
+    }
+  return Expression(real(result));
 };
 
 const double PI = std::atan2(0, -1);
