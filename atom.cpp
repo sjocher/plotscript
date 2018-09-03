@@ -141,7 +141,7 @@ std::complex<double> Atom::asComplex() const noexcept {
 std::string Atom::printComplex() const noexcept {
     std::string result;
     if(m_type == ComplexKind) {
-        result = (std::to_string((int)real(complexNumber)) + "," + std::to_string((int)imag(complexNumber)));
+        result = (std::to_string(real(complexNumber)) + "," + std::to_string(imag(complexNumber)));
     }
     return result;
 }
@@ -196,7 +196,7 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
     out << a.asSymbol();
   }
     if(a.isComplex()) {
-    out << a.printComplex();
+        out << a.printComplex();
     }
   return out;
 }
