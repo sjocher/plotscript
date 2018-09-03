@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cmath>
 #include <limits>
+#include <iomanip>
 
 Atom::Atom(): m_type(NoneKind) {}
 
@@ -138,14 +139,6 @@ std::complex<double> Atom::asComplex() const noexcept {
     return (m_type == ComplexKind) ? complexNumber : 0.0;
 }
 
-std::string Atom::printComplex() const noexcept {
-    std::string result;
-    if(m_type == ComplexKind) {
-        result = (std::to_string(real(complexNumber)) + "," + std::to_string(imag(complexNumber)));
-    }
-    return result;
-}
-
 bool Atom::operator==(const Atom & right) const noexcept{
   
   if(m_type != right.m_type) return false;
@@ -196,7 +189,7 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
     out << a.asSymbol();
   }
     if(a.isComplex()) {
-        out << a.printComplex();
+        out << a.getComReal() << "," << a.getComImag();
     }
   return out;
 }
