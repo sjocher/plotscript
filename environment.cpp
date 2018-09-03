@@ -78,25 +78,15 @@ Expression add(const std::vector<Expression> & args){
 
 Expression mul(const std::vector<Expression> & args){
   // check all aruments are numbers, while multiplying
-  double result = 1, imagi = 0;
-    bool complex = false;
+ double result = 1;
   for( auto & a :args){
     if(a.isHeadNumber()){
       result *= a.head().asNumber();      
-    } else if(a.isHeadComplex()) {
-        //needs work
-        complex = true;
-        result = ((result * a.head().getComReal()) - (imagi * a.head().getComImag()));
-        imagi = ((result * a.head().getComReal()) + (imagi * a.head().getComReal()));
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
     }
   }
-    if(complex) {
-        Atom a(result, imagi);
-        return Expression(a);
-    }
   return Expression(result);
 };
 
@@ -116,8 +106,17 @@ Expression subneg(const std::vector<Expression> & args){
     }
   }
   else if(nargs_equal(args,2)){
-    if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
-      result = args[0].head().asNumber() - args[1].head().asNumber();
+    if( (args[0].isHeadNumber()) && (args[1].isHeadNumber())) {
+        result = args[0].head().asNumber() - args[1].head().asNumber();
+    } else if(args[0].isHeadComplex() && args[1].isHeadComplex()) {
+        complex = true;
+        result = args[0].head().asComplex() - args[1].head().asComplex();
+    } else if(args[0].isHeadComplex() && args[1].isHeadNumber()) {
+        complex = true;
+        result = args[0].head().asComplex() - args[1].head().asNumber();
+    } else if(args[0].isHeadNumber() && args[1].isHeadComplex()) {
+        complex = true;
+        result = args[0].head().asNumber() - args[1].head().asComplex();
     }
     else{      
       throw SemanticError("Error in call to subtraction: invalid argument.");
@@ -134,9 +133,7 @@ Expression subneg(const std::vector<Expression> & args){
 };
 
 Expression div(const std::vector<Expression> & args){
-
-  double result = 0;  
-
+  double result = 0;
   if(nargs_equal(args,2)){
     if( (args[0].isHeadNumber()) && (args[1].isHeadNumber()) ){
       result = args[0].head().asNumber() / args[1].head().asNumber();

@@ -54,7 +54,7 @@ public:
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
     
-    
+  /// returns the real and imaginary parts of the complex number
   double getComReal() const noexcept;
   double getComImag() const noexcept;
 
@@ -63,7 +63,8 @@ public:
     
   /// value of Atom as complex, returns empty-string if not a complex
   std::complex<double> asComplex() const noexcept;
-    
+  
+  /// prints the complex number in the specified manner
   std::string printComplex() const noexcept;
 
   /// equality comparison based on type and value
