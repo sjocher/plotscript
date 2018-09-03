@@ -27,7 +27,7 @@ Expression default_proc(const std::vector<Expression> & args){
 };
 
 Expression real(const std::vector<Expression> & args) {
-    std::complex<double> result(0,0);
+    double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = real(args[0].head().asComplex());
@@ -37,12 +37,11 @@ Expression real(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    Atom a(real(result), imag(result));
-    return Expression(a);
+    return Expression(result);
 }
 
 Expression imag(const std::vector<Expression> & args) {
-    std::complex<double> result(0,0);
+    double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = imag(args[0].head().asComplex());
@@ -52,12 +51,11 @@ Expression imag(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    Atom a(real(result), imag(result));
-    return Expression(a);
+    return Expression(result);
 }
 
 Expression mag(const std::vector<Expression> & args) {
-    std::complex<double> result(0,0);
+    double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = abs(args[0].head().asComplex());
@@ -67,12 +65,11 @@ Expression mag(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    Atom a(real(result), imag(result));
-    return Expression(a);
+    return Expression(result);
 }
 
 Expression arg(const std::vector<Expression> & args) {
-    std::complex<double> result(0,0);
+    double result = 0;
     if(nargs_equal(args,1)) {
         if((args[0].isHeadComplex())) {
             result = arg(args[0].head().asComplex());
@@ -82,8 +79,7 @@ Expression arg(const std::vector<Expression> & args) {
     } else {
         throw SemanticError("Error in call for real: Invalid number of arguments.");
     }
-    Atom a(real(result), imag(result));
-    return Expression(a);
+    return Expression(result);
 }
 
 Expression conj(const std::vector<Expression> & args) {
