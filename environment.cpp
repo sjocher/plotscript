@@ -78,16 +78,24 @@ Expression add(const std::vector<Expression> & args){
 
 Expression mul(const std::vector<Expression> & args){
   // check all aruments are numbers, while multiplying
- double result = 1;
+    std::complex<double> result(1,0);
+    bool complex = false;
   for( auto & a :args){
     if(a.isHeadNumber()){
       result *= a.head().asNumber();      
+    } else if(a.isHeadComplex()) {
+        complex = true;
+        result *= a.head().asComplex();
     }
     else{
       throw SemanticError("Error in call to mul, argument not a number");
     }
   }
-  return Expression(result);
+    if(complex) {
+        Atom a(real(result), imag(result));
+        return Expression(a);
+    }
+  return Expression(real(result));
 };
 
 Expression subneg(const std::vector<Expression> & args){
