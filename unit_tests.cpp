@@ -6,10 +6,10 @@
 #include "interpreter.hpp"
 #include "parse.hpp"
 #include "token.hpp"
+
+#include <string>
+#include <sstream>
+#include <fstream>
 #include <iostream>
 
-// intentially empty
-//Milestone 0 : Task 3 Tests
-TEST_CASE("Test Milestone 0 Additions", "[MS0]") {
-    
-}
+#include "semantic_error.hpp"

@@ -9,11 +9,15 @@
 Atom::Atom(): m_type(NoneKind) {}
 
 Atom::Atom(double value){
-  setNumber(value);
+    setNumber(value);
 }
 
 Atom::Atom(double real, double image) {
     setComplex(real, image);
+}
+
+Atom::Atom(std::complex<double> complexNumber) {
+    setComplex(real(complexNumber), imag(complexNumber));
 }
 
 Atom::Atom(const Token & token): Atom() {
@@ -35,7 +39,7 @@ Atom::Atom(const Token & token): Atom() {
 }
 
 Atom::Atom(const std::string & value): Atom() {
-  setSymbol(value);
+    setSymbol(value);
 }
 
 Atom::Atom(const Atom & x): Atom(){
@@ -103,14 +107,11 @@ void Atom::setNumber(double value) {
 }
 
 void Atom::setSymbol(const std::string & value) {
-
   // we need to ensure the destructor of the symbol string is called
   if(m_type == SymbolKind){
     stringValue.~basic_string();
   }
-    
   m_type = SymbolKind;
-
   // copy construct in place
   new (&stringValue) std::string(value);
 }
@@ -164,10 +165,19 @@ bool Atom::operator==(const Atom & right) const noexcept{
       return stringValue == right.stringValue;
     }
     break;
-      case ComplexKind:
+      case ComplexKind: {
           if(right.m_type != ComplexKind) return false;
-          if(right.complexNumber == complexNumber) return true;
-          break;
+          double dleft = getComReal();
+          double dright = right.getComReal();
+          double diff = fabs(dleft - dright);
+          if(std::isnan(diff) || (diff > std::numeric_limits<double>::epsilon())) return false;
+          //check imaginary as well
+          double ileft = getComImag();
+          double iright = right.getComImag();
+          double iiff = fabs(ileft - iright);
+          if(std::isnan(iiff) || (iiff > std::numeric_limits<double>::epsilon())) return false;
+      }
+    break;
   default:
     return false;
   }
@@ -179,7 +189,6 @@ bool operator!=(const Atom & left, const Atom & right) noexcept{
   
   return !(left == right);
 }
-
 
 std::ostream & operator<<(std::ostream & out, const Atom & a){
   if(a.isNumber()){

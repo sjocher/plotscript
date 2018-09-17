@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 #include "semantic_error.hpp"
 #include "interpreter.hpp"
@@ -321,4 +322,428 @@ TEST_CASE( "Test using number as procedure", "[interpreter]" ) {
   REQUIRE(ok == true);
   
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test Real, Imag, Mag Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(^ I 2)";
+        Expression result = run(program);
+        Atom a(-1, 0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        double r = 0;
+        double i = 1;
+        std::string program = "(real I)";
+        std::string program2 = "(imag I)";
+        Expression result = run(program);
+        Expression result2 = run(program2);
+        REQUIRE(result == Expression(r));
+        REQUIRE(result2 == Expression(i));
+    }
+    {
+        std::string program = "(real 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(imag 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(real 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(imag 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(mag I)";
+        Expression result = run(program);
+        double a = 1;
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(mag 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(mag 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test Arg, Conj Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(arg I)";
+        Expression result = run(program);
+        std::complex<double> a(0,1);
+        REQUIRE(result == Expression(arg(a)));
+    }
+    {
+        std::string program = "(arg 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(arg 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(conj I)";
+        Expression result = run(program);
+        std::complex<double> a(0,1);
+        REQUIRE(result == Expression(conj(a)));
+    }
+    {
+        std::string program = "(conj 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(conj 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test Add Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(+ 1 1 1 1 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(5));
+    }
+    {
+        std::string program = "(+ 1 I 1 I 1)";
+        Expression result = run(program);
+        std::complex<double>a(3,2);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(+ 1 z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test Mul Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(* 1 1 1 1 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(1));
+    }
+    {
+        std::string program = "(* 1 I 1 I 1)";
+        Expression result = run(program);
+        std::complex<double>a(-1,0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(* 1 z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test Subneg Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(- 1 2)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(-1));
+    }
+    {
+        std::string program = "(- 1 I)";
+        Expression result = run(program);
+        std::complex<double>a(1,-1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(- I I)";
+        Expression result = run(program);
+        std::complex<double>a(0,0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(- I 1)";
+        Expression result = run(program);
+        std::complex<double>a(-1,1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(- I)";
+        Expression result = run(program);
+        std::complex<double>a(0,-1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(- 1 I I)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(- 1 I z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test Div Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(/ 1 2)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(0.5));
+    }
+    {
+        std::string program = "(/ I I)";
+        Expression result = run(program);
+        std::complex<double>a(1,0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(/ 1 I)";
+        Expression result = run(program);
+        std::complex<double>a(0,-1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(/ I 1)";
+        Expression result = run(program);
+        std::complex<double>a(0,1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(/ I I I)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(/ I z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test SQRT Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(sqrt 4)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(2));
+    }
+    {
+        std::string program = "(sqrt I)";
+        Expression result = run(program);
+        std::complex<double>a(sqrt(2)/2,(sqrt(2)/2));
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(sqrt I 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(sqrt z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test POW Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(^ I 2)";
+        Expression result = run(program);
+        std::complex<double>a(-1, 0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(^ I I)";
+        Expression result = run(program);
+        std::complex<double>a(std::exp(-1 * std::atan2(0, -1) / 2), 0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(^ 1 I)";
+        Expression result = run(program);
+        std::complex<double>a(1, 0);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(^ 1 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(1));
+    }
+    {
+        std::string program = "(^ z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(^ 2 2 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test ln Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(ln 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(0));
+    }
+    {
+        std::string program = "(ln -4)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(ln 4 4)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(ln z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Test sine, cosine, tangent Milestone0", "[Milestone0]") {
+    {
+        std::string program = "(sin 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(sin(1)));
+    }
+    {
+        std::string program = "(cos 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(cos(1)));
+    }
+    {
+        std::string program = "(tan 1)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(tan(1)));
+    }
+    {
+        std::string program = "(sin z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(cos z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(tan z)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(sin 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(cos 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(tan 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
 }

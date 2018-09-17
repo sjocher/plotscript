@@ -6,6 +6,7 @@ Defines the Expression type and assiciated functions.
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include "token.hpp"
 #include "atom.hpp"
@@ -23,6 +24,7 @@ class Expression {
 public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
+  typedef std::list<Expression> List;
 
   /// Default construct and Expression, whose type in NoneType
   Expression();
@@ -31,7 +33,10 @@ public:
     \param atom the atom to make the head
   */
   Expression(const Atom & a);
-
+    
+  //Construct an Expression with a list
+  Expression(const List & a);
+    
   /// deep-copy construct an expression (recursive)
   Expression(const Expression & a);
 
@@ -62,7 +67,7 @@ public:
   /// convienience member to determine if head atom is a symbol
   bool isHeadSymbol() const noexcept;
     
-  /// convienience member to detemrine if head atom is a complex number
+  /// convienience member to determine if head atom is a complex number
   bool isHeadComplex() const noexcept;
 
   /// Evaluate expression using a post-order traversal (recursive)
@@ -79,6 +84,9 @@ private:
   // the tail list is expressed as a vector for access efficiency
   // and cache coherence, at the cost of wasted memory.
   std::vector<Expression> m_tail;
+    
+  // list data type to store values from list
+  std::list<Expression> m_list;
 
   // convenience typedef
   typedef std::vector<Expression>::iterator IteratorType;
@@ -87,6 +95,7 @@ private:
   Expression handle_lookup(const Atom & head, const Environment & env);
   Expression handle_define(Environment & env);
   Expression handle_begin(Environment & env);
+  Expression handle_list(Environment & env);
 };
 
 /// Render expression to output stream

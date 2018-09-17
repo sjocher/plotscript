@@ -12,6 +12,10 @@ Expression::Expression(const Atom & a){
   m_head = a;
 }
 
+Expression::Expression(const List & a) {
+    
+}
+
 // recursive copy
 Expression::Expression(const Expression & a){
 
@@ -59,7 +63,6 @@ bool Expression::isHeadComplex() const noexcept {
 void Expression::append(const Atom & a){
   m_tail.emplace_back(a);
 }
-
 
 Expression * Expression::tail(){
   Expression * ptr = nullptr;
@@ -166,11 +169,19 @@ Expression Expression::handle_define(Environment & env){
   return result;
 }
 
+
+Expression Expression::handle_list(Environment &env) {
+    Expression result;
+    for(auto e = m_tail.begin(); e != m_tail.end(); ++e) {
+        m_list.push_back(e->eval(env));
+    }
+    return result;
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
 Expression Expression::eval(Environment & env){
-  
   if(m_tail.empty()){
     return handle_lookup(m_head, env);
   }
@@ -182,6 +193,9 @@ Expression Expression::eval(Environment & env){
   else if(m_head.isSymbol() && m_head.asSymbol() == "define"){
     return handle_define(env);
   }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "list") {
+      return handle_list(env);
+  }
   // else attempt to treat as procedure
   else{ 
     std::vector<Expression> results;
@@ -192,20 +206,16 @@ Expression Expression::eval(Environment & env){
   }
 }
 
-
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
-
   out << "(";
   out << exp.head();
-
   for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
     out << *e;
   }
-
   out << ")";
-
   return out;
 }
+
 
 bool Expression::operator==(const Expression & exp) const noexcept{
 

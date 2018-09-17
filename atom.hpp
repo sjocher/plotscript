@@ -26,6 +26,9 @@ public:
     
   /// Construct an Atom of type Complex with two doubles
   Atom(double real, double image);
+  
+  /// Construct an Atom of type Complex with a complex number
+  Atom(std::complex<double> complexNumber);
 
   /// Construct an Atom directly from a Token
   Atom(const Token & token);
@@ -50,7 +53,7 @@ public:
     
   /// predicate to determine if an Atom is of type Complex
   bool isComplex() const noexcept;
-
+    
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
     
@@ -71,7 +74,7 @@ private:
 
   // internal enum of known types
   // Milestone - 0 : added ComplexKind
-  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
+  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind, List};
 
   // track the type
   Type m_type;
@@ -90,7 +93,7 @@ private:
   void setSymbol(const std::string & value);
     
   // helper to set type and value of Complex
-    void setComplex(double real, double image);
+  void setComplex(double real, double image);
 };
 
 /// inequality comparison for Atom

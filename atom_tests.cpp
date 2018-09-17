@@ -8,7 +8,6 @@ TEST_CASE( "Test constructors", "[atom]" ) {
   {
     INFO("Default Constructor");
     Atom a;
-
     REQUIRE(a.isNone());
     REQUIRE(!a.isNumber());
     REQUIRE(!a.isSymbol());
@@ -31,7 +30,6 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNumber());
     REQUIRE(a.isSymbol());
   }
-    
     {
         INFO("Complex Constructor");
         Atom a(4,1);
@@ -42,8 +40,13 @@ TEST_CASE( "Test constructors", "[atom]" ) {
         REQUIRE(!a.isSymbol());
         REQUIRE(b.isComplex());
     }
-
-
+    {
+        INFO("Complex Constructor");
+        std::complex<double>a(0,1);
+        Atom b(a);
+        REQUIRE(b.isComplex());
+    }
+    
   {
     INFO("Token Constructor");
     Token t("hi");
