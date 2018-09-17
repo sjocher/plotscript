@@ -74,7 +74,7 @@ private:
 
   // internal enum of known types
   // Milestone - 0 : added ComplexKind
-  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind, List};
+  enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
 
   // track the type
   Type m_type;

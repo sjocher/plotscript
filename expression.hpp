@@ -24,7 +24,7 @@ class Expression {
 public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
-  typedef std::list<Expression> List;
+  typedef std::list<Expression>::const_iterator ConstListIteratorType;
 
   /// Default construct and Expression, whose type in NoneType
   Expression();
@@ -33,9 +33,6 @@ public:
     \param atom the atom to make the head
   */
   Expression(const Atom & a);
-    
-  //Construct an Expression with a list
-  Expression(const List & a);
     
   /// deep-copy construct an expression (recursive)
   Expression(const Expression & a);
@@ -97,6 +94,7 @@ private:
   Expression handle_begin(Environment & env);
   Expression handle_list(Environment & env);
 };
+
 
 /// Render expression to output stream
 std::ostream & operator<<(std::ostream & out, const Expression & exp);

@@ -12,10 +12,6 @@ Expression::Expression(const Atom & a){
   m_head = a;
 }
 
-Expression::Expression(const List & a) {
-    
-}
-
 // recursive copy
 Expression::Expression(const Expression & a){
 
@@ -171,10 +167,11 @@ Expression Expression::handle_define(Environment & env){
 
 
 Expression Expression::handle_list(Environment &env) {
-    Expression result;
+    m_list.push_back(m_head);
     for(auto e = m_tail.begin(); e != m_tail.end(); ++e) {
         m_list.push_back(e->eval(env));
     }
+    Expression result(m_list.front());
     return result;
 }
 
@@ -193,6 +190,7 @@ Expression Expression::eval(Environment & env){
   else if(m_head.isSymbol() && m_head.asSymbol() == "define"){
     return handle_define(env);
   }
+  // handle list special-form
   else if(m_head.isSymbol() && m_head.asSymbol() == "list") {
       return handle_list(env);
   }
@@ -218,11 +216,8 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
 
 
 bool Expression::operator==(const Expression & exp) const noexcept{
-
   bool result = (m_head == exp.m_head);
-
   result = result && (m_tail.size() == exp.m_tail.size());
-
   if(result){
     for(auto lefte = m_tail.begin(), righte = exp.m_tail.begin();
 	(lefte != m_tail.end()) && (righte != exp.m_tail.end());
@@ -230,7 +225,6 @@ bool Expression::operator==(const Expression & exp) const noexcept{
       result = result && (*lefte == *righte);
     }
   }
-
   return result;
 }
 
