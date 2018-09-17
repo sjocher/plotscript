@@ -66,6 +66,10 @@ bool Expression::isHeadComplex() const noexcept {
     return m_head.isComplex();
 }
 
+bool Expression::isHeadList() const noexcept {
+    return m_head.isTagged();
+}
+
 void Expression::append(const Atom & a){
   m_tail.emplace_back(a);
 }

@@ -58,7 +58,10 @@ public:
   /// return a const-iterator to the tail end
   ConstIteratorType tailConstEnd() const noexcept;
     
+  /// return a const-iterator to the list beginning
   ConstListIteratorType listConstBegin() const noexcept {return m_list.cbegin();}
+    
+  /// return a const-iterator to the list end
   ConstListIteratorType listConstEnd() const noexcept {return m_list.cend();}
 
   /// convienience member to determine if head atom is a number
@@ -69,6 +72,9 @@ public:
     
   /// convienience member to determine if head atom is a complex number
   bool isHeadComplex() const noexcept;
+    
+  /// convienience member to determine if the head atom is the head of a list
+  bool isHeadList() const noexcept;
     
   bool isListEmpty() const noexcept{return m_list.size() == 0;}
 
@@ -99,7 +105,6 @@ private:
   Expression handle_begin(Environment & env);
   Expression handle_list(Environment & env);
 };
-
 
 /// Render expression to output stream
 std::ostream & operator<<(std::ostream & out, const Expression & exp);

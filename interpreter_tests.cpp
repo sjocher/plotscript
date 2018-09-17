@@ -747,3 +747,10 @@ TEST_CASE("Test sine, cosine, tangent Milestone0", "[Milestone0]") {
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
 }
+
+TEST_CASE("Testing Construction of a List" , "[Milestone 1]") {
+    {
+        std::string program = "(list 1 2 3)";
+        Expression result = run(program);
+    }
+}

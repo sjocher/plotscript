@@ -26,6 +26,20 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
+Expression first(const std::vector<Expression> & args) {
+    Expression result;
+    if(nargs_equal(args, 1)) {
+        if(args[0].isHeadList()) {
+            result = *args[0].listConstBegin();
+        } else {
+            throw SemanticError("Error: Argument to first is not a list.");
+        }
+    } else {
+        throw SemanticError("Error: more than one argument in call to first.");
+    }
+    return result;
+}
+
 Expression real(const std::vector<Expression> & args) {
     double result = 0;
     if(nargs_equal(args,1)) {
@@ -453,4 +467,7 @@ void Environment::reset(){
     envmap.emplace("arg", EnvResult(ProcedureType, arg));
     //Procedure: conj
     envmap.emplace("conj", EnvResult(ProcedureType, conj));
+    
+    //Milestone 1
+    envmap.emplace("first", EnvResult(ProcedureType, first));
 }
