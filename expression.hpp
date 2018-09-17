@@ -57,6 +57,9 @@ public:
 
   /// return a const-iterator to the tail end
   ConstIteratorType tailConstEnd() const noexcept;
+    
+  ConstListIteratorType listConstBegin() const noexcept {return m_list.cbegin();}
+  ConstListIteratorType listConstEnd() const noexcept {return m_list.cend();}
 
   /// convienience member to determine if head atom is a number
   bool isHeadNumber() const noexcept;
@@ -66,6 +69,8 @@ public:
     
   /// convienience member to determine if head atom is a complex number
   bool isHeadComplex() const noexcept;
+    
+  bool isListEmpty() const noexcept{return m_list.size() == 0;}
 
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment & env);

@@ -57,6 +57,12 @@ public:
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
     
+  /// set the atom list tag to true
+  void tagAtom() {tag = true;}
+  
+  /// check if an atom contains the list tag
+  bool isTagged() const noexcept {return tag;}
+    
   /// returns the real and imaginary parts of the complex number
   double getComReal() const noexcept;
   double getComImag() const noexcept;
@@ -75,11 +81,14 @@ private:
   // internal enum of known types
   // Milestone - 0 : added ComplexKind
   enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
-
   // track the type
   Type m_type;
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
+  
+  // value to flag a symbol as the beginning of a list
+  bool tag = false;
+    
   union {
     double numberValue;
     std::complex<double> complexNumber;

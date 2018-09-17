@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <iomanip>
+#include <iostream>
 
 Atom::Atom(): m_type(NoneKind) {}
 

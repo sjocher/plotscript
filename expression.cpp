@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <list>
+#include <iostream>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -14,24 +15,33 @@ Expression::Expression(const Atom & a){
 
 // recursive copy
 Expression::Expression(const Expression & a){
-
   m_head = a.m_head;
   for(auto e : a.m_tail){
     m_tail.push_back(e);
   }
+  if(a.m_head.isTagged()) {
+    m_head.tagAtom();
+  }
+  for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e) {
+      m_list.push_back(*e);
+    }
 }
 
 Expression & Expression::operator=(const Expression & a){
-
   // prevent self-assignment
   if(this != &a){
     m_head = a.m_head;
     m_tail.clear();
     for(auto e : a.m_tail){
       m_tail.push_back(e);
-    } 
+    }
+    if(a.m_head.isTagged()) {
+        m_head.tagAtom();
+    }
+    for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e) {
+        m_list.push_back(*e);
+    }
   }
-  
   return *this;
 }
 
@@ -62,7 +72,6 @@ void Expression::append(const Atom & a){
 
 Expression * Expression::tail(){
   Expression * ptr = nullptr;
-  
   if(m_tail.size() > 0){
     ptr = &m_tail.back();
   }
@@ -100,7 +109,9 @@ Expression apply(const Atom & op, const std::vector<Expression> & args, const En
 Expression Expression::handle_lookup(const Atom & head, const Environment & env){
     if(head.isSymbol()){ // if symbol is in env return value
       if(env.is_exp(head)){
-	return env.get_exp(head);
+          return env.get_exp(head);
+      } else if(head.asSymbol() == "list") {
+          return Expression();
       }
       else{
 	throw SemanticError("Error during evaluation: unknown symbol");
@@ -165,13 +176,12 @@ Expression Expression::handle_define(Environment & env){
   return result;
 }
 
-
 Expression Expression::handle_list(Environment &env) {
-    m_list.push_back(m_head);
+    Expression result(m_head);
+    result.m_head.tagAtom();
     for(auto e = m_tail.begin(); e != m_tail.end(); ++e) {
-        m_list.push_back(e->eval(env));
+        result.m_list.push_back(e->eval(env));
     }
-    Expression result(m_list.front());
     return result;
 }
 
@@ -205,13 +215,23 @@ Expression Expression::eval(Environment & env){
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
-  out << "(";
-  out << exp.head();
-  for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
-    out << *e;
-  }
-  out << ")";
-  return out;
+    out << "(";
+    if(exp.head().isTagged()) {
+        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+            if(e == std::prev(exp.listConstEnd())) {
+                out << *e;
+            } else{
+                out << *e << " ";
+            }
+        }
+    } else {
+        out << exp.head();
+        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
+            out << *e;
+        }
+    }
+    out << ")";
+    return out;
 }
 
 
@@ -229,6 +249,5 @@ bool Expression::operator==(const Expression & exp) const noexcept{
 }
 
 bool operator!=(const Expression & left, const Expression & right) noexcept{
-
   return !(left == right);
 }

@@ -359,7 +359,6 @@ bool Environment::is_exp(const Atom & sym) const{
 }
 
 Expression Environment::get_exp(const Atom & sym) const{
-
   Expression exp;
   if(sym.isSymbol()){
     auto result = envmap.find(sym.asSymbol());
@@ -367,7 +366,6 @@ Expression Environment::get_exp(const Atom & sym) const{
       exp = result->second.exp;
     }
   }
-
   return exp;
 }
 
