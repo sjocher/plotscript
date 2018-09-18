@@ -26,6 +26,27 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
+Expression range(const std::vector<Expression> & args) {
+    std::list<Expression> list;
+    if(nargs_equal(args, 3)) {
+        if(args[0].head().asNumber() < args[1].head().asNumber()) {
+            if(args[2].head().asNumber() > 0) {
+                for(double i = args[0].head().asNumber(); i <= args[1].head().asNumber(); i = i + args[2].head().asNumber()) {
+                    Atom a(i);
+                    list.push_back(Expression(a));
+                }
+            } else {
+                throw SemanticError("Error: negative or zero increment in range.");
+            }
+        } else {
+            throw SemanticError("Error: begin greater than end in range.");
+        }
+    } else {
+        throw SemanticError("Error: Wrong number of arguments in call to range.");
+    }
+    return Expression(list);
+}
+
 Expression append(const std::vector<Expression> & args) {
     std::list<Expression> list;
     if(nargs_equal(args, 2)) {
@@ -530,4 +551,5 @@ void Environment::reset(){
     envmap.emplace("rest", EnvResult(ProcedureType, rest));
     envmap.emplace("length", EnvResult(ProcedureType, length));
     envmap.emplace("append", EnvResult(ProcedureType, append));
+    envmap.emplace("range", EnvResult(ProcedureType, range));
 }
