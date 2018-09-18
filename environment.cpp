@@ -26,6 +26,30 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
+Expression join(const std::vector<Expression> & args) {
+    std::list<Expression> list;
+    if(nargs_equal(args, 2)) {
+        if(args[0].isHeadList()) {
+            if(args[1].isHeadList()) {
+                for(auto e = args[0].listConstBegin(); e != args[0].listConstEnd(); ++e) {
+                    list.push_back(*e);
+                }
+                for(auto e = args[1].listConstBegin(); e != args[1].listConstEnd(); ++e) {
+                    list.push_back(*e);
+                }
+            } else {
+                throw SemanticError("Error: Second argument in join not a list.");
+            }
+        } else {
+            throw SemanticError("Error: First argument in join not a list.");
+        }
+    } else {
+        throw SemanticError("Error: Wrong number of arguments to append.");
+    }
+    Expression result(list);
+    return result;
+}
+
 Expression range(const std::vector<Expression> & args) {
     std::list<Expression> list;
     if(nargs_equal(args, 3)) {
@@ -552,4 +576,5 @@ void Environment::reset(){
     envmap.emplace("length", EnvResult(ProcedureType, length));
     envmap.emplace("append", EnvResult(ProcedureType, append));
     envmap.emplace("range", EnvResult(ProcedureType, range));
+    envmap.emplace("join", EnvResult(ProcedureType, join));
 }
