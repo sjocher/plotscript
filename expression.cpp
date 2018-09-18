@@ -17,9 +17,8 @@ Expression::Expression(const std::list<Expression> & list) {
     Atom a("list");
     m_head = a;
     m_head.tagAtom();
-    for(auto e = list.begin(); e != list.end(); ++e) {
+    for(auto e = list.begin(); e != list.end(); ++e)
         m_list.push_back(*e);
-    }
 }
 
 // recursive copy
@@ -28,12 +27,9 @@ Expression::Expression(const Expression & a){
   for(auto e : a.m_tail){
     m_tail.push_back(e);
   }
-  if(a.m_head.isTagged()) {
-    m_head.tagAtom();
-  }
-  for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e) {
+  if(a.m_head.isTagged()) m_head.tagAtom();
+  for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
-    }
 }
 
 Expression & Expression::operator=(const Expression & a){
@@ -44,12 +40,9 @@ Expression & Expression::operator=(const Expression & a){
     for(auto e : a.m_tail){
       m_tail.push_back(e);
     }
-    if(a.m_head.isTagged()) {
-        m_head.tagAtom();
-    }
-    for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e) {
+    if(a.m_head.isTagged()) m_head.tagAtom();
+    for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
-    }
   }
   return *this;
 }
