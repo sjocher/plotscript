@@ -30,13 +30,38 @@ Expression first(const std::vector<Expression> & args) {
     Expression result;
     if(nargs_equal(args, 1)) {
         if(args[0].isHeadList()) {
-            result = *args[0].listConstBegin();
+            if(!args[0].isListEmpty()) {
+                result = *args[0].listConstBegin();
+            } else {
+                throw SemanticError("Error: Argument to first is an empty list.");
+            }
         } else {
             throw SemanticError("Error: Argument to first is not a list.");
         }
     } else {
         throw SemanticError("Error: more than one argument in call to first.");
     }
+    return result;
+}
+
+Expression rest(const std::vector<Expression> & args) {
+    std::list<Expression> list;
+    if(nargs_equal(args, 1)) {
+        if(args[0].isHeadList()) {
+            if(!args[0].isListEmpty()) {
+                for(auto e = std::next(args[0].listConstBegin()); e != args[0].listConstEnd(); ++e) {
+                    list.push_back(*e);
+                }
+            } else {
+                throw SemanticError("Error: Argument to rest is an empty list.");;
+            }
+        } else {
+            throw SemanticError("Error: Argument to rest is not a list.");
+        }
+    } else {
+        throw SemanticError("Error: more than one argument in rest to first.");
+    }
+    Expression result(list);
     return result;
 }
 
@@ -470,4 +495,5 @@ void Environment::reset(){
     
     //Milestone 1
     envmap.emplace("first", EnvResult(ProcedureType, first));
+    envmap.emplace("rest", EnvResult(ProcedureType, rest));
 }

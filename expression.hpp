@@ -36,6 +36,8 @@ public:
     
   /// deep-copy construct an expression (recursive)
   Expression(const Expression & a);
+    
+  Expression(const std::list<Expression> & list);
 
   /// deep-copy assign an expression  (recursive)
   Expression & operator=(const Expression & a);

@@ -13,6 +13,15 @@ Expression::Expression(const Atom & a){
   m_head = a;
 }
 
+Expression::Expression(const std::list<Expression> & list) {
+    Atom a("list");
+    m_head = a;
+    m_head.tagAtom();
+    for(auto e = list.begin(); e != list.end(); ++e) {
+        m_list.push_back(*e);
+    }
+}
+
 // recursive copy
 Expression::Expression(const Expression & a){
   m_head = a.m_head;
@@ -114,8 +123,9 @@ Expression Expression::handle_lookup(const Atom & head, const Environment & env)
     if(head.isSymbol()){ // if symbol is in env return value
       if(env.is_exp(head)){
           return env.get_exp(head);
-      } else if(head.asSymbol() == "list") {
-          return Expression();
+      }else if(head.asSymbol() == "list") {
+          std::list<Expression> list;
+          return Expression(list);
       }
       else{
 	throw SemanticError("Error during evaluation: unknown symbol");
