@@ -26,6 +26,38 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
+Expression append(const std::vector<Expression> & args) {
+    std::list<Expression> list;
+    if(nargs_equal(args, 2)) {
+        if(args[0].isHeadList()) {
+            for(auto e = args[0].listConstBegin(); e != args[0].listConstEnd(); ++e) {
+                list.push_back(*e);
+            }
+            list.push_back(args[1]);
+        } else {
+            throw SemanticError("Error: First argument is not a list.");
+        }
+    } else {
+        throw SemanticError("Error: Not 2 arguments to append.");
+    }
+    Expression result(list);
+    return result;
+}
+
+Expression length(const std::vector<Expression> & args) {
+    double result;
+    if(nargs_equal(args, 1)) {
+        if(args[0].isHeadList()) {
+            result = args[0].listSize();
+        } else {
+            throw SemanticError("Error: Argument to length is not a list.");
+        }
+    } else {
+        throw SemanticError("Error: more than one argument in call to length.");
+    }
+    return Expression(result);
+}
+
 Expression first(const std::vector<Expression> & args) {
     Expression result;
     if(nargs_equal(args, 1)) {
@@ -496,4 +528,6 @@ void Environment::reset(){
     //Milestone 1
     envmap.emplace("first", EnvResult(ProcedureType, first));
     envmap.emplace("rest", EnvResult(ProcedureType, rest));
+    envmap.emplace("length", EnvResult(ProcedureType, length));
+    envmap.emplace("append", EnvResult(ProcedureType, append));
 }

@@ -77,8 +77,12 @@ public:
     
   /// convienience member to determine if the head atom is the head of a list
   bool isHeadList() const noexcept;
+  
+  /// convienience member to determine if the list is empty
+  bool isListEmpty() const noexcept {return m_list.size() == 0;}
     
-  bool isListEmpty() const noexcept{return m_list.size() == 0;}
+  /// conveinience member to return the size of a list
+  double listSize() const noexcept {return m_list.size();}
 
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment & env);
