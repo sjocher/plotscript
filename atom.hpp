@@ -63,6 +63,12 @@ public:
   /// check if an atom contains the list tag
   bool isTagged() const noexcept {return tag;}
     
+  /// set the lambda tag to true
+  void markLambda() {lambda = true;}
+    
+  /// check if an atom is the lambda tag
+  bool isLambda() const noexcept {return lambda;}
+    
   /// returns the real and imaginary parts of the complex number
   double getComReal() const noexcept;
   double getComImag() const noexcept;
@@ -86,8 +92,8 @@ private:
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
   
-  // value to flag a symbol as the beginning of a list
-  bool tag = false;
+  // values that flag special type for symbols
+  bool tag = false, lambda = false;
     
   union {
     double numberValue;

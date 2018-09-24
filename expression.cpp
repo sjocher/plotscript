@@ -28,8 +28,11 @@ Expression::Expression(const Expression & a){
     m_tail.push_back(e);
   }
   if(a.m_head.isTagged()) m_head.tagAtom();
+  if(a.m_head.isLambda()) m_head.markLambda();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
+  for(auto e = a.m_parameters.begin(); e != a.m_parameters.end(); ++e)
+      m_parameters.push_back(*e);
 }
 
 Expression & Expression::operator=(const Expression & a){
@@ -41,8 +44,11 @@ Expression & Expression::operator=(const Expression & a){
       m_tail.push_back(e);
     }
     if(a.m_head.isTagged()) m_head.tagAtom();
+    if(a.m_head.isLambda()) m_head.markLambda();
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
+    for(auto e = a.m_parameters.begin(); e != a.m_parameters.end(); ++e)
+        m_parameters.push_back(*e);
   }
   return *this;
 }
@@ -192,6 +198,19 @@ Expression Expression::handle_list(Environment &env) {
     return result;
 }
 
+Expression Expression::handle_lambda(Environment &env) {
+    Expression result(m_tail[1]);
+    result.m_head.markLambda();
+    if(m_tail.size() != 2){
+        throw SemanticError("Error during evaluation: invalid number of arguments to lambda");
+    }
+    //add each parameter to vector of expressions, which is a needed for a procedure.
+    result.m_parameters.push_back(m_tail[0].head());
+    for(auto e = m_tail[0].tailConstBegin(); e != m_tail[0].tailConstEnd(); ++e){
+        result.m_parameters.push_back(*e);
+    }
+    return result;
+}
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -208,8 +227,11 @@ Expression Expression::eval(Environment & env){
     return handle_define(env);
   }
   // handle list special-form
-  else if(m_head.isSymbol() && m_head.asSymbol() == "list") {
+  if(m_head.isSymbol() && m_head.asSymbol() == "list") {
       return handle_list(env);
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
+      return handle_lambda(env);
   }
   // else attempt to treat as procedure
   else{ 
@@ -223,7 +245,27 @@ Expression Expression::eval(Environment & env){
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
     out << "(";
-    if(exp.head().isTagged()) {
+    if(exp.head().isLambda()) {
+        out << "(";
+        for(auto e = exp.paramsBegin(); e != exp.paramsEnd(); ++e) {
+            if(e == std::prev(exp.paramsEnd())) {
+                out << *e;
+            } else{
+                out << *e << " ";
+            }
+        }
+        out << ") (";
+        out << exp.head() << " ";
+        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
+            if(e == std::prev(exp.tailConstEnd())) {
+                out << *e;
+            } else{
+                out << *e << " ";
+            }
+        }
+        out << ")";
+    }
+    else if(exp.head().isTagged()) {
         for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
             if(e == std::prev(exp.listConstEnd())) {
                 out << *e;

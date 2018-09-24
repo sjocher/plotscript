@@ -485,18 +485,17 @@ Expression Environment::get_exp(const Atom & sym) const{
   return exp;
 }
 
-void Environment::add_exp(const Atom & sym, const Expression & exp){
-
+void Environment::add_exp(const Atom & sym, const Expression & exp) {
   if(!sym.isSymbol()){
     throw SemanticError("Attempt to add non-symbol to environment");
   }
-    
   // error if overwriting symbol map
   if(envmap.find(sym.asSymbol()) != envmap.end()){
     throw SemanticError("Attempt to overwrite symbol in environemnt");
   }
-
-  envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp)); 
+    if(sym.isLambda()) {
+        envmap.emplace(sym.asSymbol(), EnvResult(ProcedureType, exp));
+    } else envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
 }
 
 bool Environment::is_proc(const Atom & sym) const{

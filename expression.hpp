@@ -65,7 +65,10 @@ public:
     
   /// return a const-iterator to the list end
   ConstListIteratorType listConstEnd() const noexcept {return m_list.cend();}
-
+    
+  ConstIteratorType paramsBegin() const noexcept {return m_parameters.cbegin();}
+  ConstIteratorType paramsEnd() const noexcept {return m_parameters.cend();}
+    
   /// convienience member to determine if head atom is a number
   bool isHeadNumber() const noexcept;
 
@@ -99,6 +102,9 @@ private:
   // and cache coherence, at the cost of wasted memory.
   std::vector<Expression> m_tail;
     
+  // Lambda data
+  std::vector<Expression> m_parameters;
+    
   // list data type to store values from list
   std::list<Expression> m_list;
 
@@ -110,6 +116,7 @@ private:
   Expression handle_define(Environment & env);
   Expression handle_begin(Environment & env);
   Expression handle_list(Environment & env);
+  Expression handle_lambda(Environment & env);
 };
 
 /// Render expression to output stream
