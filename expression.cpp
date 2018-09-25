@@ -178,7 +178,6 @@ Expression Expression::handle_define(Environment & env){
 	
   // eval tail[1]
   Expression result = m_tail[1].eval(env);
-
   if(env.is_exp(m_head)){
     throw SemanticError("Error during evaluation: attempt to redefine a previously defined symbol");
   }

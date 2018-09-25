@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -25,6 +26,24 @@ Expression default_proc(const std::vector<Expression> & args){
   args.size(); // make compiler happy we used this parameter
   return Expression();
 };
+
+Expression apply(const std::vector<Expression> & args) {
+    if(nargs_equal(args, 2)) {
+        Environment a;
+        if(a.is_proc(args[0].head().asSymbol())) {
+            if(args[1].isHeadList()) {
+                
+            } else {
+                throw SemanticError("Error: Second argument in apply not a list.");
+            }
+        } else {
+            throw SemanticError("Error: First argument is not procedure in apply.");
+        }
+    } else {
+        throw SemanticError("Error: Wrong number of arguments to apply.");
+    }
+    return Expression();
+}
 
 Expression join(const std::vector<Expression> & args) {
     std::list<Expression> list;
@@ -493,9 +512,11 @@ void Environment::add_exp(const Atom & sym, const Expression & exp) {
   if(envmap.find(sym.asSymbol()) != envmap.end()){
     throw SemanticError("Attempt to overwrite symbol in environemnt");
   }
-    if(sym.isLambda()) {
+    if(exp.head().isLambda()) {
         envmap.emplace(sym.asSymbol(), EnvResult(ProcedureType, exp));
-    } else envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
+    } else {
+        envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
+    }
 }
 
 bool Environment::is_proc(const Atom & sym) const{
