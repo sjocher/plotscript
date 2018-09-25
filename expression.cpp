@@ -274,18 +274,18 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
         }
     } else {
         out << exp.head();
-        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
-            if(e == std::prev(exp.tailConstEnd())) {
+        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
+            if(e == exp.tailConstBegin()) {
                 out << " " << *e;
-            } else{
-                out << *e << " ";
-            }
+            } else if(e == std::prev(exp.tailConstEnd())) {
+                out << " " << *e;
+            } else out << *e;
+                
         }
     }
     out << ")";
     return out;
 }
-
 
 bool Expression::operator==(const Expression & exp) const noexcept{
   bool result = (m_head == exp.m_head);
