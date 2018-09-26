@@ -115,6 +115,7 @@ private:
   Expression handle_list(Environment & env);
   Expression handle_lambda();
   Expression handle_apply(Environment & env);
+  Expression handle_map(Environment & env);
   Expression eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env);
 };
 

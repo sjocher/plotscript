@@ -250,6 +250,45 @@ Expression Expression::handle_apply(Environment &env) {
     return Expression();
 }
 
+Expression Expression::handle_map(Environment &env) {
+    if(m_tail.size() != 2)
+        throw SemanticError("Error: invalid number of arguments to map");
+    //evaluate the first and second arguments of apply, make sure m_tail[0] is procedure/lambda
+    Expression pdr = m_tail[0];
+    if(pdr.m_tail.size() != 0)
+        throw SemanticError("Error: first argument to map is not a procedure.");
+    if(!env.is_proc(pdr.head()) && !(env.get_exp(pdr.head()).isHeadLambda()))
+        throw SemanticError("Error: first argument to map is not a procedure.");
+    //make sure m_tail[1] is a list
+    Expression lst = m_tail[1].eval(env);
+    if(!lst.isHeadList())
+        throw SemanticError("Error: second argument to map is not a list");
+    //copy the list of values into a vector of arguments for easier translation
+    std::vector<Expression> args;
+    for(auto e = lst.listConstBegin(); e != lst.listConstEnd(); ++e)
+        args.push_back(*e);
+    std::list<Expression> results;
+    //now evaluate as a procedure if possible
+    if(env.is_proc(pdr.head())) {
+        Procedure proc = env.get_proc(pdr.head());
+        for(auto e = args.begin(); e != args.end(); e++) {
+            std::vector<Expression> procargs;
+            procargs.push_back(*e);
+            results.push_back(proc(procargs));
+        }
+    }
+    //now evaluate as a lambda if possible
+    if(env.get_exp(pdr.head()).isHeadLambda()) {
+        for(auto e = args.begin(); e != args.end(); e++) {
+            std::vector<Expression> procargs;
+            procargs.push_back(*e);
+            results.push_back(eval_lambda(pdr.head(), procargs, env));
+        }
+    }
+    //base case return blank expression
+    return Expression(results);
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -272,8 +311,11 @@ Expression Expression::eval(Environment & env){
   if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
       return handle_lambda();
   }
-  else if(m_head.isSymbol() && m_head.asSymbol() == "apply") {
+  if(m_head.isSymbol() && m_head.asSymbol() == "apply") {
       return handle_apply(env);
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "map") {
+      return handle_map(env);
   }
   // else attempt to treat as procedure
   else{ 
