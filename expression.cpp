@@ -287,7 +287,7 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
         for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
             if(e == exp.tailConstBegin()) {
                 out << " " << *e;
-            } else if(e == std::prev(exp.tailConstEnd())) {
+            } else if(e != exp.tailConstEnd()) {
                 out << " " << *e;
             } else out << *e;
         }
