@@ -753,4 +753,10 @@ TEST_CASE("Testing Construction of a List" , "[Milestone 1]") {
         std::string program = "(list 1 2 3)";
         Expression result = run(program);
     }
+    {
+        std::string program = ("(begin (define a (lambda (x) (* x 2))) (a 2))");
+        Expression result = run(program);
+        Atom a(4.0);
+        REQUIRE(result == Expression(a));
+    }
 }

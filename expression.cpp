@@ -31,8 +31,6 @@ Expression::Expression(const Expression & a){
   if(a.m_head.isLambda()) m_head.markLambda();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
-  for(auto e = a.m_parameters.begin(); e != a.m_parameters.end(); ++e)
-      m_parameters.push_back(*e);
 }
 
 Expression & Expression::operator=(const Expression & a){
@@ -47,8 +45,6 @@ Expression & Expression::operator=(const Expression & a){
     if(a.m_head.isLambda()) m_head.markLambda();
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
-    for(auto e = a.m_parameters.begin(); e != a.m_parameters.end(); ++e)
-        m_parameters.push_back(*e);
   }
   return *this;
 }
@@ -100,21 +96,17 @@ Expression::ConstIteratorType Expression::tailConstEnd() const noexcept{
 }
 
 Expression apply(const Atom & op, const std::vector<Expression> & args, const Environment & env){
-
   // head must be a symbol
   if(!op.isSymbol()){
     throw SemanticError("Error during evaluation: procedure name not symbol");
   }
-  
   // must map to a proc
   if(!env.is_proc(op)){
     throw SemanticError("Error during evaluation: symbol does not name a procedure");
   }
-  
   // map from symbol to proc
   Procedure proc = env.get_proc(op);
-  
-  // call proc with args
+  //applying lambda
   return proc(args);
 }
 
@@ -198,18 +190,21 @@ Expression Expression::handle_list(Environment &env) {
 }
 
 Expression Expression::handle_lambda(Environment &env) {
-    Expression result(m_tail[1]);
-    result.m_head.markLambda();
-    if(m_tail.size() != 2){
+    if(m_tail.size() != 2) {
         throw SemanticError("Error during evaluation: invalid number of arguments to lambda");
     }
+    Expression result(m_head);
+    result.m_head.markLambda();
     //add each parameter to vector of expressions, which is a needed for a procedure.
-    result.m_parameters.push_back(m_tail[0].head());
-    for(auto e = m_tail[0].tailConstBegin(); e != m_tail[0].tailConstEnd(); ++e){
-        result.m_parameters.push_back(*e);
+    result.m_list.push_back(m_tail[0].head());
+    for(auto e = m_tail[0].tailConstBegin(); e != m_tail[0].tailConstEnd(); ++e) {
+        result.m_list.push_back(*e);
     }
+    //add the expression to m_tail
+    result.m_tail.push_back(m_tail[1]);
     return result;
 }
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -246,15 +241,14 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
     out << "(";
     if(exp.head().isLambda()) {
         out << "(";
-        for(auto e = exp.paramsBegin(); e != exp.paramsEnd(); ++e) {
-            if(e == std::prev(exp.paramsEnd())) {
+        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+            if(e == std::prev(exp.listConstEnd())) {
                 out << *e;
             } else{
                 out << *e << " ";
             }
         }
-        out << ") (";
-        out << exp.head() << " ";
+        out << ") ";
         for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
             if(e == std::prev(exp.tailConstEnd())) {
                 out << *e;
@@ -262,7 +256,6 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
                 out << *e << " ";
             }
         }
-        out << ")";
     }
     else if(exp.head().isTagged()) {
         for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {

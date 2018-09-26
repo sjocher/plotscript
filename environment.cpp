@@ -31,11 +31,7 @@ Expression apply(const std::vector<Expression> & args) {
     if(nargs_equal(args, 2)) {
         Environment a;
         if(a.is_proc(args[0].head().asSymbol())) {
-            if(args[1].isHeadList()) {
-                
-            } else {
-                throw SemanticError("Error: Second argument in apply not a list.");
-            }
+            
         } else {
             throw SemanticError("Error: First argument is not procedure in apply.");
         }
@@ -476,7 +472,6 @@ Expression tangent(const std::vector<Expression> & args) {
 }
 
 Environment::Environment(){
-
   reset();
 }
 
@@ -513,6 +508,7 @@ void Environment::add_exp(const Atom & sym, const Expression & exp) {
     throw SemanticError("Attempt to overwrite symbol in environemnt");
   }
     if(exp.head().isLambda()) {
+        //procedure is a ptr to a function taking a vector of expressions, and returning an Expression
         envmap.emplace(sym.asSymbol(), EnvResult(ProcedureType, exp));
     } else {
         envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
@@ -536,7 +532,6 @@ Procedure Environment::get_proc(const Atom & sym) const{
       return result->second.proc;
     }
   }
-
   return default_proc;
 }
 
@@ -597,4 +592,5 @@ void Environment::reset(){
     envmap.emplace("append", EnvResult(ProcedureType, append));
     envmap.emplace("range", EnvResult(ProcedureType, range));
     envmap.emplace("join", EnvResult(ProcedureType, join));
+    envmap.emplace("apply", EnvResult(ProcedureType, apply));
 }
