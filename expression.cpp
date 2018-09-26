@@ -208,9 +208,13 @@ Expression Expression::handle_lambda() {
 Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env) {
     Environment pocketenv = env;
     Expression lfunc = pocketenv.get_exp(op);
+    if(args.size() != lfunc.listSize())
+        throw SemanticError("Error during lambda evaluation: wrong number of arguments.");
     int argCnt = 0;
     for(auto e = lfunc.listConstBegin(); e != lfunc.listConstEnd(); ++e ) {
-        pocketenv.add_exp(e->head(), args[argCnt]);
+        Atom a = e->head();
+        a.markP();
+        pocketenv.add_exp(a, args[argCnt]);
         argCnt++;
     }
     return lfunc.m_tail[0].eval(pocketenv);

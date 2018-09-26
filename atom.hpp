@@ -69,6 +69,12 @@ public:
   /// check if an atom is the lambda tag
   bool isLambda() const noexcept {return lambda;}
     
+  /// set the lambda tag to true
+  void markP() {pck = true;}
+ 
+  /// check if an atom is the lambda tag
+  bool isP() const noexcept {return pck;}
+    
   /// returns the real and imaginary parts of the complex number
   double getComReal() const noexcept;
   double getComImag() const noexcept;
@@ -81,9 +87,8 @@ public:
   
   /// equality comparison based on type and value
   bool operator==(const Atom & right) const noexcept;
-
+    
 private:
-
   // internal enum of known types
   // Milestone - 0 : added ComplexKind
   enum Type {NoneKind, NumberKind, SymbolKind, ComplexKind};
@@ -93,7 +98,7 @@ private:
   // when setting non POD values (see setSymbol)
   
   // values that flag special type for symbols
-  bool tag = false, lambda = false;
+  bool tag = false, lambda = false, pck = false;
     
   union {
     double numberValue;

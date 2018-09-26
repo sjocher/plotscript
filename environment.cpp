@@ -504,10 +504,15 @@ void Environment::add_exp(const Atom & sym, const Expression & exp) {
     throw SemanticError("Attempt to add non-symbol to environment");
   }
   // error if overwriting symbol map
-  if(envmap.find(sym.asSymbol()) != envmap.end()){
-    throw SemanticError("Attempt to overwrite symbol in environemnt");
-  }
-    envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
+    if(!sym.isP()) {
+        if(envmap.find(sym.asSymbol()) != envmap.end()){
+            throw SemanticError("Attempt to overwrite symbol in environemnt");
+        }
+         envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
+        return;
+    }
+    auto result = envmap.find(sym.asSymbol());
+    result->second.exp = exp;
 }
 
 bool Environment::is_proc(const Atom & sym) const{
