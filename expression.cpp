@@ -205,9 +205,15 @@ Expression Expression::handle_lambda() {
     return result;
 }
 
-Expression Expression::eval_lambda(Environment & env) {
-    
-    return Expression();
+Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env) {
+    Environment pocketenv = env;
+    Expression lfunc = pocketenv.get_exp(op);
+    int argCnt = 0;
+    for(auto e = lfunc.listConstBegin(); e != lfunc.listConstEnd(); ++e ) {
+        pocketenv.add_exp(e->head(), args[argCnt]);
+        argCnt++;
+    }
+    return lfunc.m_tail[0].eval(pocketenv);
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -238,7 +244,9 @@ Expression Expression::eval(Environment & env){
     for(Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it){
       results.push_back(it->eval(env));
     }
-    return apply(m_head, results, env);
+    if(env.get_exp(m_head).head().isLambda()) {
+        return eval_lambda(m_head, results, env);
+    } else return apply(m_head, results, env);
   }
 }
 
@@ -278,7 +286,6 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
             } else if(e == std::prev(exp.tailConstEnd())) {
                 out << " " << *e;
             } else out << *e;
-                
         }
     }
     out << ")";
