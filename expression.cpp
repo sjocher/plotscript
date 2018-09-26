@@ -183,16 +183,14 @@ Expression Expression::handle_define(Environment & env){
 Expression Expression::handle_list(Environment &env) {
     Expression result(m_head);
     result.m_head.tagAtom();
-    for(auto e = m_tail.begin(); e != m_tail.end(); ++e) {
+    for(auto e = m_tail.begin(); e != m_tail.end(); ++e)
         result.m_list.push_back(e->eval(env));
-    }
     return result;
 }
 
 Expression Expression::handle_lambda() {
-    if(m_tail.size() != 2) {
+    if(m_tail.size() != 2)
         throw SemanticError("Error during evaluation: invalid number of arguments to lambda");
-    }
     Expression result(m_head);
     result.m_head.markLambda();
     //add each parameter to vector of expressions, which is a needed for a procedure.
@@ -207,6 +205,8 @@ Expression Expression::handle_lambda() {
 
 Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env) {
     Environment pocketenv = env;
+    if(!env.is_exp(op))
+        throw SemanticError("Error during lambda evaluation: can't find lambda function definition in environment.");
     Expression lfunc = pocketenv.get_exp(op);
     if(args.size() != lfunc.listSize())
         throw SemanticError("Error during lambda evaluation: wrong number of arguments.");
@@ -218,6 +218,36 @@ Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression
         argCnt++;
     }
     return lfunc.m_tail[0].eval(pocketenv);
+}
+
+Expression Expression::handle_apply(Environment &env) {
+    if(m_tail.size() != 2)
+        throw SemanticError("Error: invalid number of arguments to apply");
+    //evaluate the first and second arguments of apply, make sure m_tail[0] is procedure/lambda
+    Expression pdr = m_tail[0];
+    if(pdr.m_tail.size() != 0)
+        throw SemanticError("Error: first argument to apply is not a procedure.");
+    if(!env.is_proc(pdr.head()) && !(env.get_exp(pdr.head()).isHeadLambda()))
+        throw SemanticError("Error: first argument to apply is not a procedure.");
+    //make sure m_tail[1] is a list
+    Expression lst = m_tail[1].eval(env);
+    if(!lst.isHeadList())
+        throw SemanticError("Error: second argument to apply is not a list");
+    //copy the list of values into a vector of arguments for easier translation
+    std::vector<Expression> args;
+    for(auto e = lst.listConstBegin(); e != lst.listConstEnd(); ++e)
+        args.push_back(*e);
+    //now evaluate as a procedure if possible
+    if(env.is_proc(pdr.head())) {
+        Procedure proc = env.get_proc(pdr.head());
+        return proc(args);
+    }
+    //now evaluate as a lambda if possible
+    if(env.get_exp(pdr.head()).isHeadLambda()) {
+        return eval_lambda(pdr.head(), args, env);
+    }
+    //base case return blank expression
+    return Expression();
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -239,8 +269,11 @@ Expression Expression::eval(Environment & env){
   if(m_head.isSymbol() && m_head.asSymbol() == "list") {
       return handle_list(env);
   }
-  else if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
+  if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
       return handle_lambda();
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "apply") {
+      return handle_apply(env);
   }
   // else attempt to treat as procedure
   else{ 

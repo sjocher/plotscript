@@ -27,20 +27,6 @@ Expression default_proc(const std::vector<Expression> & args){
   return Expression();
 };
 
-Expression apply(const std::vector<Expression> & args) {
-    if(nargs_equal(args, 2)) {
-        Environment a;
-        if(a.is_proc(args[0].head().asSymbol())) {
-            
-        } else {
-            throw SemanticError("Error: First argument is not procedure in apply.");
-        }
-    } else {
-        throw SemanticError("Error: Wrong number of arguments to apply.");
-    }
-    return Expression();
-}
-
 Expression join(const std::vector<Expression> & args) {
     std::list<Expression> list;
     if(nargs_equal(args, 2)) {
@@ -504,15 +490,13 @@ void Environment::add_exp(const Atom & sym, const Expression & exp) {
     throw SemanticError("Attempt to add non-symbol to environment");
   }
   // error if overwriting symbol map
-    if(!sym.isP()) {
-        if(envmap.find(sym.asSymbol()) != envmap.end()){
-            throw SemanticError("Attempt to overwrite symbol in environemnt");
-        }
-         envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
-        return;
+    if(envmap.find(sym.asSymbol()) != envmap.end()){
+        if(sym.isP()) {
+            auto result = envmap.find(sym.asSymbol());
+            result->second.exp = exp;
+        } else throw SemanticError("Attempt to overwrite symbol in environemnt");
     }
-    auto result = envmap.find(sym.asSymbol());
-    result->second.exp = exp;
+    envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
 }
 
 bool Environment::is_proc(const Atom & sym) const{
@@ -590,5 +574,4 @@ void Environment::reset(){
     envmap.emplace("append", EnvResult(ProcedureType, append));
     envmap.emplace("range", EnvResult(ProcedureType, range));
     envmap.emplace("join", EnvResult(ProcedureType, join));
-    envmap.emplace("apply", EnvResult(ProcedureType, apply));
 }
