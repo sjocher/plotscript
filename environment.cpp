@@ -507,12 +507,7 @@ void Environment::add_exp(const Atom & sym, const Expression & exp) {
   if(envmap.find(sym.asSymbol()) != envmap.end()){
     throw SemanticError("Attempt to overwrite symbol in environemnt");
   }
-    if(exp.head().isLambda()) {
-        //procedure is a ptr to a function taking a vector of expressions, and returning an Expression
-        envmap.emplace(sym.asSymbol(), EnvResult(ProcedureType, exp));
-    } else {
-        envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
-    }
+    envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
 }
 
 bool Environment::is_proc(const Atom & sym) const{
@@ -523,10 +518,8 @@ bool Environment::is_proc(const Atom & sym) const{
 }
 
 Procedure Environment::get_proc(const Atom & sym) const{
-
   //Procedure proc = default_proc;
-
-  if(sym.isSymbol()){
+  if(sym.isSymbol()) {
     auto result = envmap.find(sym.asSymbol());
     if((result != envmap.end()) && (result->second.type == ProcedureType)){
       return result->second.proc;

@@ -110,7 +110,8 @@ private:
   Expression handle_define(Environment & env);
   Expression handle_begin(Environment & env);
   Expression handle_list(Environment & env);
-  Expression handle_lambda(Environment & env);
+  Expression handle_lambda();
+  Expression eval_lambda(Environment & env);
 };
 
 /// Render expression to output stream

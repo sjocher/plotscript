@@ -189,7 +189,7 @@ Expression Expression::handle_list(Environment &env) {
     return result;
 }
 
-Expression Expression::handle_lambda(Environment &env) {
+Expression Expression::handle_lambda() {
     if(m_tail.size() != 2) {
         throw SemanticError("Error during evaluation: invalid number of arguments to lambda");
     }
@@ -203,6 +203,11 @@ Expression Expression::handle_lambda(Environment &env) {
     //add the expression to m_tail
     result.m_tail.push_back(m_tail[1]);
     return result;
+}
+
+Expression Expression::eval_lambda(Environment & env) {
+    
+    return Expression();
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -225,7 +230,7 @@ Expression Expression::eval(Environment & env){
       return handle_list(env);
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
-      return handle_lambda(env);
+      return handle_lambda();
   }
   // else attempt to treat as procedure
   else{ 
