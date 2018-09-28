@@ -576,6 +576,17 @@ TEST_CASE("Test Div Milestone0", "[Milestone0]") {
         REQUIRE(ok == true);
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
+    {
+        std::string program = "(/ 2)";
+        Expression result = run(program);
+        REQUIRE(result == Expression(0.5));
+    }
+    {
+        std::string program = "(/ I)";
+        Expression result = run(program);
+        Atom a(0,-1);
+        REQUIRE(result == Expression(a));
+    }
 }
 
 TEST_CASE("Test SQRT Milestone0", "[Milestone0]") {
@@ -752,11 +763,333 @@ TEST_CASE("Testing Construction of a List" , "[Milestone 1]") {
     {
         std::string program = "(list 1 2 3)";
         Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(1));
+        lists.push_back(Atom(2));
+        lists.push_back(Atom(3));
+        Expression a(lists);
+        REQUIRE(result == a);
     }
     {
-        std::string program = "(begin (define linear (lambda (a b x) (* (+ a x) b))) (linear 3 4 5))";
+        std::string program = "(first (list 1 2 3))";
         Expression result = run(program);
-        //Atom a(19);
-       // REQUIRE(result == Expression(a));
+        Atom a(1);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(first 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(first (list))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(first (list 1) (list 2))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(rest (list 1 2 3))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(2));
+        lists.push_back(Atom(3));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(rest (1))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(rest (list))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(rest (list 1 2) (list 3 4))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(rest (list 1))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(length (list 1 2 3 4))";
+        Expression result = run(program);
+        Atom a(4);
+        REQUIRE(result == Expression(a));
+    }
+    {
+        std::string program = "(length 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(length 1 2)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(length (list 1 2) (list 2 3))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(append (list 3) 3)";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(3));
+        lists.push_back(Atom(3));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(append 3 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(join (list 1) (list 2))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(1));
+        lists.push_back(Atom(2));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(join (list 1) 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(range 0 5 1)";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(0));
+        lists.push_back(Atom(1));
+        lists.push_back(Atom(3));
+        lists.push_back(Atom(4));
+        lists.push_back(Atom(5));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(range 3 -1 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(range 0 5 -1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+}
+
+TEST_CASE("Testing lambda function" , "[Milestone 1]") {
+    {
+        std::string program = "(begin (define a 1) (define x 100) (define f (lambda (x) (begin (define b 12) (+ a b x)))) (f 2))";
+        Expression result = run(program);
+        Expression a(Atom(15));
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(apply + (list 1 2 3 4))";
+        Expression result = run(program);
+        Expression a(Atom(10));
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(begin (define complexAsList (lambda (x) (list (real x) (imag x)))) (apply complexAsList (list (+ 1 (* 3 I)))))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(1));
+        lists.push_back(Atom(3));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(apply + 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(apply (+ z I) (list 0))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(apply (+ z I) (list 0) (list 3))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(map (+ z I) (list 0) (list 3))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(map / (list 1 2 4))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(1));
+        lists.push_back(Atom(0.5));
+        lists.push_back(Atom(0.25));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+        std::string program = "(map + 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(map 3 (list 1 2 3))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(begin (define addtwo (lambda (x y) (+ x y)) (map addtwo (list 1 2 3))))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(begin (define f (lambda (x) (sin x))) (map f (list (/ (- pi) 2) 0 (/ pi 2))))";
+        Expression result = run(program);
+        std::list<Expression> lists;
+        lists.push_back(Atom(-1));
+        lists.push_back(Atom(0));
+        lists.push_back(Atom(1));
+        Expression a(lists);
+        REQUIRE(result == a);
+    }
+    {
+            std::string program = "(join 3 (list 1 2 3))";
+            std::istringstream iss(program);
+            Interpreter interp;
+            bool ok = interp.parseStream(iss);
+            REQUIRE(ok == true);
+            REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(join (list 1 2 3) 3 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(append 3 3 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(range 3 3 3 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(begin)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(define)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(define 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(lambda (x y z) (+ x y z))";
+        Expression result = run(program);
     }
 }

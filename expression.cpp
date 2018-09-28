@@ -205,8 +205,6 @@ Expression Expression::handle_lambda() {
 
 Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env) {
     Environment pocketenv = env;
-    if(!env.is_exp(op))
-        throw SemanticError("Error during lambda evaluation: can't find lambda function definition in environment.");
     Expression lfunc = pocketenv.get_exp(op);
     if(args.size() != lfunc.listSize())
         throw SemanticError("Error during lambda evaluation: wrong number of arguments.");
@@ -238,16 +236,16 @@ Expression Expression::handle_apply(Environment &env) {
     for(auto e = lst.listConstBegin(); e != lst.listConstEnd(); ++e)
         args.push_back(*e);
     //now evaluate as a procedure if possible
+    Expression result;
     if(env.is_proc(pdr.head())) {
         Procedure proc = env.get_proc(pdr.head());
-        return proc(args);
+        result = proc(args);
     }
     //now evaluate as a lambda if possible
     if(env.get_exp(pdr.head()).isHeadLambda()) {
-        return eval_lambda(pdr.head(), args, env);
+        result = eval_lambda(pdr.head(), args, env);
     }
-    //base case return blank expression
-    return Expression();
+    return result;
 }
 
 Expression Expression::handle_map(Environment &env) {
