@@ -3,40 +3,27 @@
 #include <stack>
 
 bool setHead(Expression &exp, const Token &token) {
-
   Atom a(token);
-
   exp.head() = a;
-
   return !a.isNone();
 }
 
 bool append(Expression *exp, const Token &token) {
-
   Atom a(token);
-
   exp->append(a);
-
   return !a.isNone();
 }
 
 Expression parse(const TokenSequenceType &tokens) noexcept {
-
   Expression ast;
-
   // cannot parse empty
   if (tokens.empty())
     return Expression();
-
-  bool athead = false;
-
+    bool athead = false;
   // stack tracks the last node created
   std::stack<Expression *> stack;
-
   std::size_t num_tokens_seen = 0;
-
   for (auto &t : tokens) {
-
     if (t.type() == Token::OPEN) {
       athead = true;
     } else if (t.type() == Token::CLOSE) {
@@ -44,16 +31,15 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
         return Expression();
       }
       stack.pop();
-
       if (stack.empty()) {
         num_tokens_seen += 1;
         break;
       }
-    } else {
-
+    }
+    else {
       if (athead) {
         if (stack.empty()) {
-          if (!setHead(ast, t)) {
+            if (!setHead(ast, t)) {
             return Expression();
           }
           stack.push(&ast);
@@ -61,7 +47,6 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
           if (stack.empty()) {
             return Expression();
           }
-
           if (!append(stack.top(), t)) {
             return Expression();
           }
@@ -72,7 +57,6 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
         if (stack.empty()) {
           return Expression();
         }
-
         if (!append(stack.top(), t)) {
           return Expression();
         }

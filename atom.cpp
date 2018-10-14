@@ -31,11 +31,13 @@ Atom::Atom(const Token & token): Atom() {
       setNumber(temp);
     }
   }
-  else{ // else assume symbol
-    // make sure does not start with number
-    if(!std::isdigit(token.asString()[0])){
-      setSymbol(token.asString());
-    }
+  //assume symbol and check if first character is a digit
+  else if(!std::isdigit(token.asString()[0])) {
+      if(token.asString().at(token.asString().size() - 1) == '"') {
+          setString(token.asString());
+      } else {
+          setSymbol(token.asString());
+      }
   }
 }
 
@@ -53,6 +55,9 @@ Atom::Atom(const Atom & x): Atom(){
   else if(x.isComplex()) {
       setComplex(x.getComReal(), x.getComImag());
   }
+  else if(x.isString()) {
+      setString(x.stringValue);
+  }
 }
 
 Atom & Atom::operator=(const Atom & x) {
@@ -69,6 +74,9 @@ Atom & Atom::operator=(const Atom & x) {
     }
     else if(x.m_type == ComplexKind) {
         setComplex(x.getComReal(), x.getComImag());
+    }
+    else if(x.m_type == StringKind) {
+        setString(x.stringValue);
     }
   }
   return *this;
@@ -97,6 +105,10 @@ bool Atom::isComplex() const noexcept {
     return m_type == ComplexKind;
 }
 
+bool Atom::isString() const noexcept {
+    return m_type == StringKind;
+}
+
 void Atom::setComplex(double real, double image) {
     m_type = ComplexKind;
     complexNumber = std::complex<double>(real, image);
@@ -117,6 +129,21 @@ void Atom::setSymbol(const std::string & value) {
   new (&stringValue) std::string(value);
 }
 
+void Atom::setString(const std::string & value) {
+    // we need to ensure the destructor of the symbol string is called
+    if(m_type == StringKind){
+        stringValue.~basic_string();
+    }
+    m_type = StringKind;
+    //trim the identifying quote
+    std::string temp = value;
+    if(temp.at(temp.size() - 1) == '"') {
+        temp.pop_back();
+    }
+    // copy construct in place
+    new (&stringValue) std::string(temp);
+}
+
 double Atom::getComImag() const noexcept {
     return imag(complexNumber);
 }
@@ -135,6 +162,14 @@ std::string Atom::asSymbol() const noexcept{
     result = stringValue;
   }
   return result;
+}
+
+std::string Atom::asString() const noexcept {
+    std::string result;
+    if(m_type == StringKind) {
+        result = stringValue;
+    }
+    return result;
 }
 
 std::complex<double> Atom::asComplex() const noexcept {
@@ -166,6 +201,12 @@ bool Atom::operator==(const Atom & right) const noexcept{
       return stringValue == right.stringValue;
     }
     break;
+      case StringKind:
+      {
+          if(right.m_type != StringKind) return false;
+          return stringValue == right.stringValue;
+      }
+          break;
       case ComplexKind: {
           if(right.m_type != ComplexKind) return false;
           double dleft = getComReal();
@@ -200,6 +241,9 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
   }
     if(a.isComplex()) {
         out << a.getComReal() << "," << a.getComImag();
+    }
+    if(a.isString()) {
+        out << '"' << a.asString() << '"';
     }
   return out;
 }
