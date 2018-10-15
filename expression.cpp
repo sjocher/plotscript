@@ -32,8 +32,8 @@ Expression::Expression(const Expression & a){
   if(a.m_head.isLambda()) m_head.markLambda();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
-  for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
-      properties.insert(*e);
+    for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
+      properties.emplace(*e);
 }
 
 
@@ -50,7 +50,7 @@ Expression & Expression::operator=(const Expression & a){
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
     for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
-        properties.insert(*e);
+        properties.emplace(*e);
   }
   return *this;
 }

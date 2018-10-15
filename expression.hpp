@@ -7,7 +7,7 @@ Defines the Expression type and assiciated functions.
 #include <string>
 #include <vector>
 #include <list>
-#include <unordered_map>
+#include <map>
 
 #include "token.hpp"
 #include "atom.hpp"
@@ -117,7 +117,7 @@ private:
   std::list<Expression> m_list;
     
   //property list
-  std::unordered_map<std::string, Expression> properties;
+  std::map<std::string, Expression> properties;
 
   // convenience typedef
   typedef std::vector<Expression>::iterator IteratorType;
