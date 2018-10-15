@@ -392,6 +392,7 @@ Expression Expression::eval(Environment & env){
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
+    if(exp.isHeadNone()) { out << exp.head(); return out;}
     out << "(";
     if (exp.isHeadList()) {
         for (auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
