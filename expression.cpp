@@ -3,6 +3,7 @@
 #include <sstream>
 #include <list>
 #include <iostream>
+#include <unordered_map>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -31,7 +32,10 @@ Expression::Expression(const Expression & a){
   if(a.m_head.isLambda()) m_head.markLambda();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
+  for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
+      properties.insert(*e);
 }
+
 
 Expression & Expression::operator=(const Expression & a){
   // prevent self-assignment
@@ -45,6 +49,8 @@ Expression & Expression::operator=(const Expression & a){
     if(a.m_head.isLambda()) m_head.markLambda();
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
+    for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
+        properties.insert(*e);
   }
   return *this;
 }
@@ -303,7 +309,7 @@ Expression Expression::property_set(Environment & env) {
     Expression value = m_tail[1].eval(pocketenv);
     //Expression as the third argument
     Expression result = m_tail[2].eval(pocketenv);
-    env.set_prop(key, value);
+    result.set_prop(key, value);
     return result;
 }
 
@@ -314,7 +320,29 @@ Expression Expression::property_get(Environment & env) {
         throw SemanticError("Error: first argument not string in get-property.");
     Expression key = m_tail[0];
     Expression value = m_tail[1];
-    return env.get_prop(key, value);
+    return env.get_exp(value.head()).get_prop(key, env.get_exp(value.head()));
+}
+
+void Expression::set_prop(const Expression & key, const Expression & value) {
+    if(!key.isHeadString())
+        throw SemanticError("Error: key is not an expression of type String.");
+    if(properties.find(key.head().asString()) != properties.end()) {
+        auto result = properties.find(key.head().asString());
+        result->second = value;
+    } else {
+        properties.emplace(key.head().asString(), value);
+    }
+}
+
+Expression Expression::get_prop(const Expression & key, const Expression & value) {
+    Expression result;
+    
+    if(key.isHeadString()) {
+        auto result = value.properties.find(key.head().asString());
+        if((result != value.properties.end()))
+            return result->second;
+    }
+    return result;
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -364,55 +392,35 @@ Expression Expression::eval(Environment & env){
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
-    if(!exp.isHeadNone()) {
-        out << "(";
-        if(exp.head().isLambda()) {
-            out << "(";
-            for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
-                if(e == std::prev(exp.listConstEnd())) {
-                    out << *e;
-                } else{
-                    out << *e << " ";
-                }
+    out << "(";
+    if (exp.isHeadList()) {
+        for (auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+            if (e != exp.listConstEnd() && e != exp.listConstBegin()) {
+                out << " ";
             }
-            out << ") ";
-            for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
-                if(e == std::prev(exp.tailConstEnd())) {
-                    out << *e;
-                } else{
-                    out << *e << " ";
-                }
-            }
-        }
-        else if(exp.head().isTagged()) {
-            for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
-                if(e == std::prev(exp.listConstEnd())) {
-                    out << *e;
-                } else{
-                    out << *e << " ";
-                }
-            }
-        } else {
-            out << exp.head();
-            for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
-                if(e == exp.tailConstBegin()) {
-                    out << " " << *e;
-                } else if(e != exp.tailConstEnd()) {
-                    out << " " << *e;
-                } else out << *e;
-            }
-        }
-        out << ")";
-    } else {
-        out << exp.head();
-        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
-            if(e == exp.tailConstBegin()) {
-                out << " " << *e;
-            } else if(e != exp.tailConstEnd()) {
-                out << " " << *e;
-            } else out << *e;
+            out << *e;
         }
     }
+    else if (exp.isHeadLambda()) {
+        out << "(";
+        for (auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+            if (e != exp.listConstEnd() && e != exp.listConstBegin()) {
+                out << " ";
+            }
+            out << *e;
+        }
+        out << ")";
+    }
+    else {
+        out << exp.head();
+    }
+    for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
+        if (e != exp.tailConstEnd() || e != exp.tailConstBegin()) {
+            out << " ";
+        }
+        out << *e;
+    }
+    out << ")";
     return out;
 }
 

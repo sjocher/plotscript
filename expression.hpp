@@ -7,6 +7,7 @@ Defines the Expression type and assiciated functions.
 #include <string>
 #include <vector>
 #include <list>
+#include <unordered_map>
 
 #include "token.hpp"
 #include "atom.hpp"
@@ -98,6 +99,10 @@ public:
 
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression & exp) const noexcept;
+    
+  //Property list setters and getters
+  void set_prop(const Expression & key, const Expression & value);
+  Expression get_prop(const Expression & key, const Expression & value);
   
 private:
 
@@ -110,6 +115,9 @@ private:
     
   // list data type to store values from list
   std::list<Expression> m_list;
+    
+  //property list
+  std::unordered_map<std::string, Expression> properties;
 
   // convenience typedef
   typedef std::vector<Expression>::iterator IteratorType;
