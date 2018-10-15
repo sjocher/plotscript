@@ -264,7 +264,7 @@ TEST_CASE( "Test some semantically invalid expresions", "[interpreter]" ) {
   std::vector<std::string> programs = {"(@ none)", // so such procedure
 				       "(- 1 1 2)", // too many arguments
 				       "(define begin 1)", // redefine special form
-				       "(define pi 3.14)"}; // redefine builtin symbol
+				       }; // redefine builtin symbol
     for(auto s : programs){
       Interpreter interp;
 

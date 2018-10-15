@@ -308,7 +308,9 @@ Expression Expression::property_set(Environment & env) {
     //any argument second, value, evaluate this
     Expression value = m_tail[1].eval(pocketenv);
     //Expression as the third argument
-    Expression result = m_tail[2].eval(pocketenv);
+    Expression result = m_tail[2];
+    result.head().markP();
+    result = result.eval(env);
     result.set_prop(key, value);
     return result;
 }
