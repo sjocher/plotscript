@@ -65,6 +65,9 @@ public:
     
   /// return a const-iterator to the list end
   ConstListIteratorType listConstEnd() const noexcept {return m_list.cend();}
+    
+  /// convienience member to determine if head atom is of type none
+  bool isHeadNone() const noexcept {return m_head.isNone();}
 
   /// convienience member to determine if head atom is a number
   bool isHeadNumber() const noexcept;
@@ -80,6 +83,9 @@ public:
     
   /// convienience member to determine if the head atom is the head of a lambda func
   bool isHeadLambda() const noexcept {return m_head.isLambda();}
+    
+  /// conveience member to determine if hte head atom is a string literal
+  bool isHeadString() const noexcept {return m_head.isString();}
   
   /// convienience member to determine if the list is empty
   bool isListEmpty() const noexcept {return m_list.size() == 0;}
@@ -116,6 +122,8 @@ private:
   Expression handle_lambda();
   Expression handle_apply(Environment & env);
   Expression handle_map(Environment & env);
+  Expression property_get(Environment & env);
+  Expression property_set(Environment & env);
   Expression eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env);
 };
 

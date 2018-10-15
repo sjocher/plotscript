@@ -12,6 +12,7 @@ needed.
 
 // system includes
 #include <map>
+#include <unordered_map>
 
 // module includes
 #include "atom.hpp"
@@ -85,6 +86,10 @@ public:
 
   /*! Reset the environment to its default state. */
   void reset();
+    
+  //Property list setters and getters
+  void set_prop(const Expression & key, const Expression & value);
+  Expression get_prop(const Expression & key, const Expression & value);
 
 private:
   
@@ -104,6 +109,7 @@ private:
 
   // the environment map
   std::map<std::string, EnvResult> envmap;
+  std::unordered_map<std::string, Expression> properties;
 };
 
 #endif

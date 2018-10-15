@@ -235,15 +235,14 @@ bool operator!=(const Atom & left, const Atom & right) noexcept{
 std::ostream & operator<<(std::ostream & out, const Atom & a){
   if(a.isNumber()){
     out << a.asNumber();
-  }
-  if(a.isSymbol()){
+  } else if(a.isSymbol()){
     out << a.asSymbol();
+  } else if(a.isComplex()) {
+    out << a.getComReal() << "," << a.getComImag();
+  } else if(a.isString()) {
+    out << '"' << a.asString() << '"';
+  } else if(a.isNone()) {
+      out << "NONE";
   }
-    if(a.isComplex()) {
-        out << a.getComReal() << "," << a.getComImag();
-    }
-    if(a.isString()) {
-        out << '"' << a.asString() << '"';
-    }
   return out;
 }

@@ -64,10 +64,8 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
     }
     num_tokens_seen += 1;
   }
-
   if (stack.empty() && (num_tokens_seen == tokens.size())) {
     return ast;
   }
-
   return Expression();
 };

@@ -525,6 +525,27 @@ Procedure Environment::get_proc(const Atom & sym) const{
   return default_proc;
 }
 
+void Environment::set_prop(const Expression & key, const Expression & value) {
+    if(!key.isHeadString())
+        throw SemanticError("Error: key is not an expression of type String.");
+    if(properties.find(key.head().asString()) != properties.end()) {
+        auto result = properties.find(key.head().asString());
+        result->second = value;
+    } else {
+        properties.emplace(key.head().asString(), value);
+    }
+}
+
+Expression Environment::get_prop(const Expression & key, const Expression & value) {
+    Expression result;
+    if(key.isHeadString()) {
+        auto result = properties.find(key.head().asString());
+        if((result != properties.end()))
+            return result->second;
+    }
+    return result;
+}
+
 /*
 Reset the environment to the default state. First remove all entries and
 then re-add the default ones.

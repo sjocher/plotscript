@@ -290,6 +290,33 @@ Expression Expression::handle_map(Environment &env) {
     return Expression(results);
 }
 
+Expression Expression::property_set(Environment & env) {
+    //not sure if the pocketenv is needed
+    Environment pocketenv = env;
+    if(m_tail.size() != 3)
+        throw SemanticError("Error: Wrong number of arguments to set-property.");
+    //String as first argument, key
+    if(!m_tail[0].isHeadString())
+        throw SemanticError("Error: First Argument is not a String");
+    Expression key = m_tail[0];
+    //any argument second, value, evaluate this
+    Expression value = m_tail[1].eval(pocketenv);
+    //Expression as the third argument
+    Expression result = m_tail[2].eval(pocketenv);
+    env.set_prop(key, value);
+    return result;
+}
+
+Expression Expression::property_get(Environment & env) {
+    if(m_tail.size() != 2)
+        throw SemanticError("Error: wrong number of arguments to get-property.");
+    if(!m_tail[0].isHeadString())
+        throw SemanticError("Error: first argument not string in get-property.");
+    Expression key = m_tail[0];
+    Expression value = m_tail[1];
+    return env.get_prop(key, value);
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -306,17 +333,23 @@ Expression Expression::eval(Environment & env){
     return handle_define(env);
   }
   // handle list special-form
-  if(m_head.isSymbol() && m_head.asSymbol() == "list") {
+  else if(m_head.isSymbol() && m_head.asSymbol() == "list") {
       return handle_list(env);
   }
-  if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
+  else if(m_head.isSymbol() && m_head.asSymbol() == "lambda") {
       return handle_lambda();
   }
-  if(m_head.isSymbol() && m_head.asSymbol() == "apply") {
+  else if(m_head.isSymbol() && m_head.asSymbol() == "apply") {
       return handle_apply(env);
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "map") {
       return handle_map(env);
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "set-property") {
+      return property_set(env);
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "get-property") {
+      return property_get(env);
   }
   // else attempt to treat as procedure
   else{ 
@@ -331,33 +364,45 @@ Expression Expression::eval(Environment & env){
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
-    out << "(";
-    if(exp.head().isLambda()) {
+    if(!exp.isHeadNone()) {
         out << "(";
-        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
-            if(e == std::prev(exp.listConstEnd())) {
-                out << *e;
-            } else{
-                out << *e << " ";
+        if(exp.head().isLambda()) {
+            out << "(";
+            for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+                if(e == std::prev(exp.listConstEnd())) {
+                    out << *e;
+                } else{
+                    out << *e << " ";
+                }
+            }
+            out << ") ";
+            for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
+                if(e == std::prev(exp.tailConstEnd())) {
+                    out << *e;
+                } else{
+                    out << *e << " ";
+                }
             }
         }
-        out << ") ";
-        for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e){
-            if(e == std::prev(exp.tailConstEnd())) {
-                out << *e;
-            } else{
-                out << *e << " ";
+        else if(exp.head().isTagged()) {
+            for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
+                if(e == std::prev(exp.listConstEnd())) {
+                    out << *e;
+                } else{
+                    out << *e << " ";
+                }
+            }
+        } else {
+            out << exp.head();
+            for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
+                if(e == exp.tailConstBegin()) {
+                    out << " " << *e;
+                } else if(e != exp.tailConstEnd()) {
+                    out << " " << *e;
+                } else out << *e;
             }
         }
-    }
-    else if(exp.head().isTagged()) {
-        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
-            if(e == std::prev(exp.listConstEnd())) {
-                out << *e;
-            } else{
-                out << *e << " ";
-            }
-        }
+        out << ")";
     } else {
         out << exp.head();
         for(auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
@@ -368,7 +413,6 @@ std::ostream & operator<<(std::ostream & out, const Expression & exp){
             } else out << *e;
         }
     }
-    out << ")";
     return out;
 }
 
