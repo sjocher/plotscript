@@ -220,7 +220,6 @@ Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression
     int argCnt = 0;
     for(auto e = lfunc.listConstBegin(); e != lfunc.listConstEnd(); ++e ) {
         Atom a = e->head();
-        a.markP();
         pocketenv.add_exp(a, args[argCnt]);
         argCnt++;
     }
@@ -308,9 +307,7 @@ Expression Expression::property_set(Environment & env) {
     //any argument second, value, evaluate this
     Expression value = m_tail[1].eval(pocketenv);
     //Expression as the third argument
-    Expression result = m_tail[2];
-    result.head().markP();
-    result = result.eval(env);
+    Expression result = m_tail[2].eval(env);
     result.set_prop(key, value);
     return result;
 }

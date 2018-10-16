@@ -72,12 +72,6 @@ public:
   /// check if an atom is the lambda tag
   bool isLambda() const noexcept {return lambda;}
     
-  /// set the lambda tag to true
-  void markP() {pck = true;}
- 
-  /// check if an atom is the lambda tag
-  bool isP() const noexcept {return pck;}
-    
   /// returns the real and imaginary parts of the complex number
   double getComReal() const noexcept;
   double getComImag() const noexcept;
@@ -103,7 +97,7 @@ private:
   // when setting non POD values (see setSymbol)
   
   // values that flag special type for symbols
-  bool tag = false, lambda = false, pck = false;
+    bool tag = false, lambda = false;
     
   union {
     double numberValue;
