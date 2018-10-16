@@ -61,6 +61,19 @@ int eval_from_command(std::string argexp){
 // A REPL is a repeated read-eval-print loop
 void repl(){
   Interpreter interp;
+  //read the startup file
+  std::ifstream startup(STARTUP_FILE);
+  if(!interp.parseStream(startup)) {
+        error("Invalid Startup. Could not parse.");
+  } else {
+      try {
+          Expression exp = interp.evaluate();
+          std::cout << exp << std::endl;
+      } catch (const SemanticError & ex){
+          std::cerr << ex.what() << std::endl;
+      }
+  }
+  //repl
   while(!std::cin.eof()){
     prompt();
     std::string line = readline();
@@ -82,9 +95,6 @@ void repl(){
 }
 
 int main(int argc, char *argv[]) {
-    std::cout << "Loading " << STARTUP_FILE << std::endl;
-    eval_from_file(STARTUP_FILE);
-    std::cout << "Attempt done.";
   if(argc == 2){
     return eval_from_file(argv[1]);
   }

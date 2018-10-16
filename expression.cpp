@@ -18,6 +18,7 @@ Expression::Expression(const std::list<Expression> & list) {
     Atom a("list");
     m_head = a;
     m_head.tagAtom();
+    m_list.clear();
     for(auto e = list.begin(); e != list.end(); ++e)
         m_list.push_back(*e);
 }
@@ -30,10 +31,12 @@ Expression::Expression(const Expression & a){
   }
   if(a.m_head.isTagged()) m_head.tagAtom();
   if(a.m_head.isLambda()) m_head.markLambda();
+  m_list.clear();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
-    for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
-      properties.emplace(*e);
+  properties.clear();
+  for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
+     properties.emplace(*e);
 }
 
 
@@ -47,8 +50,10 @@ Expression & Expression::operator=(const Expression & a){
     }
     if(a.m_head.isTagged()) m_head.tagAtom();
     if(a.m_head.isLambda()) m_head.markLambda();
+    m_list.clear();
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
+    properties.clear();
     for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
         properties.emplace(*e);
   }
