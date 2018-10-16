@@ -11,10 +11,9 @@ void prompt(){
   std::cout << "\nplotscript> ";
 }
 
-std::string readline(){
+std::string readline() {
   std::string line;
   std::getline(std::cin, line);
-
   return line;
 }
 
@@ -27,9 +26,7 @@ void info(const std::string & err_str){
 }
 
 int eval_from_stream(std::istream & stream){
-
   Interpreter interp;
-  
   if(!interp.parseStream(stream)){
     error("Invalid Program. Could not parse.");
     return EXIT_FAILURE;
@@ -44,42 +41,31 @@ int eval_from_stream(std::istream & stream){
       return EXIT_FAILURE;
     }	
   }
-
   return EXIT_SUCCESS;
 }
 
 int eval_from_file(std::string filename){
-      
   std::ifstream ifs(filename);
-  
   if(!ifs){
     error("Could not open file for reading.");
     return EXIT_FAILURE;
   }
-  
   return eval_from_stream(ifs);
 }
 
 int eval_from_command(std::string argexp){
-
   std::istringstream expression(argexp);
-
   return eval_from_stream(expression);
 }
 
 // A REPL is a repeated read-eval-print loop
 void repl(){
   Interpreter interp;
-    
   while(!std::cin.eof()){
-    
     prompt();
     std::string line = readline();
-    
     if(line.empty()) continue;
-
     std::istringstream expression(line);
-    
     if(!interp.parseStream(expression)){
       error("Invalid Expression. Could not parse.");
     }
@@ -95,11 +81,10 @@ void repl(){
   }
 }
 
-int main(int argc, char *argv[])
-{
-  //evaluate the startup.pls file from milestone2 task 3
-    std::cout << STARTUP_FILE;
-  eval_from_file(STARTUP_FILE);
+int main(int argc, char *argv[]) {
+    std::cout << "Loading " << STARTUP_FILE << std::endl;
+    eval_from_file(STARTUP_FILE);
+    std::cout << "Attempt done.";
   if(argc == 2){
     return eval_from_file(argv[1]);
   }
@@ -114,6 +99,5 @@ int main(int argc, char *argv[])
   else{
     repl();
   }
-    
   return EXIT_SUCCESS;
 }

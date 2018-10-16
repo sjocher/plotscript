@@ -1,11 +1,1 @@
-(begin
-    (define make-txt (lambda (str) ("str")))
-    (define make-txt (set-property "object name" "text" make-txt))
-    (define make-txt (set-property "position" (list 0 0) make-txt))
-    (define make-line (lambda (p1 p2) (list p1 p2)))
-    (define make-line (set-property "object name" "line" make-line))
-    (define make-line (set-property "thickness" (1) make-line))
-    (define make-point (lambda (x y) (list x y)))
-    (define make-point (set-property "object name" "point" make-point))
-    (define make-point (set-property "size" (0) make-point))
-)
+(begin (define make-txt (lambda (str) ("str"))) (define make-txt (set-property "object name" "text" make-txt)) (define make-txt (set-property "position" (list 0 0) make-txt)) (define make-line (lambda (p1 p2) (list p1 p2))) (define make-line (set-property "object name" "line" make-line)) (define make-line (set-property "thickness" (1) make-line)) (define make-point (lambda (x y) (list x y))) (define make-point (set-property "object name" "point" make-point)) (define make-point (set-property "size" (0) make-point)))
