@@ -68,9 +68,9 @@ void repl(){
   } else {
       try {
           Expression exp = interp.evaluate();
-          std::cout << exp << std::endl;
+          //std::cout << exp << std::endl;
       } catch (const SemanticError & ex){
-          std::cerr << ex.what() << std::endl;
+          //std::cerr << ex.what() << std::endl;
       }
   }
   //repl
