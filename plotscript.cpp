@@ -5,6 +5,7 @@
 
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
+#include "startup_config.hpp"
 
 void prompt(){
   std::cout << "\nplotscript> ";
@@ -95,7 +96,9 @@ void repl(){
 }
 
 int main(int argc, char *argv[])
-{  
+{
+  //evaluate the startup.pls file from milestone2 task 3
+  eval_from_file(STARTUP_FILE);
   if(argc == 2){
     return eval_from_file(argv[1]);
   }
