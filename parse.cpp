@@ -17,9 +17,8 @@ bool append(Expression *exp, const Token &token) {
 Expression parse(const TokenSequenceType &tokens) noexcept {
   Expression ast;
   // cannot parse empty
-  if (tokens.empty())
-    return Expression();
-    bool athead = false;
+  if (tokens.empty()) return Expression();
+  bool athead = false;
   // stack tracks the last node created
   std::stack<Expression *> stack;
   std::size_t num_tokens_seen = 0;

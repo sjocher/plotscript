@@ -61,17 +61,16 @@ int eval_from_command(std::string argexp){
 // A REPL is a repeated read-eval-print loop
 void repl(){
   Interpreter interp;
-  //read the startup file
-  std::ifstream startup(STARTUP_FILE);
-  if(!interp.parseStream(startup)) {
+    std::ifstream startup(STARTUP_FILE);
+    if(!interp.parseStream(startup)) {
         error("Invalid Startup. Could not parse.");
-  } else {
-      try {
-          Expression exp = interp.evaluate();
-      } catch (const SemanticError & ex){
-          std::cerr << ex.what() << std::endl;
-      }
-  }
+    } else {
+        try {
+            Expression exp = interp.evaluate();
+        } catch (const SemanticError & ex){
+            std::cerr << ex.what() << std::endl;
+        }
+    }
   //repl
   while(!std::cin.eof()){
     prompt();

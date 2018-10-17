@@ -9,12 +9,25 @@
 #include "semantic_error.hpp"
 #include "interpreter.hpp"
 #include "expression.hpp"
+#include "startup_config.hpp"
 
+void error(const std::string & err_str){
+    std::cerr << "Error: " << err_str << std::endl;
+}
 Expression run(const std::string & program){
-  
-  std::istringstream iss(program);
+    Interpreter interp;
+    std::ifstream startup(STARTUP_FILE);
+    if(!interp.parseStream(startup)) {
+        error("Invalid Startup. Could not parse.");
+    } else {
+        try {
+            Expression exp = interp.evaluate();
+        } catch (const SemanticError & ex){
+            std::cerr << ex.what() << std::endl;
+        }
+    }
     
-  Interpreter interp;
+  std::istringstream iss(program);
     
   bool ok = interp.parseStream(iss);
   if(!ok){
@@ -1065,7 +1078,7 @@ TEST_CASE("Testing lambda function" , "[Milestone 1]") {
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
     {
-        std::string program = "(begin)";
+        std::string program = "(begin )";
         std::istringstream iss(program);
         Interpreter interp;
         bool ok = interp.parseStream(iss);
@@ -1073,7 +1086,7 @@ TEST_CASE("Testing lambda function" , "[Milestone 1]") {
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
     {
-        std::string program = "(define)";
+        std::string program = "(define )";
         std::istringstream iss(program);
         Interpreter interp;
         bool ok = interp.parseStream(iss);
@@ -1091,5 +1104,64 @@ TEST_CASE("Testing lambda function" , "[Milestone 1]") {
     {
         std::string program = "(lambda (x y z) (+ x y z))";
         Expression result = run(program);
+    }
+}
+TEST_CASE("Milestone 2 test cases", "[Milestone 2]") {
+    {
+        std::string program = "(begin (define make-point (lambda (x y) (list x y))) (define make-point (set-property \"object-name\" \"point\" make-point)) (define make-point (set-property \"size\" 0 make-point)) (define make-line (lambda (p1 p2) (list p1 p2))) (define make-line (set-property \"object-name\" \"line\" make-line)) (define make-line (set-property \"thickness\" 0 make-line)) (define make-text (lambda (str) (\"str\"))) (define make-text (set-property \"object-name\" \"text\" make-text)) (define make-text (set-property \"position\" (make-point 0 0) make-text)))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream((iss));
+        REQUIRE(ok == true);
+    }
+    {
+        std::string program = "(\"abc\")";
+        Expression result = run(program);
+        REQUIRE(result.head().asString() == "abc");
+    }
+    {
+        std::string program = "(set-property 1 1 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(begin (define a (lambda (x y) (* x y))) (define a (set-property \"name\" 3 a)))";
+        Expression result = run(program);
+        Expression b(result);
+        Expression c = b;
+        REQUIRE(result == b);
+        REQUIRE(c == result);
+    }
+    {
+        std::string program = "(begin (define a (lambda (x y) (* x y))) (define a (set-property \"name\" 3 a)) (get-property \"name\" a))";
+        Expression result = run(program);
+        Expression b(result);
+        Expression c = b;
+        REQUIRE(result == b);
+        REQUIRE(c == result);
+    }
+    {
+        std::string program = "(\"ree\")";
+        Expression result = run(program);
+        Expression b(result);
+        Expression c = b;
+        REQUIRE(result == b);
+        REQUIRE(c == result);
+    }
+    {
+        std::string program = "(+ 2 I)";
+        Expression result = run(program);
+        Expression b(result);
+        Expression c = b;
+        REQUIRE(result == b);
+        REQUIRE(c == result);
+    }
+    {
+        std::string program = "(define a (make-point 0 0))";
+        Expression result = run(program);
+        Expression a = result;
     }
 }

@@ -26,6 +26,7 @@ public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
   typedef std::list<Expression>::const_iterator ConstListIteratorType;
+  typedef std::map<std::string, Expression>::const_iterator ConstMapIteratorType;
 
   /// Default construct and Expression, whose type in NoneType
   Expression();
@@ -66,6 +67,12 @@ public:
     
   /// return a const-iterator to the list end
   ConstListIteratorType listConstEnd() const noexcept {return m_list.cend();}
+    
+  /// return a const-iterator to property list begin
+  ConstMapIteratorType mapConstBegin() const noexcept {return properties.cbegin();}
+    
+  /// return a const-iterator to property list end
+  ConstMapIteratorType mapConstEnd() const noexcept {return properties.cend();}
     
   /// convienience member to determine if head atom is of type none
   bool isHeadNone() const noexcept {return m_head.isNone();}

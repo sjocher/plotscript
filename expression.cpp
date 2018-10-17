@@ -35,10 +35,10 @@ Expression::Expression(const Expression & a){
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
   properties.clear();
-  for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
-     properties.emplace(*e);
+    for(auto e = a.properties.begin(); e != a.properties.end(); e++) {
+        properties.emplace(e->first, e->second);
+    }
 }
-
 
 Expression & Expression::operator=(const Expression & a){
   // prevent self-assignment
@@ -54,8 +54,9 @@ Expression & Expression::operator=(const Expression & a){
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);
     properties.clear();
-    for(auto e = a.properties.begin(); e != a.properties.end(); ++e)
-        properties.emplace(*e);
+      for(auto e = a.properties.begin(); e != a.properties.end(); e++) {
+          properties.emplace(e->first, e->second);
+      }
   }
   return *this;
 }
@@ -124,6 +125,7 @@ Expression apply(const Atom & op, const std::vector<Expression> & args, const En
 Expression Expression::handle_lookup(const Atom & head, const Environment & env){
     if(head.isSymbol()){ // if symbol is in env return value
       if(env.is_exp(head)){
+          Expression temp = env.get_exp(head);
           return env.get_exp(head);
       }else if(head.asSymbol() == "list") {
           std::list<Expression> list;
@@ -187,7 +189,6 @@ Expression Expression::handle_define(Environment & env){
   if(env.is_exp(m_head)){
     throw SemanticError("Error during evaluation: attempt to redefine a previously defined symbol");
   }
-    
   //and add to env
   env.add_exp(m_tail[0].head(), result);
   
@@ -228,7 +229,11 @@ Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression
         pocketenv.add_exp(a, args[argCnt]);
         argCnt++;
     }
-    return lfunc.m_tail[0].eval(pocketenv);
+    Expression result = lfunc.m_tail[0].eval(pocketenv);;
+    //need to copy properties here
+    for(auto e = lfunc.mapConstBegin(); e != lfunc.mapConstEnd(); ++e)
+        result.properties.emplace(e->first, e->second);
+    return result;
 }
 
 Expression Expression::handle_apply(Environment &env) {
@@ -340,7 +345,6 @@ void Expression::set_prop(const Expression & key, const Expression & value) {
 
 Expression Expression::get_prop(const Expression & key, const Expression & value) {
     Expression result;
-    
     if(key.isHeadString()) {
         auto result = value.properties.find(key.head().asString());
         if((result != value.properties.end()))

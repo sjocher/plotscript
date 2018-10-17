@@ -494,7 +494,7 @@ Expression Environment::get_exp(const Atom & sym) const{
 }
 
 void Environment::add_exp(const Atom & sym, const Expression & exp) {
-  if(!sym.isSymbol()){
+  if(!sym.isSymbol()) {
     throw SemanticError("Attempt to add non-symbol to environment");
   }
     if(envmap.find(sym.asSymbol()) != envmap.end()){
