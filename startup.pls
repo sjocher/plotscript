@@ -5,7 +5,7 @@
     (define make-line (lambda (p1 p2) (list p1 p2)))
     (define make-line (set-property "object-name" "line" make-line))
     (define make-line (set-property "thickness" 0 make-line))
-    (define make-text (lambda (str) ("str")))
+    (define make-text (lambda (string) (string)))
     (define make-text (set-property "object-name" "text" make-text))
     (define make-text (set-property "position" (make-point 0 0) make-text))
 )

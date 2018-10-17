@@ -390,9 +390,8 @@ Expression Expression::eval(Environment & env){
   // else attempt to treat as procedure
   else{ 
     std::vector<Expression> results;
-    for(Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it){
+    for(Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it)
       results.push_back(it->eval(env));
-    }
     if(env.get_exp(m_head).head().isLambda()) {
         return eval_lambda(m_head, results, env);
     } else return apply(m_head, results, env);
