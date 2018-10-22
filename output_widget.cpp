@@ -57,13 +57,20 @@ void OutputWidget::printExpression(Expression exp) {
 }
 
 void OutputWidget::printPoint(Expression exp) {
-    QPoint pos((int)exp.listConstBegin()->head().asNumber(), (int)exp.listConstEnd()->head().asNumber());
-    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(QRect(pos, QSize(0, 0)));
+    int x = (int)exp.listConstBegin()->head().asNumber();
+    int y = (int)std::next(exp.listConstBegin())->head().asNumber();
+    QPoint pos(x,y);
+    QRect circle;
+    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(QRect(QPoint(), QSize(0, 0)));
     Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
     if(!sizeExp.isHeadNone()) {
-        point->setRect(QRect(pos, QSize((int)sizeExp.head().asNumber(), (int)sizeExp.head().asNumber())));
+        int size = sizeExp.head().asNumber();
+        if(size < 0)
+            recieveError("Error: size is invalid number.");
+        circle.setRect(0, 0, size, size);
+        circle.moveCenter(pos);
+        point->setRect(circle);
         point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-        point->setTransformOriginPoint(point->rect().center());
     }
     scene->addItem(point);
 }
@@ -78,8 +85,8 @@ void OutputWidget::printLine(Expression exp) {
     if(!p1.isHeadList() || !p2.isHeadList() || (((p1.listSize() != 2) || (p2.listSize() != 2))))
         recieveError("Error: arguments to make-line are not points");
     //convert points to QPOINTS
-    QPoint start((int)p1.listConstBegin()->head().asNumber(), (int)p1.listConstEnd()->head().asNumber());
-    QPoint end((int)p2.listConstBegin()->head().asNumber(), (int)p2.listConstEnd()->head().asNumber());
+    QPoint start((int)p1.listConstBegin()->head().asNumber(), (int)std::next(p1.listConstBegin())->head().asNumber());
+    QPoint end((int)p2.listConstBegin()->head().asNumber(), (int)std::next(p2.listConstBegin())->head().asNumber());
     //setup line in QT
     QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(start, end));
     Expression thicknessExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
@@ -97,7 +104,7 @@ void OutputWidget::printText(Expression exp) {
     display->setPos(QPoint(0,0));
     Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!positionExp.isHeadNone()) {
-        display->setPos(QPointF((int)positionExp.listConstBegin()->head().asNumber(), (int)positionExp.listConstEnd()->head().asNumber()));
+        display->setPos(QPointF((int)positionExp.listConstBegin()->head().asNumber(), (int)std::next(positionExp.listConstBegin())->head().asNumber()));
     }
     scene->addItem(display);
 }
