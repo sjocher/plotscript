@@ -34,7 +34,6 @@ void OutputWidget::eval(Expression exp) {
     if((exp.isHeadNumber() || exp.isHeadComplex() || exp.isHeadString() || exp.isHeadNone() || exp.isHeadSymbol()) && (m_type == None)) {
         printExpression(exp);
     } else if(exp.isHeadLambda()) {
-        //do nothing for now
         return;
     }else if(m_type == Point) {
         printPoint(exp);
@@ -42,8 +41,9 @@ void OutputWidget::eval(Expression exp) {
         printLine(exp);
     } else if(m_type == Text) {
         printText(exp);
-    } else if(exp.isHeadList()) {
-        //lists did not evaluate correctly.
+    } else if(m_type == List) {
+        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e)
+            eval(*e);
     }
 }
 
@@ -62,8 +62,7 @@ void OutputWidget::printPoint(Expression exp) {
     Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
     if(!sizeExp.isHeadNone()) {
         point->setRect(QRect(pos, QSize((int)sizeExp.head().asNumber(), (int)sizeExp.head().asNumber())));
-        
-        //need to set fill
+        point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     }
     scene->addItem(point);
 }
@@ -111,5 +110,9 @@ void OutputWidget::getType(Expression exp) {
         m_type = Line;
     } else if(objname == "text") {
         m_type = Text;
-    } else m_type = None;
+    } else {
+        if(exp.isHeadList()) {
+            m_type = List;
+        } else m_type = None;
+    }
 }

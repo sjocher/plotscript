@@ -21,7 +21,7 @@ private:
     void printPoint(Expression exp);
     void printLine(Expression exp);
     void printText(Expression exp);
-    enum Type {Point, Line, Text, None};
+    enum Type {Point, Line, Text, List, None};
     Type m_type;
     void getType(Expression exp);
 public slots:
