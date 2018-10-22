@@ -13,6 +13,7 @@ NotebookApp::NotebookApp(QWidget * parent): QWidget(parent) {
     auto *layout = new QGridLayout();
     auto input = new InputWidget();
     input->setObjectName("input");
+    
         connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
     auto output = new OutputWidget();
     output->setObjectName("input");

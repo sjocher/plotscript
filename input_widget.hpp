@@ -5,7 +5,7 @@
 #include <QKeyEvent>
 #include <QPlainTextEdit>
 
-class InputWidget: public QWidget {
+class InputWidget: public QPlainTextEdit {
     Q_OBJECT
 public:
     InputWidget(QWidget * parent = nullptr);
