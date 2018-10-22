@@ -1,11 +1,12 @@
 #include "output_widget.hpp"
-#include <Qlayout>
+#include <QLayout>
 #include <QGraphicsTextItem>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
 #include <iostream>
 
 OutputWidget::OutputWidget(QWidget * parent) {
+    setParent(parent);
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     //view->setFixedSize(250, 250);

@@ -9,12 +9,13 @@
 #include "startup_config.hpp"
 
 NotebookApp::NotebookApp(QWidget * parent) {
+    setParent(parent);
     loadStartup();
     auto *layout = new QGridLayout();
-    InputWidget *input = new InputWidget;
+    InputWidget *input = new InputWidget();
     input->setObjectName(QString::fromStdString("input"));
         connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
-    OutputWidget *output = new OutputWidget;
+    OutputWidget *output = new OutputWidget();
     output->setObjectName(QString::fromStdString("output"));
         connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
         connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);

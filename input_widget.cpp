@@ -1,9 +1,10 @@
 #include "input_widget.hpp"
-#include <QLayout>
 #include <QKeyEvent>
+#include <QLayout>
 #include <QDebug>
 
-InputWidget::InputWidget(QWidget * parent) {
+InputWidget::InputWidget(QWidget* parent) {
+    setParent(parent);
     text = new QPlainTextEdit();
     auto layout = new QGridLayout();
     layout->addWidget(text, 0, 0);
