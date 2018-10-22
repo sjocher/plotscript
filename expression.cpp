@@ -229,9 +229,9 @@ Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression
         pocketenv.add_exp(a, args[argCnt]);
         argCnt++;
     }
-    Expression result = lfunc.m_tail[0].eval(pocketenv);;
+    Expression result = lfunc.m_tail[0].eval(pocketenv);
     //need to copy properties here
-    for(auto e = lfunc.mapConstBegin(); e != lfunc.mapConstEnd(); ++e)
+    for(auto e = lfunc.properties.begin(); e != lfunc.properties.end(); ++e)
         result.properties.emplace(e->first, e->second);
     return result;
 }

@@ -1160,7 +1160,7 @@ TEST_CASE("Milestone 2 test cases", "[Milestone 2]") {
         REQUIRE(c == result);
     }
     {
-        std::string program = "(define a (make-point 0 0))";
+        std::string program = "(begin (define a (make-point 0 0)) (get-property \"object-name\" a))";
         Expression result = run(program);
         Expression a = result;
     }

@@ -1,11 +1,11 @@
 #include <QApplication>
 #include <QWidget>
+#include "notebook_app.hpp"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
-  QWidget widget;
-  widget.show();
+  NotebookApp notebook;
+  notebook.show();
   return app.exec();
 }
 

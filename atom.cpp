@@ -42,7 +42,9 @@ Atom::Atom(const Token & token): Atom() {
 }
 
 Atom::Atom(const std::string & value): Atom() {
-    setSymbol(value);
+    if(value.at(value.size() - 1) == '"') {
+        setString(value);
+    } else setSymbol(value);
 }
 
 Atom::Atom(const Atom & x): Atom(){
