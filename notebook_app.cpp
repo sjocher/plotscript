@@ -8,19 +8,16 @@
 #include <fstream>
 #include "startup_config.hpp"
 
-NotebookApp::NotebookApp(QWidget * parent) {
-    setParent(parent);
+NotebookApp::NotebookApp(QWidget * parent): QWidget(parent) {
     loadStartup();
     auto *layout = new QGridLayout();
-    InputWidget *input = new InputWidget();
+    auto input = new InputWidget();
     input->setObjectName("input");
         connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
-    input->setMinimumSize(200, 150);
-    OutputWidget *output = new OutputWidget();
+    auto output = new OutputWidget();
     output->setObjectName("input");
         connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
         connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);
-    output->setMinimumSize(200, 150);
     layout->addWidget(input, 0, 0);
     layout->addWidget(output, 1, 0);
     setLayout(layout);

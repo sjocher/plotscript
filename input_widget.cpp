@@ -3,8 +3,7 @@
 #include <QLayout>
 #include <QDebug>
 
-InputWidget::InputWidget(QWidget* parent) {
-    setParent(parent);
+InputWidget::InputWidget(QWidget* parent): QWidget(parent) {
     text = new QPlainTextEdit();
     auto layout = new QGridLayout();
     layout->addWidget(text, 0, 0);

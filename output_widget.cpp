@@ -5,8 +5,7 @@
 #include <QGraphicsLineItem>
 #include <iostream>
 
-OutputWidget::OutputWidget(QWidget * parent) {
-    setParent(parent);
+OutputWidget::OutputWidget(QWidget * parent): QWidget(parent) {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
