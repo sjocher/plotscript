@@ -18,6 +18,8 @@ NotebookApp::NotebookApp(QWidget * parent): QWidget(parent) {
     output->setObjectName("input");
         connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
         connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);
+    input->setMinimumSize(200, 200);
+    output->setMinimumSize(200, 200);
     layout->addWidget(input, 0, 0);
     layout->addWidget(output, 1, 0);
     setLayout(layout);
