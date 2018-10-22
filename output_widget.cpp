@@ -90,6 +90,9 @@ void OutputWidget::printLine(Expression exp) {
     QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(start, end));
     Expression thicknessExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
     if(!thicknessExp.isHeadNone()) {
+        int size = thicknessExp.head().asNumber();
+        if(size < 0)
+            recieveError("Error: thickness is invalid number.");
         line->setPen(QPen(QBrush(QColor(Qt::black)), (int)thicknessExp.head().asNumber()));
     }
     scene->addItem(line);
@@ -103,6 +106,10 @@ void OutputWidget::printText(Expression exp) {
     display->setPos(QPoint(0,0));
     Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!positionExp.isHeadNone()) {
+        Expression prop = exp.get_prop(Expression(Atom("object-name\"")), exp);
+        std::string objname = prop.head().asString();
+        if(objname != "point")
+            recieveError("Error: position is not a point.");
         display->setPos(QPointF((int)positionExp.listConstBegin()->head().asNumber(), (int)std::next(positionExp.listConstBegin())->head().asNumber()));
     }
     scene->addItem(display);

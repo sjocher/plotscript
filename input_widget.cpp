@@ -15,7 +15,6 @@ bool InputWidget::event(QEvent *e) {
     if ((key->key() == Qt::Key_Return) && (key->modifiers() == Qt::SHIFT)) {
         m_rawData = text->toPlainText();
         emit valueChanged(m_rawData);
-        text->clear();
     }
     return true;
 }
