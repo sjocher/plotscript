@@ -9,7 +9,6 @@ OutputWidget::OutputWidget(QWidget * parent) {
     setParent(parent);
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
-    //view->setFixedSize(250, 250);
     view->show();
     auto layout = new QGridLayout();
     layout->addWidget(view, 0 , 0);
@@ -64,6 +63,7 @@ void OutputWidget::printPoint(Expression exp) {
     if(!sizeExp.isHeadNone()) {
         point->setRect(QRect(pos, QSize((int)sizeExp.head().asNumber(), (int)sizeExp.head().asNumber())));
         point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
+        point->setTransformOriginPoint(point->rect().center());
     }
     scene->addItem(point);
 }
