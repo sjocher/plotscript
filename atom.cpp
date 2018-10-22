@@ -242,7 +242,7 @@ std::ostream & operator<<(std::ostream & out, const Atom & a){
   } else if(a.isComplex()) {
     out << a.getComReal() << "," << a.getComImag();
   } else if(a.isString()) {
-    out << '"' << a.asString() << '"';
+    out << a.asString();
   } else if(a.isNone()) {
       out << "NONE";
   }

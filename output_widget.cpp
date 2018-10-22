@@ -43,8 +43,7 @@ void OutputWidget::eval(Expression exp) {
     } else if(m_type == Text) {
         printText(exp);
     } else if(exp.isHeadList()) {
-        for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e)
-            eval(*e);
+        //lists did not evaluate correctly.
     }
 }
 
@@ -59,27 +58,48 @@ void OutputWidget::printExpression(Expression exp) {
 
 void OutputWidget::printPoint(Expression exp) {
     QPoint pos((int)exp.listConstBegin()->head().asNumber(), (int)exp.listConstEnd()->head().asNumber());
-    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(QRect(pos, QSize(10, 10)));
-    
+    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(QRect(pos, QSize(0, 0)));
     Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
     if(!sizeExp.isHeadNone()) {
         point->setRect(QRect(pos, QSize((int)sizeExp.head().asNumber(), (int)sizeExp.head().asNumber())));
+        
+        //need to set fill
     }
     scene->addItem(point);
 }
 
 void OutputWidget::printLine(Expression exp) {
+    //cant access m_list directly, must use listConstBegin and listConstEnd
+    if(exp.listSize() != 2)
+        recieveError("Error: wrong number of arguments in print line");
+    //get points as expressions
+    Expression p1 = *exp.listConstBegin();
+    Expression p2 = *std::next(exp.listConstBegin());
+    if(!p1.isHeadList() || !p2.isHeadList() || (((p1.listSize() != 2) || (p2.listSize() != 2))))
+        recieveError("Error: arguments to make-line are not points");
+    //convert points to QPOINTS
+    QPoint start((int)p1.listConstBegin()->head().asNumber(), (int)p1.listConstEnd()->head().asNumber());
+    QPoint end((int)p2.listConstBegin()->head().asNumber(), (int)p2.listConstEnd()->head().asNumber());
+    //setup line in QT
+    QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(start, end));
     Expression thicknessExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
     if(!thicknessExp.isHeadNone()) {
-        
+        line->setPen(QPen(QBrush(QColor(Qt::black)), (int)thicknessExp.head().asNumber()));
     }
+    scene->addItem(line);
 }
 
 void OutputWidget::printText(Expression exp) {
+    std::ostringstream out;
+    out << exp.head();
+    std::string output = out.str();
+    QGraphicsTextItem *display = new QGraphicsTextItem(QString::fromStdString(output));
+    display->setPos(QPoint(0,0));
     Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!positionExp.isHeadNone()) {
-        
+        display->setPos(QPointF((int)positionExp.listConstBegin()->head().asNumber(), (int)positionExp.listConstEnd()->head().asNumber()));
     }
+    scene->addItem(display);
 }
 
 void OutputWidget::getType(Expression exp) {

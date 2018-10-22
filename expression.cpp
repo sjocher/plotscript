@@ -198,8 +198,10 @@ Expression Expression::handle_define(Environment & env){
 Expression Expression::handle_list(Environment &env) {
     Expression result(m_head);
     result.m_head.tagAtom();
-    for(auto e = m_tail.begin(); e != m_tail.end(); ++e)
-        result.m_list.push_back(e->eval(env));
+    for(auto e = m_tail.begin(); e != m_tail.end(); ++e) {
+        Expression evaled = e->eval(env);
+        result.m_list.push_back(evaled);
+    }
     return result;
 }
 
@@ -233,6 +235,7 @@ Expression Expression::eval_lambda(const Atom & op, const std::vector<Expression
     //need to copy properties here
     for(auto e = lfunc.properties.begin(); e != lfunc.properties.end(); ++e)
         result.properties.emplace(e->first, e->second);
+    //also need to copy list here
     return result;
 }
 
@@ -393,13 +396,17 @@ Expression Expression::eval(Environment & env){
     for(Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it)
       results.push_back(it->eval(env));
     if(env.get_exp(m_head).head().isLambda()) {
-        return eval_lambda(m_head, results, env);
+        Expression result = eval_lambda(m_head, results, env);
+        return result;
     } else return apply(m_head, results, env);
   }
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){
+    //special cases for convenience
     if(exp.isHeadNone()) { out << exp.head(); return out;}
+    if(exp.isHeadString()) {out << "(\"" << exp.head() << "\")"; return out;}
+    //normal output
     out << "(";
     if (exp.isHeadList()) {
         for (auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e) {
