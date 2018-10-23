@@ -77,8 +77,8 @@ void OutputWidget::printLine(Expression exp) {
     if(thickness < 0)
         recieveError("Error: thickness is invalid number.");
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
+    line->setLine(start.x(), start.y(), end.x(), end.y());
     scene->addItem(line);
-    qDebug() << line;
 }
 
 void OutputWidget::printText(Expression exp) {
