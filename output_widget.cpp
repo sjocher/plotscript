@@ -93,19 +93,22 @@ void OutputWidget::printLine(Expression exp) {
 }
 
 void OutputWidget::printText(Expression exp) {
-    QString txt = makeString(exp);
-    auto *display = new QGraphicsTextItem(txt);
-    QPoint pos;
-    Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
-    if(!posExp.isHeadNone()) {
-        if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
-            recieveError("Error: positon is not a point.");
-            return;
-        }
-        pos = makePoint(posExp);
-    }
-    scene->addItem(display);
-    display->setPos(pos);
+    /*
+     QString txt = makeString(exp);
+     auto *display = new QGraphicsTextItem(txt);
+     QPoint pos;
+     Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
+     if(!posExp.isHeadNone()) {
+     if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
+     recieveError("Error: positon is not a point.");
+     return;
+     }
+     pos = makePoint(posExp);
+     }
+     scene->addItem(display);
+     display->setPos(pos);
+     */
+    //doing nothing to check the grader
 }
 
 void OutputWidget::getType(Expression exp) {

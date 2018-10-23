@@ -20,7 +20,7 @@ private:
     void printPoint(Expression exp);
     void printLine(Expression exp);
     void printText(Expression exp);
-    enum Type {Point, Line, Text, List, None, Define, placeholder};
+    enum Type {Point, Line, Text, List, None, Define};
     Type m_type;
     void getType(Expression exp);
     QPoint makePoint(Expression exp);
