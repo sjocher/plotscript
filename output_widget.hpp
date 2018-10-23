@@ -14,8 +14,6 @@ public:
     QGraphicsScene * scene;
     QGraphicsView * view;
 private:
-    Expression m_display;
-    std::string m_error;
     void eval(Expression exp);
     void printExpression(Expression exp);
     void printPoint(Expression exp);

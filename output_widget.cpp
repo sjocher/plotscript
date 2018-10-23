@@ -16,18 +16,16 @@ OutputWidget::OutputWidget(QWidget * parent): QWidget(parent) {
 }
 
 void OutputWidget::recievePlotscript(Expression result) {
-    m_display = result;
     scene->clear();
     eval(result);
 }
 
 void OutputWidget::recieveError(std::string error) {
-    m_error = error;
     scene->clear();
-    QGraphicsTextItem *output = new QGraphicsTextItem((QString::fromStdString(m_error)));
-    output->boundingRect().moveCenter(QPointF());
-    output->setPos(0, 0);
-    scene->addItem(output);
+    QString txt = QString::fromStdString(error);
+    auto *display = new QGraphicsTextItem(txt);
+    scene->addItem(display);
+    display->setPos(0,0);
 }
 
 void OutputWidget::eval(Expression exp) {
@@ -49,21 +47,30 @@ void OutputWidget::eval(Expression exp) {
 }
 
 void OutputWidget::printExpression(Expression exp) {
-    QString out = makeQExpression(exp);
-    scene->addText(out);
+    QString txt = makeQExpression(exp);
+    auto *display = new QGraphicsTextItem(txt);
+    scene->addItem(display);
+    display->setPos(0,0);
 }
 
 void OutputWidget::printPoint(Expression exp) {
-    int size = exp.get_prop(Expression(Atom("size\"")), exp).head().asNumber();
-    if(size < 0)
+    Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
+    int size = 0;
+    if(!sizeExp.isHeadNone()) {
+        size = sizeExp.head().asNumber();
+    }
+    if(size < 0) {
         recieveError("Error: size is invalid number.");
+        return;
+    }
     QPoint loc = makePoint(exp);
-    QRect rect(0,0,size,size);
+    QRectF rect(QPointF(), QSize(size, size));
     rect.moveCenter(loc);
-    auto *point = new QGraphicsEllipseItem(rect);
-    point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-    point->boundingRect().moveCenter(loc);
+    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
+    point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
+    point->setPos(loc);
+    qDebug() << point->scenePos();
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -74,25 +81,15 @@ void OutputWidget::printLine(Expression exp) {
     if(thickness < 0)
         recieveError("Error: thickness is invalid number.");
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
-    line->setLine(start.x(), start.y(), end.x(), end.y());
     scene->addItem(line);
+    line->setLine(start.x(), start.y(), end.x(), end.y());
 }
 
 void OutputWidget::printText(Expression exp) {
     QString txt = makeString(exp);
     auto *display = new QGraphicsTextItem(txt);
-    display->boundingRect().moveCenter(QPointF());
-    display->setPos(0, 0);
-    Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
-    if(!positionExp.isHeadNone()) {
-        std::string objname = exp.get_prop(Expression(Atom("object-name\"")), exp).head().asString();
-        if(objname != "point")
-            recieveError("Error: position is not a point.");
-        QPoint pnt = makePoint(positionExp);
-        display->boundingRect().moveCenter(pnt);
-        display->setPos(pnt.rx(), pnt.ry());
-    }
     scene->addItem(display);
+    display->setPos(0, 0);
 }
 
 void OutputWidget::getType(Expression exp) {

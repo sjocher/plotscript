@@ -14,7 +14,6 @@ public:
     QString getParseData();
 private:
     QString m_rawData;
-    
 signals:
     void valueChanged(QString newValue);
 };
