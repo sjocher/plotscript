@@ -71,7 +71,6 @@ void OutputWidget::printPoint(Expression exp) {
     scene->addItem(point);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     point->setPos(loc);
-    qDebug() << point->scenePos();
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -105,7 +104,7 @@ void OutputWidget::printText(Expression exp) {
          pos = makePoint(posExp);
      }
      scene->addItem(display);
-    display->setPos(pos.rx(), pos.ry());
+     display->setPos(pos.rx(), pos.ry());
 }
 
 void OutputWidget::getType(Expression exp) {
