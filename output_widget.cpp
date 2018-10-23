@@ -6,7 +6,7 @@
 #include <QGraphicsLineItem>
 #include <iostream>
 
-OutputWidget::OutputWidget(QWidget * parent): QWidget(parent) {
+OutputWidget::OutputWidget() {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
@@ -93,7 +93,6 @@ void OutputWidget::printLine(Expression exp) {
 }
 
 void OutputWidget::printText(Expression exp) {
-    /*
      QString txt = makeString(exp);
      auto *display = new QGraphicsTextItem(txt);
      QPoint pos;
@@ -107,8 +106,6 @@ void OutputWidget::printText(Expression exp) {
      }
      scene->addItem(display);
      display->setPos(pos);
-     */
-    //doing nothing to check the grader
 }
 
 void OutputWidget::getType(Expression exp) {

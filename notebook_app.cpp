@@ -8,18 +8,18 @@
 #include <fstream>
 #include "startup_config.hpp"
 
-NotebookApp::NotebookApp(QWidget * parent): QWidget(parent) {
+NotebookApp::NotebookApp() {
     loadStartup();
-    auto layout = new QGridLayout();
-    auto input = new InputWidget();
+    QVBoxLayout * layout = new QVBoxLayout;
+    input = new InputWidget;
     input->setObjectName("input");
-        connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
-    auto output = new OutputWidget();
+     connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
+    output = new OutputWidget;
     output->setObjectName("output");
-        connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
-        connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);
-    layout->addWidget(input, 0, 0);
-    layout->addWidget(output, 1, 0);
+     connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
+     connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);
+    layout->addWidget(input);
+    layout->addWidget(output);
     setLayout(layout);
 }
 

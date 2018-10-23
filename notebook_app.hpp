@@ -11,12 +11,14 @@
 class NotebookApp: public QWidget {
     Q_OBJECT
 public:
-    NotebookApp(QWidget * parent = nullptr);
+    NotebookApp();
     void repl(QString data);
 private:
     QString m_parseData;
     Interpreter interp;
     void loadStartup();
+    InputWidget * input;
+    OutputWidget * output;
 public slots:
     void setData(QString data);
 signals:

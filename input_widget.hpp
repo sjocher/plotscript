@@ -2,16 +2,13 @@
 #define INPUT_WIDGET_HPP
 
 #include <QWidget>
-#include <QKeyEvent>
 #include <QPlainTextEdit>
 
 class InputWidget: public QPlainTextEdit {
     Q_OBJECT
 public:
-    InputWidget(QWidget * parent = nullptr);
-    QPlainTextEdit * text;
-    bool event(QEvent* e);
-    QString getParseData();
+    InputWidget();
+    void keyPressEvent(QKeyEvent* ev);
 private:
     QString m_rawData;
 signals:

@@ -1,21 +1,19 @@
 #include "input_widget.hpp"
+#include <QPlainTextEdit>
+#include <QWidget>
 #include <QKeyEvent>
-#include <QLayout>
 #include <QDebug>
 
-InputWidget::InputWidget(QWidget* parent): QPlainTextEdit(parent) {
-    text = new QPlainTextEdit();
-    auto layout = new QGridLayout();
-    layout->addWidget(text, 0, 0);
-    layout->setMargin(0);
-    setLayout(layout);
+
+InputWidget::InputWidget() {
+    
 }
 
-bool InputWidget::event(QEvent *e) {
-    QKeyEvent* key = static_cast<QKeyEvent*>(e);
-    if ((key->key() == Qt::Key_Return) && (key->modifiers() == Qt::SHIFT)) {
-        m_rawData = text->toPlainText();
+void InputWidget::keyPressEvent(QKeyEvent *ev) {
+    if ((ev->key() == Qt::Key_Return) && (ev->modifiers() == Qt::SHIFT)) {
+        m_rawData = this->document()->toPlainText();
         emit valueChanged(m_rawData);
+    } else {
+        QPlainTextEdit::keyPressEvent(ev);
     }
-    return true;
 }
