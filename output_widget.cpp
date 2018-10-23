@@ -24,8 +24,8 @@ void OutputWidget::recievePlotscript(Expression result) {
 void OutputWidget::recieveError(std::string error) {
     m_error = error;
     scene->clear();
-    QGraphicsTextItem *output = new QGraphicsTextItem((QString::fromStdString(error)));
-    output->setPos(QPointF());
+    QGraphicsTextItem *output = new QGraphicsTextItem((QString::fromStdString(m_error)));
+    output->setPos(0, 0);
     scene->addItem(output);
 }
 
@@ -48,11 +48,10 @@ void OutputWidget::eval(Expression exp) {
 }
 
 void OutputWidget::printExpression(Expression exp) {
-    std::ostringstream out;
-    out << exp;
-    std::string output = out.str();
-    auto *display = new QGraphicsTextItem(QString::fromStdString(output));
-    display->boundingRect().moveCenter(QPointF());
+    QString out = makeString(exp);
+    auto *display = new QGraphicsTextItem(out);
+    display->setPos(0, 0);
+    display->boundingRect().moveCenter(QPoint(0,0));
     scene->addItem(display);
 }
 
@@ -78,6 +77,7 @@ void OutputWidget::printLine(Expression exp) {
     if(thickness < 0)
         recieveError("Error: thickness is invalid number.");
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
+    line->setLine(start.rx(), start.ry(), end.rx(), end.ry());
     scene->addItem(line);
 }
 
@@ -85,6 +85,7 @@ void OutputWidget::printText(Expression exp) {
     QString txt = makeString(exp);
     auto *display = new QGraphicsTextItem(txt);
     display->boundingRect().moveCenter(QPointF());
+    display->setPos(0, 0);
     Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!positionExp.isHeadNone()) {
         std::string objname = exp.get_prop(Expression(Atom("object-name\"")), exp).head().asString();
@@ -92,6 +93,7 @@ void OutputWidget::printText(Expression exp) {
             recieveError("Error: position is not a point.");
         QPoint pnt = makePoint(positionExp);
         display->boundingRect().moveCenter(pnt);
+        display->setPos(pnt.rx(), pnt.ry());
     }
     scene->addItem(display);
 }
