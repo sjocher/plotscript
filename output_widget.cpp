@@ -98,14 +98,14 @@ void OutputWidget::printText(Expression exp) {
      QPoint pos;
      Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
      if(!posExp.isHeadNone()) {
-     if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
-     recieveError("Error: positon is not a point.");
-     return;
-     }
-     pos = makePoint(posExp);
+         if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
+             recieveError("Error: positon is not a point.");
+             return;
+         }
+         pos = makePoint(posExp);
      }
      scene->addItem(display);
-     display->setPos(pos);
+    display->setPos(pos.rx(), pos.ry());
 }
 
 void OutputWidget::getType(Expression exp) {

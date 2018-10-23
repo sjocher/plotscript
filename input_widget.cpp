@@ -5,9 +5,7 @@
 #include <QDebug>
 
 
-InputWidget::InputWidget() {
-    
-}
+InputWidget::InputWidget() {}
 
 void InputWidget::keyPressEvent(QKeyEvent *ev) {
     if ((ev->key() == Qt::Key_Return) && (ev->modifiers() == Qt::SHIFT)) {
