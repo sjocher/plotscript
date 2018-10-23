@@ -1,5 +1,6 @@
 #include "output_widget.hpp"
 #include <QLayout>
+#include <QDebug>
 #include <QGraphicsTextItem>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
@@ -24,7 +25,7 @@ void OutputWidget::recieveError(std::string error) {
     m_error = error;
     scene->clear();
     QGraphicsTextItem *output = new QGraphicsTextItem((QString::fromStdString(error)));
-    output->setPos(QPoint(0,0));
+    output->setPos(QPointF());
     scene->addItem(output);
 }
 
@@ -50,68 +51,47 @@ void OutputWidget::printExpression(Expression exp) {
     std::ostringstream out;
     out << exp;
     std::string output = out.str();
-    QGraphicsTextItem *display = new QGraphicsTextItem(QString::fromStdString(output));
-    display->setPos(QPoint(0,0));
+    auto *display = new QGraphicsTextItem(QString::fromStdString(output));
+    display->boundingRect().moveCenter(QPointF());
     scene->addItem(display);
 }
 
 void OutputWidget::printPoint(Expression exp) {
-    int x = (int)exp.listConstBegin()->head().asNumber();
-    int y = (int)std::next(exp.listConstBegin())->head().asNumber();
-    QPoint pos(x,y);
-    QRect circle(0,0,0,0);
-    circle.moveCenter(pos);
-    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(circle);
-    Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
-    if(!sizeExp.isHeadNone()) {
-        int size = sizeExp.head().asNumber();
-        if(size < 0)
-            recieveError("Error: size is invalid number.");
-        circle.setRect(0, 0, size, size);
-        circle.moveCenter(pos);
-        point->setRect(circle);
-    }
+    int size = exp.get_prop(Expression(Atom("size\"")), exp).head().asNumber();
+    if(size < 0)
+        recieveError("Error: size is invalid number.");
+    QPoint loc = makePoint(exp);
+    QRect circle(0,0,size,size);
+    circle.moveCenter(loc);
+    auto *point = new QGraphicsEllipseItem(circle);
+    point->setX(loc.rx());
+    point->setY(loc.ry());
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     scene->addItem(point);
 }
 
 void OutputWidget::printLine(Expression exp) {
-    //cant access m_list directly, must use listConstBegin and listConstEnd
-    if(exp.listSize() != 2)
-        recieveError("Error: wrong number of arguments in print line");
-    //get points as expressions
-    Expression p1 = *exp.listConstBegin();
-    Expression p2 = *std::next(exp.listConstBegin());
-    if(!p1.isHeadList() || !p2.isHeadList() || (((p1.listSize() != 2) || (p2.listSize() != 2))))
-        recieveError("Error: arguments to make-line are not points");
-    //convert points to QPOINTS
-    QPoint start((int)p1.listConstBegin()->head().asNumber(), (int)std::next(p1.listConstBegin())->head().asNumber());
-    QPoint end((int)p2.listConstBegin()->head().asNumber(), (int)std::next(p2.listConstBegin())->head().asNumber());
-    //setup line in QT
-    QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(start, end));
-    Expression thicknessExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
-    if(!thicknessExp.isHeadNone()) {
-        int size = thicknessExp.head().asNumber();
-        if(size < 0)
-            recieveError("Error: thickness is invalid number.");
-        line->setPen(QPen(QBrush(QColor(Qt::black)), (int)thicknessExp.head().asNumber()));
-    }
+    QPoint start = makePoint(*exp.listConstBegin());
+    QPoint end = makePoint(*std::next(exp.listConstBegin()));
+    auto *line = new QGraphicsLineItem(QLineF(start, end));
+    int thickness = exp.get_prop(Expression(Atom("thickness\"")), exp).head().asNumber();
+    if(thickness < 0)
+        recieveError("Error: thickness is invalid number.");
+    line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
 }
 
 void OutputWidget::printText(Expression exp) {
-    std::ostringstream out;
-    out << exp.head();
-    std::string output = out.str();
-    QGraphicsTextItem *display = new QGraphicsTextItem(QString::fromStdString(output));
-    display->setPos(QPoint(0,0));
+    QString txt = makeString(exp);
+    auto *display = new QGraphicsTextItem(txt);
+    display->boundingRect().moveCenter(QPointF());
     Expression positionExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!positionExp.isHeadNone()) {
-        Expression prop = exp.get_prop(Expression(Atom("object-name\"")), exp);
-        std::string objname = prop.head().asString();
+        std::string objname = exp.get_prop(Expression(Atom("object-name\"")), exp).head().asString();
         if(objname != "point")
             recieveError("Error: position is not a point.");
-        display->setPos(QPointF((int)positionExp.listConstBegin()->head().asNumber(), (int)std::next(positionExp.listConstBegin())->head().asNumber()));
+        QPoint pnt = makePoint(positionExp);
+        display->boundingRect().moveCenter(pnt);
     }
     scene->addItem(display);
 }
@@ -130,4 +110,18 @@ void OutputWidget::getType(Expression exp) {
             m_type = List;
         } else m_type = None;
     }
+}
+
+QPoint OutputWidget::makePoint(Expression exp) {
+    QPoint result;
+    result.setX(exp.listConstBegin()->head().asNumber());
+    result.setY(std::next(exp.listConstBegin())->head().asNumber());
+    return result;
+}
+
+QString OutputWidget::makeString(Expression exp) {
+    std::ostringstream out;
+    out << exp.head();
+    std::string output = out.str();
+    return(QString::fromStdString(output));
 }

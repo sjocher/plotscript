@@ -24,6 +24,8 @@ private:
     enum Type {Point, Line, Text, List, None};
     Type m_type;
     void getType(Expression exp);
+    QPoint makePoint(Expression exp);
+    QString makeString(Expression exp);
 public slots:
     void recievePlotscript(Expression result);
     void recieveError(std::string error);
