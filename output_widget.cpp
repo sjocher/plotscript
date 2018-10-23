@@ -59,8 +59,9 @@ void OutputWidget::printPoint(Expression exp) {
     int x = (int)exp.listConstBegin()->head().asNumber();
     int y = (int)std::next(exp.listConstBegin())->head().asNumber();
     QPoint pos(x,y);
-    QRect circle;
-    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(QRect(QPoint(), QSize(0, 0)));
+    QRect circle(0,0,0,0);
+    circle.moveCenter(pos);
+    QGraphicsEllipseItem *point = new QGraphicsEllipseItem(circle);
     Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
     if(!sizeExp.isHeadNone()) {
         int size = sizeExp.head().asNumber();
@@ -69,8 +70,8 @@ void OutputWidget::printPoint(Expression exp) {
         circle.setRect(0, 0, size, size);
         circle.moveCenter(pos);
         point->setRect(circle);
-        point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     }
+    point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     scene->addItem(point);
 }
 
