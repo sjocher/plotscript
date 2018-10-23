@@ -50,10 +50,7 @@ void OutputWidget::eval(Expression exp) {
 
 void OutputWidget::printExpression(Expression exp) {
     QString out = makeQExpression(exp);
-    auto *display = new QGraphicsTextItem(out);
-    display->boundingRect().moveCenter(QPointF());
-    display->setPos(0, 0);
-    scene->addItem(display);
+    scene->addText(out);
 }
 
 void OutputWidget::printPoint(Expression exp) {
