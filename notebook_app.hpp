@@ -15,7 +15,6 @@ public:
     void repl(QString data);
 private:
     QString m_parseData;
-    Expression m_result;
     Interpreter interp;
     void loadStartup();
 public slots:

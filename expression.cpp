@@ -29,8 +29,16 @@ Expression::Expression(const Expression & a){
   for(auto e : a.m_tail){
     m_tail.push_back(e);
   }
-  if(a.m_head.isTagged()) m_head.tagAtom();
-  if(a.m_head.isLambda()) m_head.markLambda();
+    if(a.m_head.isTagged()) {
+        m_head.tagAtom();
+    } else {
+        m_head.deTag();
+    }
+    if(a.m_head.isLambda()) {
+        m_head.markLambda();
+    } else {
+        m_head.deMarkLambda();
+    }
   m_list.clear();
   for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
       m_list.push_back(*e);
@@ -48,8 +56,16 @@ Expression & Expression::operator=(const Expression & a){
     for(auto e : a.m_tail){
       m_tail.push_back(e);
     }
-    if(a.m_head.isTagged()) m_head.tagAtom();
-    if(a.m_head.isLambda()) m_head.markLambda();
+      if(a.m_head.isTagged()) {
+          m_head.tagAtom();
+      } else {
+          m_head.deTag();
+      }
+      if(a.m_head.isLambda()) {
+          m_head.markLambda();
+      } else {
+          m_head.deMarkLambda();
+      }
     m_list.clear();
     for(auto e = a.m_list.begin(); e != a.m_list.end(); ++e)
         m_list.push_back(*e);

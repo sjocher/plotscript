@@ -17,7 +17,8 @@ OutputWidget::OutputWidget(QWidget * parent): QWidget(parent) {
 
 void OutputWidget::recievePlotscript(Expression result) {
     scene->clear();
-    eval(result);
+    m_result = result;
+    eval(m_result);
 }
 
 void OutputWidget::recieveError(std::string error) {
@@ -32,8 +33,6 @@ void OutputWidget::eval(Expression exp) {
     getType(exp);
     if((exp.isHeadNumber() || exp.isHeadComplex() || exp.isHeadString() || exp.isHeadNone() || exp.isHeadSymbol()) && (m_type == None)) {
         printExpression(exp);
-    } else if(exp.isHeadLambda()) {
-        return;
     }else if(m_type == Point) {
         printPoint(exp);
     } else if(m_type == Line) {
@@ -43,6 +42,8 @@ void OutputWidget::eval(Expression exp) {
     } else if(m_type == List) {
         for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e)
             eval(*e);
+    } else if(m_type == Define) {
+        return;
     }
 }
 
@@ -116,6 +117,8 @@ void OutputWidget::getType(Expression exp) {
         m_type = Line;
     } else if(objname == "text") {
         m_type = Text;
+    } else if(exp.head().asSymbol() == "lambda") {
+        m_type = Define;
     } else {
         if(exp.isHeadList()) {
             m_type = List;

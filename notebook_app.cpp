@@ -40,6 +40,7 @@ void NotebookApp::loadStartup() {
 void NotebookApp::setData(QString data) {
     m_parseData = data;
     repl(m_parseData);
+    m_parseData = QString();
 }
 
 void NotebookApp::repl(QString data) {
@@ -50,8 +51,8 @@ void NotebookApp::repl(QString data) {
     else{
         try{
             Expression exp = interp.evaluate();
-            m_result = exp;
-            emit plotscriptResult(m_result);
+            emit plotscriptResult(exp);
+            exp = Expression();
         }
         catch(const SemanticError & ex){
             std::string error = ex.what();

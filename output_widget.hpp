@@ -14,12 +14,13 @@ public:
     QGraphicsScene * scene;
     QGraphicsView * view;
 private:
+    Expression m_result;
     void eval(Expression exp);
     void printExpression(Expression exp);
     void printPoint(Expression exp);
     void printLine(Expression exp);
     void printText(Expression exp);
-    enum Type {Point, Line, Text, List, None};
+    enum Type {Point, Line, Text, List, None, Define, placeholder};
     Type m_type;
     void getType(Expression exp);
     QPoint makePoint(Expression exp);

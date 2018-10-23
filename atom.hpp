@@ -62,12 +62,14 @@ public:
     
   /// set the atom list tag to true
   void tagAtom() {tag = true;}
+  void deTag() {tag = false;}
   
   /// check if an atom contains the list tag
   bool isTagged() const noexcept {return tag;}
     
   /// set the lambda tag to true
   void markLambda() {lambda = true;}
+  void deMarkLambda() {lambda = false;}
     
   /// check if an atom is the lambda tag
   bool isLambda() const noexcept {return lambda;}
