@@ -58,10 +58,10 @@ void OutputWidget::printPoint(Expression exp) {
     int size = 0;
     if(!sizeExp.isHeadNone()) {
         size = sizeExp.head().asNumber();
-    }
-    if(size < 0) {
-        recieveError("Error: size is invalid number.");
-        return;
+        if(size < 0) {
+            recieveError("Error: size is invalid number.");
+            return;
+        }
     }
     QPoint loc = makePoint(exp);
     QRectF rect(QPointF(), QSize(size, size));
@@ -77,9 +77,15 @@ void OutputWidget::printLine(Expression exp) {
     QPoint start = makePoint(*exp.listConstBegin());
     QPoint end = makePoint(*std::next(exp.listConstBegin()));
     auto *line = new QGraphicsLineItem(QLineF(start, end));
-    int thickness = exp.get_prop(Expression(Atom("thickness\"")), exp).head().asNumber();
-    if(thickness < 0)
-        recieveError("Error: thickness is invalid number.");
+    int thickness = 1;
+    Expression thickExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
+    if(!thickExp.isHeadNone()) {
+        thickness = thickExp.head().asNumber();
+        if(thickness < 0) {
+            recieveError("Error: thickness is invalid number.");
+            return;
+        }
+    }
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
     line->setLine(start.x(), start.y(), end.x(), end.y());
@@ -88,8 +94,17 @@ void OutputWidget::printLine(Expression exp) {
 void OutputWidget::printText(Expression exp) {
     QString txt = makeString(exp);
     auto *display = new QGraphicsTextItem(txt);
+    QPoint pos;
+    Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
+    if(!posExp.isHeadNone()) {
+        if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
+            recieveError("Error: positon is not a point.");
+            return;
+        }
+        pos = makePoint(posExp);
+    }
     scene->addItem(display);
-    display->setPos(0, 0);
+    display->setPos(pos);
 }
 
 void OutputWidget::getType(Expression exp) {
