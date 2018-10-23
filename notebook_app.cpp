@@ -15,7 +15,7 @@ NotebookApp::NotebookApp(QWidget * parent): QWidget(parent) {
     input->setObjectName("input");
         connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
     auto output = new OutputWidget();
-    output->setObjectName("input");
+    output->setObjectName("output");
         connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
         connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);
     layout->addWidget(input, 0, 0);

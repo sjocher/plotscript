@@ -60,13 +60,12 @@ void OutputWidget::printPoint(Expression exp) {
     if(size < 0)
         recieveError("Error: size is invalid number.");
     QPoint loc = makePoint(exp);
-    QRect circle(0,0,size,size);
-    circle.moveCenter(loc);
-    auto *point = new QGraphicsEllipseItem(circle);
-    point->setX(loc.rx());
-    point->setY(loc.ry());
+    QRect rect(0,0,size,size);
+    rect.moveCenter(loc);
+    auto *point = new QGraphicsEllipseItem(rect);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
     scene->addItem(point);
+    //qDebug() << point->scenePos() << rect;
 }
 
 void OutputWidget::printLine(Expression exp) {
