@@ -26,7 +26,7 @@ NotebookApp::NotebookApp() {
 void NotebookApp::loadStartup() {
     std::ifstream startup(STARTUP_FILE);
     if(!interp.parseStream(startup)) {
-        emit plotscriptError("Invalid Startup. Could not parse.");
+        emit plotscriptError("Error: Could not parse.");
     } else {
         try {
             Expression exp = interp.evaluate();
@@ -46,7 +46,7 @@ void NotebookApp::setData(QString data) {
 void NotebookApp::repl(QString data) {
     std::istringstream expression(data.toStdString());
     if(!interp.parseStream(expression)){
-        emit plotscriptError("Invalid Expression. Could not parse.");
+        emit plotscriptError("Error: Could not parse.");
     }
     else{
         try{
