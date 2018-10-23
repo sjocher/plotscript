@@ -48,10 +48,10 @@ void OutputWidget::eval(Expression exp) {
 }
 
 void OutputWidget::printExpression(Expression exp) {
-    QString out = makeString(exp);
+    QString out = makeQExpression(exp);
     auto *display = new QGraphicsTextItem(out);
+    display->boundingRect().moveCenter(QPointF());
     display->setPos(0, 0);
-    display->boundingRect().moveCenter(QPoint(0,0));
     scene->addItem(display);
 }
 
@@ -64,8 +64,8 @@ void OutputWidget::printPoint(Expression exp) {
     rect.moveCenter(loc);
     auto *point = new QGraphicsEllipseItem(rect);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
+    point->boundingRect().moveCenter(loc);
     scene->addItem(point);
-    //qDebug() << point->scenePos() << rect;
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -76,8 +76,8 @@ void OutputWidget::printLine(Expression exp) {
     if(thickness < 0)
         recieveError("Error: thickness is invalid number.");
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
-    line->setLine(start.rx(), start.ry(), end.rx(), end.ry());
     scene->addItem(line);
+    qDebug() << line;
 }
 
 void OutputWidget::printText(Expression exp) {
@@ -114,9 +114,7 @@ void OutputWidget::getType(Expression exp) {
 }
 
 QPoint OutputWidget::makePoint(Expression exp) {
-    QPoint result;
-    result.setX(exp.listConstBegin()->head().asNumber());
-    result.setY(std::next(exp.listConstBegin())->head().asNumber());
+    QPoint result(exp.listConstBegin()->head().asNumber(), std::next(exp.listConstBegin())->head().asNumber());
     return result;
 }
 
@@ -126,3 +124,11 @@ QString OutputWidget::makeString(Expression exp) {
     std::string output = out.str();
     return(QString::fromStdString(output));
 }
+
+QString OutputWidget::makeQExpression(Expression exp) {
+    std::ostringstream out;
+    out << exp;
+    std::string output = out.str();
+    return(QString::fromStdString(output));
+}
+

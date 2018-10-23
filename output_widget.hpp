@@ -26,6 +26,7 @@ private:
     void getType(Expression exp);
     QPoint makePoint(Expression exp);
     QString makeString(Expression exp);
+    QString makeQExpression(Expression exp);
 public slots:
     void recievePlotscript(Expression result);
     void recieveError(std::string error);
