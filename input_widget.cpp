@@ -7,6 +7,7 @@ InputWidget::InputWidget(QWidget* parent): QPlainTextEdit(parent) {
     text = new QPlainTextEdit();
     auto layout = new QGridLayout();
     layout->addWidget(text, 0, 0);
+    layout->setMargin(0);
     setLayout(layout);
 }
 
