@@ -25,6 +25,7 @@ void OutputWidget::recieveError(std::string error) {
     m_error = error;
     scene->clear();
     QGraphicsTextItem *output = new QGraphicsTextItem((QString::fromStdString(m_error)));
+    output->boundingRect().moveCenter(QPointF());
     output->setPos(0, 0);
     scene->addItem(output);
 }
