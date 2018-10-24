@@ -11,10 +11,10 @@
 NotebookApp::NotebookApp() {
     loadStartup();
     QVBoxLayout * layout = new QVBoxLayout;
-    input = new InputWidget;
+    input = new InputWidget(this);
     input->setObjectName("input");
      connect(input, &InputWidget::valueChanged, this, &NotebookApp::setData);
-    output = new OutputWidget;
+    output = new OutputWidget(this);
     output->setObjectName("output");
      connect(this, &NotebookApp::plotscriptResult, output, &OutputWidget::recievePlotscript);
      connect(this, &NotebookApp::plotscriptError, output, &OutputWidget::recieveError);

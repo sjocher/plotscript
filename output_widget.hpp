@@ -10,7 +10,7 @@
 class OutputWidget: public QWidget {
     Q_OBJECT
 public:
-    OutputWidget();
+    OutputWidget(QWidget* parent);
     QGraphicsScene * scene;
     QGraphicsView * view;
 private:
@@ -23,9 +23,11 @@ private:
     enum Type {Point, Line, Text, List, None, Define};
     Type m_type;
     void getType(Expression exp);
+    //composition
     QPoint makePoint(Expression exp);
     QString makeString(Expression exp);
     QString makeQExpression(Expression exp);
+    
 public slots:
     void recievePlotscript(Expression result);
     void recieveError(std::string error);
