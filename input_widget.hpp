@@ -7,7 +7,7 @@
 class InputWidget: public QPlainTextEdit {
     Q_OBJECT
 public:
-    InputWidget(QWidget* parent);
+    InputWidget();
     void keyPressEvent(QKeyEvent* ev);
 private:
     QString m_rawData;

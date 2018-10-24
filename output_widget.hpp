@@ -10,7 +10,7 @@
 class OutputWidget: public QWidget {
     Q_OBJECT
 public:
-    OutputWidget(QWidget* parent);
+    OutputWidget();
     QGraphicsScene * scene;
     QGraphicsView * view;
 private:
