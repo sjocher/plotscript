@@ -26,7 +26,7 @@ void OutputWidget::recieveError(std::string error) {
     QString txt = QString::fromStdString(error);
     auto *display = new QGraphicsTextItem(txt);
     scene->addItem(display);
-    display->setPos(0,0);
+    //display->setPos(0,0);
 }
 
 void OutputWidget::eval(Expression exp) {
@@ -51,7 +51,7 @@ void OutputWidget::printExpression(Expression exp) {
     QString txt = makeQExpression(exp);
     auto *display = new QGraphicsTextItem(txt);
     scene->addItem(display);
-    display->setPos(0,0);
+    //display->setPos(0,0);
 }
 
 void OutputWidget::printPoint(Expression exp) {
@@ -70,7 +70,7 @@ void OutputWidget::printPoint(Expression exp) {
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-    point->setPos(loc);
+    //point->setPos(loc);
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -88,7 +88,7 @@ void OutputWidget::printLine(Expression exp) {
     }
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
-    line->setLine(start.x(), start.y(), end.x(), end.y());
+    //line->setLine(start.x(), start.y(), end.x(), end.y());
 }
 
 void OutputWidget::printText(Expression exp) {
@@ -104,7 +104,7 @@ void OutputWidget::printText(Expression exp) {
          pos = makePoint(posExp);
      }
      scene->addItem(display);
-     display->setPos(pos);
+     //display->setPos(pos);
 }
 
 void OutputWidget::getType(Expression exp) {

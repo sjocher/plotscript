@@ -18,6 +18,11 @@ TEST_CASE( "Test Token creation", "[token]" ) {
 
   REQUIRE(tks.type() == Token::STRING);
   REQUIRE(tks.asString() == "thevalue");
+  Token tk2("\"test\"");
+  REQUIRE(tk2.asString() == "\"test\"");
+    Token tk3(Token::QUOTE);
+    REQUIRE(tk3.type() == Token::QUOTE);
+    REQUIRE(tk3.asString() == "\"");
 }
 
 TEST_CASE( "Test tokenize", "[token]" ) {

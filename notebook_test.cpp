@@ -122,7 +122,5 @@ void NotebookTest::testFindPoints() {
     out->scene->clear();
 }
 
-
-
 QTEST_MAIN(NotebookTest)
 #include "notebook_test.moc"

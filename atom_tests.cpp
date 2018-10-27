@@ -229,6 +229,15 @@ TEST_CASE( "test comparison", "[atom]" ) {
     REQUIRE(a == b);
     REQUIRE(a != c);
   }
+    {
+        INFO("Atom making atom constructor");
+        Atom a("test\"");
+        Atom b(a);
+        Atom c(0,0);
+        Atom d(c);
+        REQUIRE(a == b);
+        REQUIRE(c == d);
+    }
 
 }
 

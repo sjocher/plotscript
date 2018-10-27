@@ -23,7 +23,6 @@ private:
     enum Type {Point, Line, Text, List, None, Define};
     Type m_type;
     void getType(Expression exp);
-    //composition
     QPoint makePoint(Expression exp);
     QString makeString(Expression exp);
     QString makeQExpression(Expression exp);

@@ -540,6 +540,70 @@ TEST_CASE("Test Subneg Milestone0", "[Milestone0]") {
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
     {
+        std::string program = "(* 7 ])";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(- 7 ])";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(])";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(define 7 7)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(lambda 3 2 1)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(begin (define ree (lambda (x) (+ x 1)) (ree 1 2)))";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(set-property 1 2 3 4)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
+        std::string program = "(get-property 1 2 3 4)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
         std::string program = "(- 1 I z)";
         std::istringstream iss(program);
         Interpreter interp;
@@ -1086,6 +1150,14 @@ TEST_CASE("Testing lambda function" , "[Milestone 1]") {
         REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
     }
     {
+        std::string program = "(set-property 3 3 3)";
+        std::istringstream iss(program);
+        Interpreter interp;
+        bool ok = interp.parseStream(iss);
+        REQUIRE(ok == true);
+        REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+    }
+    {
         std::string program = "(define )";
         std::istringstream iss(program);
         Interpreter interp;
@@ -1142,6 +1214,11 @@ TEST_CASE("Milestone 2 test cases", "[Milestone 2]") {
         Expression c = b;
         REQUIRE(result == b);
         REQUIRE(c == result);
+    }
+    {
+        std::string program = "(begin (define a 3) (get-property \"test\" a))";
+        Expression result = run(program);
+        REQUIRE(result == Expression());
     }
     {
         std::string program = "(\"ree\")";
