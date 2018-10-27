@@ -10,23 +10,26 @@ OutputWidget::OutputWidget() {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
-    auto layout = new QGridLayout();
-    layout->addWidget(view, 0 , 0);
+    scene->addLine(0, 0, 0, 100);
+    scene->addLine(0, 0, 0, -100);
+    scene->addLine(0, 0, 100, 0);
+    scene->addLine(0, 0 ,-100, 0);
+    auto layout = new QVBoxLayout();
+    layout->addWidget(view);
     setLayout(layout);
 }
 
 void OutputWidget::recievePlotscript(Expression result) {
-    scene->clear();
+    //scene->clear();
     m_result = result;
     eval(m_result);
 }
 
 void OutputWidget::recieveError(std::string error) {
     scene->clear();
-    QString txt = QString::fromStdString(error);
-    auto *display = new QGraphicsTextItem(txt);
+    QGraphicsTextItem * display = new QGraphicsTextItem(QString::fromStdString(error));
     scene->addItem(display);
-    //display->setPos(0,0);
+    display->setPos(QPointF());
 }
 
 void OutputWidget::eval(Expression exp) {
@@ -43,15 +46,16 @@ void OutputWidget::eval(Expression exp) {
         for(auto e = exp.listConstBegin(); e != exp.listConstEnd(); ++e)
             eval(*e);
     } else if(m_type == Define) {
+        //do nothing
         return;
     }
 }
 
 void OutputWidget::printExpression(Expression exp) {
     QString txt = makeQExpression(exp);
-    auto *display = new QGraphicsTextItem(txt);
+    QGraphicsTextItem * display = new QGraphicsTextItem(txt);
     scene->addItem(display);
-    //display->setPos(0,0);
+    display->setPos(QPointF());
 }
 
 void OutputWidget::printPoint(Expression exp) {
@@ -88,7 +92,7 @@ void OutputWidget::printLine(Expression exp) {
     }
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
-    //line->setLine(start.x(), start.y(), end.x(), end.y());
+    line->setLine(start.rx(), start.ry(), end.rx(), end.rx());
 }
 
 void OutputWidget::printText(Expression exp) {
@@ -104,7 +108,7 @@ void OutputWidget::printText(Expression exp) {
          pos = makePoint(posExp);
      }
      scene->addItem(display);
-     //display->setPos(pos);
+     display->setPos(pos);
 }
 
 void OutputWidget::getType(Expression exp) {
