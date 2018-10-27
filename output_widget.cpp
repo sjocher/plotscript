@@ -10,10 +10,10 @@ OutputWidget::OutputWidget() {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
-    scene->addLine(0, 0, 0, 100);
-    scene->addLine(0, 0, 0, -100);
-    scene->addLine(0, 0, 100, 0);
-    scene->addLine(0, 0 ,-100, 0);
+    //scene->addLine(0, 0, 0, 100);
+    //scene->addLine(0, 0, 0, -100);
+    //scene->addLine(0, 0, 100, 0);
+    //scene->addLine(0, 0 ,-100, 0);
     auto layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
