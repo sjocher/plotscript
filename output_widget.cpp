@@ -20,7 +20,7 @@ OutputWidget::OutputWidget() {
 }
 
 void OutputWidget::recievePlotscript(Expression result) {
-    //scene->clear();
+    scene->clear();
     m_result = result;
     eval(m_result);
 }
@@ -92,20 +92,20 @@ void OutputWidget::printLine(Expression exp) {
     }
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
-    line->setLine(start.rx(), start.ry(), end.rx(), end.rx());
+    line->setLine(QLineF(start, end));
 }
 
 void OutputWidget::printText(Expression exp) {
      QString txt = makeString(exp);
      auto *display = new QGraphicsTextItem(txt);
-     QPoint pos;
+     QPointF pos;
      Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
      if(!posExp.isHeadNone()) {
          if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
              recieveError("Error: positon is not a point.");
              return;
          }
-         pos = makePoint(posExp);
+         pos += makePoint(posExp);
      }
      scene->addItem(display);
      display->setPos(pos);
