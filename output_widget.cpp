@@ -68,13 +68,13 @@ void OutputWidget::printPoint(Expression exp) {
             return;
         }
     }
-    QPoint loc = makePoint(exp);
-    QRectF rect(QPointF(), QSize(size, size));
+    QPointF loc;
+    QRectF rect(loc, QSize(size, size));
+    loc += makePoint(exp);
     rect.moveCenter(loc);
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-    //point->setPos(loc);
 }
 
 void OutputWidget::printLine(Expression exp) {
