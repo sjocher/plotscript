@@ -104,10 +104,10 @@ void OutputWidget::printText(Expression exp) {
              recieveError("Error: positon is not a point.");
              return;
          }
-         pos += makePoint(posExp);
+         pos = makePoint(posExp);
      }
-     scene->addItem(display);
      display->setPos(pos);
+     scene->addItem(display);
 }
 
 void OutputWidget::getType(Expression exp) {
