@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QGraphicsTextItem>
+#include <QGraphicsEllipseItem>
+#include <QGraphicsLineItem>
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
 
@@ -26,7 +29,6 @@ private:
     QPoint makePoint(Expression exp);
     QString makeString(Expression exp);
     QString makeQExpression(Expression exp);
-    
 public slots:
     void recievePlotscript(Expression result);
     void recieveError(std::string error);

@@ -68,9 +68,8 @@ void OutputWidget::printPoint(Expression exp) {
             return;
         }
     }
-    QPointF loc;
-    QRectF rect(loc, QSize(size, size));
-    loc += makePoint(exp);
+    QRectF rect(QPointF(), QSize(size, size));
+    QPointF loc = makePoint(exp);
     rect.moveCenter(loc);
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
