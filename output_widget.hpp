@@ -7,6 +7,7 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
+#include <QFont>
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
 

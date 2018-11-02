@@ -95,11 +95,14 @@ void OutputWidget::printLine(Expression exp) {
 }
 
 void OutputWidget::printText(Expression exp) {
-     QString txt = makeString(exp);
-     auto *display = new QGraphicsTextItem(txt);
-     QPointF pos;
-     Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
-     if(!posExp.isHeadNone()) {
+    QString txt = makeString(exp);
+    auto *display = new QGraphicsTextItem(txt);
+    //font
+    
+    //position
+    QPointF pos;
+    Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
+    if(!posExp.isHeadNone()) {
          if(posExp.get_prop(Expression(Atom("object-name\"")), posExp).head().asString() != "point") {
              recieveError("Error: positon is not a point.");
              return;
@@ -107,6 +110,16 @@ void OutputWidget::printText(Expression exp) {
          pos = makePoint(posExp);
      }
      display->setPos(pos);
+    //rotation
+    Expression rotExp = exp.get_prop(Expression(Atom("rotation\"")), exp);
+    if(!rotExp.isHeadNone()) {
+        
+    }
+    //scale
+    Expression scaleExp = exp.get_prop(Expression(Atom("scale\"")), exp);
+    if(!scaleExp.isHeadNone()) {
+        
+    }
      scene->addItem(display);
 }
 

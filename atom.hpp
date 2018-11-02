@@ -105,6 +105,7 @@ private:
     double numberValue;
     std::complex<double> complexNumber;
     std::string stringValue;
+    std::string sstring;
   };
     
   // helper to set type and value of Number

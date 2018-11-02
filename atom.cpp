@@ -33,7 +33,7 @@ Atom::Atom(const Token & token): Atom() {
   }
   //assume symbol and check if first character is a digit
   else if(!std::isdigit(token.asString()[0])) {
-      if(token.asString().at(token.asString().size() - 1) == '"') {
+      if(token.asString().back() == '"') {
           setString(token.asString());
       } else {
           setSymbol(token.asString());
@@ -42,7 +42,7 @@ Atom::Atom(const Token & token): Atom() {
 }
 
 Atom::Atom(const std::string & value): Atom() {
-    if(value.at(value.size() - 1) == '"') {
+    if(value.back() == '"') {
         setString(value);
     } else setSymbol(value);
 }
@@ -58,12 +58,11 @@ Atom::Atom(const Atom & x): Atom(){
       setComplex(x.getComReal(), x.getComImag());
   }
   else if(x.isString()) {
-      setString(x.stringValue);
+      setString(x.sstring);
   }
 }
 
 Atom & Atom::operator=(const Atom & x) {
-
   if(this != &x){
     if(x.m_type == NoneKind){
       m_type = NoneKind;
@@ -78,7 +77,7 @@ Atom & Atom::operator=(const Atom & x) {
         setComplex(x.getComReal(), x.getComImag());
     }
     else if(x.m_type == StringKind) {
-        setString(x.stringValue);
+        setString(x.sstring);
     }
   }
   return *this;
@@ -88,7 +87,9 @@ Atom::~Atom() {
   // we need to ensure the destructor of the symbol string is called
   if(m_type == SymbolKind){
     stringValue.~basic_string();
-  }
+  } else if(m_type == StringKind) {
+      sstring.~basic_string();
+    }
 }
 
 bool Atom::isNone() const noexcept {
@@ -132,18 +133,15 @@ void Atom::setSymbol(const std::string & value) {
 }
 
 void Atom::setString(const std::string & value) {
-    // we need to ensure the destructor of the symbol string is called
     if(m_type == StringKind){
-        stringValue.~basic_string();
+        sstring.~basic_string();
     }
     m_type = StringKind;
-    //trim the identifying quote
-    std::string temp = value;
-    if(temp.at(temp.size() - 1) == '"') {
-        temp.pop_back();
-    }
     // copy construct in place
-    new (&stringValue) std::string(temp);
+    new (&sstring) std::string(value);
+    if(sstring.back() == '"') {
+        sstring.pop_back();
+    }
 }
 
 double Atom::getComImag() const noexcept {
@@ -169,7 +167,7 @@ std::string Atom::asSymbol() const noexcept{
 std::string Atom::asString() const noexcept {
     std::string result;
     if(m_type == StringKind) {
-        result = stringValue;
+        result = sstring;
     }
     return result;
 }
@@ -179,9 +177,7 @@ std::complex<double> Atom::asComplex() const noexcept {
 }
 
 bool Atom::operator==(const Atom & right) const noexcept{
-  
   if(m_type != right.m_type) return false;
-
   switch(m_type){
   case NoneKind:
     if(right.m_type != NoneKind) return false;
@@ -199,14 +195,13 @@ bool Atom::operator==(const Atom & right) const noexcept{
   case SymbolKind:
     {
       if(right.m_type != SymbolKind) return false;
-
       return stringValue == right.stringValue;
     }
     break;
       case StringKind:
       {
           if(right.m_type != StringKind) return false;
-          return stringValue == right.stringValue;
+          return stringValue == right.sstring;
       }
           break;
       case ComplexKind: {

@@ -1241,4 +1241,13 @@ TEST_CASE("Milestone 2 test cases", "[Milestone 2]") {
         Expression result = run(program);
         Expression a = result;
     }
+    {
+        std::string program = "(begin (define a (set-property \"name\" \"a complex number\" (lambda (x y) (* x y)))) (get-property \"name\" a))";
+        //std::string test = "(begin (define b (set-property \"note\" \"a complex number\" (+ I 1))) (get-property \"note\" b))";
+        Expression result = run(program);
+        //std::string test2 = "(\"a complex number\")";
+        //Expression result2 = run(test2);
+        //REQUIRE(result == result2);
+        REQUIRE(result.head().asString() == "a complex number");
+    }
 }
