@@ -10,10 +10,6 @@ OutputWidget::OutputWidget() {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
-    //scene->addLine(0, 0, 0, 100);
-    //scene->addLine(0, 0, 0, -100);
-    //scene->addLine(0, 0, 100, 0);
-    //scene->addLine(0, 0 ,-100, 0);
     auto layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
@@ -97,8 +93,7 @@ void OutputWidget::printLine(Expression exp) {
 void OutputWidget::printText(Expression exp) {
     QString txt = makeString(exp);
     auto *display = new QGraphicsTextItem(txt);
-    //font
-    
+    QFont courier("Courier", 1, true);
     //position
     QPointF pos;
     Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
@@ -109,18 +104,29 @@ void OutputWidget::printText(Expression exp) {
          }
          pos = makePoint(posExp);
      }
-     display->setPos(pos);
     //rotation
     Expression rotExp = exp.get_prop(Expression(Atom("rotation\"")), exp);
     if(!rotExp.isHeadNone()) {
-        
+        double rot = rotExp.head().asNumber();
+        rot = (rot * 180) / M_PI;
+        display->setRotation(rot);
     }
     //scale
     Expression scaleExp = exp.get_prop(Expression(Atom("scale\"")), exp);
     if(!scaleExp.isHeadNone()) {
-        
+        int scale = scaleExp.head().asNumber();
+        if(scale < 0) {
+            recieveError("Error: scale is invalid");
+            return;
+        }
+        courier.setPointSize(scale);
     }
-     scene->addItem(display);
+    //center positio
+    scene->addItem(display);
+    float xoffset = display->boundingRect().width() / 2;
+    float yoffset = display->boundingRect().height() / 2;
+    display->setFont(courier);
+    display->setPos(-xoffset + pos.rx(), -yoffset + pos.ry());
 }
 
 void OutputWidget::getType(Expression exp) {
