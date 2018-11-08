@@ -129,12 +129,12 @@ void OutputWidget::printText(Expression exp) {
         }
         display->setScale(scale);
     }
-    //center position
-    float xoffset = pos.rx() - display->boundingRect().width() / 2;
-    float yoffset = pos.ry() - display->boundingRect().height() / 2;
     display->setFont(font);
-    display->setPos(xoffset, yoffset);
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    display->setPos(pos);
+    //center the position of the text
+    double xoffset = -((display->boundingRect().width()) / 2);
+    double yoffset = -((display->boundingRect().height()) / 2);
+    display->moveBy(xoffset, yoffset);
 }
 
 void OutputWidget::getType(Expression exp) {
@@ -174,5 +174,5 @@ QString OutputWidget::makeQExpression(Expression exp) {
 }
 
 void OutputWidget::resizeEvent(QResizeEvent* event) {
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
