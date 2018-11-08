@@ -372,6 +372,14 @@ Expression Expression::get_prop(const Expression & key, const Expression & value
     return result;
 }
 
+Expression Expression::discrete_plot(Environment & env) {
+    return Expression();
+}
+
+Expression Expression::continuous_plot(Environment & env) {
+    return Expression();
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -405,6 +413,12 @@ Expression Expression::eval(Environment & env){
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "get-property") {
       return property_get(env);
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "discrete-plot") {
+      
+  }
+  else if(m_head.isSymbol() && m_head.asSymbol() == "continuous-plot") {
+      
   }
   // else attempt to treat as procedure
   else{ 

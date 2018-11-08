@@ -72,7 +72,7 @@ void OutputWidget::printPoint(Expression exp) {
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -91,7 +91,7 @@ void OutputWidget::printLine(Expression exp) {
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
     line->setLine(QLineF(start, end));
-    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::printText(Expression exp) {
@@ -127,7 +127,7 @@ void OutputWidget::printText(Expression exp) {
             recieveError("Error: scale is invalid");
             return;
         }
-        display->setScale(scale);
+        font.setPixelSize(scale);
     }
     display->setFont(font);
     display->setPos(pos);
@@ -174,5 +174,5 @@ QString OutputWidget::makeQExpression(Expression exp) {
 }
 
 void OutputWidget::resizeEvent(QResizeEvent* event) {
-    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }

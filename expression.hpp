@@ -132,6 +132,8 @@ private:
   Expression handle_map(Environment & env);
   Expression property_get(Environment & env);
   Expression property_set(Environment & env);
+  Expression discrete_plot(Environment & env);
+  Expression continuous_plot(Environment & env);
   Expression eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env);
 };
 
