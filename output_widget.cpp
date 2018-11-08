@@ -10,6 +10,8 @@ OutputWidget::OutputWidget() {
     scene = new QGraphicsScene;
     view = new QGraphicsView(scene);
     view->show();
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     auto layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
@@ -70,6 +72,7 @@ void OutputWidget::printPoint(Expression exp) {
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
     point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
+    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -88,13 +91,18 @@ void OutputWidget::printLine(Expression exp) {
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
     line->setLine(QLineF(start, end));
+    //view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::printText(Expression exp) {
     QString txt = makeString(exp);
     auto *display = new QGraphicsTextItem(txt);
-    QFont courier("Courier", 1, true);
+    auto font = QFont("Courier");
+    font.setStyleHint(QFont::TypeWriter);
+    font.setPointSize(1);
+    display->setTransformOriginPoint(display->boundingRect().center());
     //position
+    scene->addItem(display);
     QPointF pos;
     Expression posExp = exp.get_prop(Expression(Atom("position\"")), exp);
     if(!posExp.isHeadNone()) {
@@ -119,14 +127,14 @@ void OutputWidget::printText(Expression exp) {
             recieveError("Error: scale is invalid");
             return;
         }
-        courier.setPointSize(scale);
+        display->setScale(scale);
     }
-    //center positio
-    scene->addItem(display);
-    float xoffset = display->boundingRect().width() / 2;
-    float yoffset = display->boundingRect().height() / 2;
-    display->setFont(courier);
-    display->setPos(-xoffset + pos.rx(), -yoffset + pos.ry());
+    //center position
+    float xoffset = pos.rx() - display->boundingRect().width() / 2;
+    float yoffset = pos.ry() - display->boundingRect().height() / 2;
+    display->setFont(font);
+    display->setPos(xoffset, yoffset);
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::getType(Expression exp) {
@@ -144,8 +152,7 @@ void OutputWidget::getType(Expression exp) {
         if(exp.isHeadList()) {
             m_type = List;
         } else m_type = None;
-    }
-}
+    }}
 
 QPoint OutputWidget::makePoint(Expression exp) {
     QPoint result(exp.listConstBegin()->head().asNumber(), std::next(exp.listConstBegin())->head().asNumber());
@@ -166,3 +173,6 @@ QString OutputWidget::makeQExpression(Expression exp) {
     return(QString::fromStdString(output));
 }
 
+void OutputWidget::resizeEvent(QResizeEvent* event) {
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+}

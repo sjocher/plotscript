@@ -148,7 +148,7 @@ void NotebookTest::testCenterText() {
     QTest::keyPress(in, Qt::Key_Return, Qt::KeyboardModifier::ShiftModifier, 0);
     auto find = out->scene->items();
     QVERIFY2(find.size() == 1, "text not found");
-    qDebug() << find[0]->boundingRect().center();
+    qDebug() << find[0]->sceneBoundingRect().center();
 }
 
 QTEST_MAIN(NotebookTest)

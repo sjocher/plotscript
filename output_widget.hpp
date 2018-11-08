@@ -24,12 +24,13 @@ private:
     void printPoint(Expression exp);
     void printLine(Expression exp);
     void printText(Expression exp);
-    enum Type {Point, Line, Text, List, None, Define};
+    enum Type {Point, Line, Text, List, None, Define, Discrete, Continuos};
     Type m_type;
     void getType(Expression exp);
     QPoint makePoint(Expression exp);
     QString makeString(Expression exp);
     QString makeQExpression(Expression exp);
+    void resizeEvent(QResizeEvent* event);
 public slots:
     void recievePlotscript(Expression result);
     void recieveError(std::string error);

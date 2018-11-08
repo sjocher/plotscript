@@ -5,4 +5,8 @@
     (define make-line (set-property "object-name" "line" make-line))
     (define make-text (lambda (string) (string)))
     (define make-text (set-property "object-name" "text" make-text))
+    (define discrete-plot (lambda (DATA OPTIONS) (list DATA OPTIONS)))
+    (define discrete-plot (set-property "object-name" "dplot" discrete-plot))
+    (define continous-plot (lambda (FUNC BOUNDS OPTIONS) (list FUNC BOUNDS OPTIONS)))
+    (define continuos-plot (set-property "object-name" "cplot" continuos-plot))
 )
