@@ -75,7 +75,6 @@ void OutputWidget::printPoint(Expression exp) {
     scene->addItem(point);
     point->setPen(QPen(Qt::PenStyle(Qt::NoBrush)));
     point->setBrush(QBrush(Qt::BrushStyle(Qt::SolidPattern)));
-    
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -102,7 +101,6 @@ void OutputWidget::printText(Expression exp) {
     auto font = QFont("Courier");
     font.setStyleHint(QFont::TypeWriter);
     font.setPointSize(1);
-    display->setTransformOriginPoint(display->boundingRect().center());
     //position
     scene->addItem(display);
     QPointF pos;
@@ -114,13 +112,6 @@ void OutputWidget::printText(Expression exp) {
          }
          pos = makePoint(posExp);
      }
-    //rotation
-    Expression rotExp = exp.get_prop(Expression(Atom("rotation\"")), exp);
-    if(!rotExp.isHeadNone()) {
-        double rot = rotExp.head().asNumber();
-        rot = (rot * 180) / M_PI;
-        display->setRotation(rot);
-    }
     //scale
     Expression scaleExp = exp.get_prop(Expression(Atom("scale\"")), exp);
     if(!scaleExp.isHeadNone()) {
@@ -137,6 +128,14 @@ void OutputWidget::printText(Expression exp) {
     double xoffset = -((display->boundingRect().width()) / 2);
     double yoffset = -((display->boundingRect().height()) / 2);
     display->moveBy(xoffset, yoffset);
+    //rotation
+    Expression rotExp = exp.get_prop(Expression(Atom("rotation\"")), exp);
+    if(!rotExp.isHeadNone()) {
+        display->setTransformOriginPoint(display->boundingRect().center());
+        double rot = rotExp.head().asNumber();
+        rot = (rot * 180) / M_PI;
+        display->setRotation(rot);
+    }
 }
 
 void OutputWidget::getType(Expression exp) {

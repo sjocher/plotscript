@@ -140,6 +140,11 @@ private:
   Expression makePExpression(const double x, const double y);
   std::list<Expression> makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
   Expression makeLine(const double x1, const double y1, const double x2, const double y2);
+  std::list<Expression> scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
+  std::list<Expression> combineLists(const std::list<Expression> list1, const std::list<Expression> list2);
+  std::list<Expression> sigpointlabels(const double AL, const double AU, const double OL, const double OU);
+  Expression dbltoString(const double num);
+  std::list<Expression> handleOptions(const Expression options);
   //graphics scales
   double P = 0.5;
   double D = 2;

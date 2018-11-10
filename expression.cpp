@@ -4,6 +4,7 @@
 #include <list>
 #include <iostream>
 #include <unordered_map>
+#include <iomanip>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -401,6 +402,7 @@ Expression Expression::makePExpression(const double x, const double y) {
     pointform.push_back(xp);
     pointform.push_back(yp);
     Expression result(pointform);
+    result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
     return result;
 }
 
@@ -436,6 +438,106 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
     return lines;
 }
 
+std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+    double relXAxis = (((fabs(OU) - (fabs(OU) + fabs(OL)) / 2)) * yscale);
+    double relYAxis = (((fabs(AU) - (fabs(AU) + fabs(AL)) / 2)) * xscale);
+    std::list<Expression> spoints;
+    for(auto e = points.begin(); e != points.end(); ++e) {
+        Expression pt = *e;
+        double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale) - relYAxis);
+        double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale) - relXAxis);
+        Expression newPt = makePExpression(xpt, ypt);
+        Expression lolliLine = makeLine(xpt, ypt, xpt, relXAxis);
+        newPt.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
+        newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(P)));
+        spoints.push_back(newPt);
+        spoints.push_back(lolliLine);
+    }
+    return spoints;
+}
+
+std::list<Expression> Expression::combineLists(const std::list<Expression> list1, const std::list<Expression> list2) {
+    std::list<Expression> result;
+    for(auto e = list1.begin(); e != list1.end(); ++e) {
+        result.push_back(*e);
+    }
+    for(auto e = list2.begin(); e != list2.end(); ++e) {
+        result.push_back(*e);
+    }
+    return result;
+}
+
+Expression Expression::dbltoString(const double num) {
+    std::stringstream ss;
+    ss << std::setprecision(2) << num;
+    std::string string = ss.str();
+    string += '"';
+    return Expression(Atom(string));
+}
+
+std::list<Expression> Expression::sigpointlabels(const double AL, const double AU, const double OL, const double OU) {
+    std::list<Expression> result;
+    Expression eAL = dbltoString(AL);
+    eAL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+    eAL.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2), (N/2) + C));
+    Expression eAU = dbltoString(AU);
+    eAU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+    eAU.set_prop(Expression(Atom("position\"")), makePExpression((N/2), (N/2) + C));
+    Expression eOL = dbltoString(OL);
+    eOL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+    eOL.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - D, (N/2)));
+    Expression eOU = dbltoString(OU);
+    eOU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+    eOU.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - D, -(N/2)));
+    result.push_back(eAL);
+    result.push_back(eAU);
+    result.push_back(eOL);
+    result.push_back(eOU);
+    return result;
+}
+
+Expression makeText(const std::string text) {
+    std::string temp = text + '"';
+    return Expression(Atom(temp));
+}
+
+std::list<Expression> Expression::handleOptions(const Expression options) {
+    std::list<Expression> yes;
+    double scale = 1;
+    for(auto e = options.listConstBegin(); e != options.listConstEnd(); ++e) {
+        Expression label = *e;
+        std::string id = label.listConstBegin()->head().asString();
+        std::string data;
+        Expression result;
+        if(id == "title") {
+            data = std::next(label.listConstBegin())->head().asString();
+            result = makeText(data);
+            result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(0, -(N/2) - A));
+            yes.push_back(result);
+        } else if(id == "abscissa-label") {
+            data = std::next(label.listConstBegin())->head().asString();
+            result = makeText(data);
+            result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(0, (N/2) + A));
+            yes.push_back(result);
+        } else if(id == "ordinate-label") {
+            data = std::next(label.listConstBegin())->head().asString();
+            result = makeText(data);
+            result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+            result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(-(M_PI/2))));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - B, 0));
+            yes.push_back(result);
+        } else if(id == "text-scale") {
+            scale = std::next(label.listConstBegin())->head().asNumber();
+        }
+    }
+    for(auto e : yes) {
+        e.set_prop(Expression(Atom("scale\"")), Expression(Atom(scale)));
+    }
+    return yes;
+}
+
 Expression Expression::discrete_plot(Environment & env) {
     if(m_tail.size() != 2)
         throw SemanticError("Error: wrong number of arguments to discrete plot");
@@ -448,8 +550,13 @@ Expression Expression::discrete_plot(Environment & env) {
     double xscale = (N / (fabs(AU) + fabs(AL)));
     double yscale = (N / (fabs(OU) + fabs(OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
-    
-    Expression result(gridlines);
+    std::list<Expression> scaledPoints = scalePoints(points, xscale, yscale, AL, AU, OL, OU);
+    std::list<Expression> plotdata = combineLists(gridlines, scaledPoints);
+    std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
+    plotdata = combineLists(plotdata, numLabels);
+    std::list<Expression> labels = handleOptions(OPTIONS);
+    plotdata = combineLists(plotdata, labels);
+    Expression result(plotdata);
     return result;
 }
 
