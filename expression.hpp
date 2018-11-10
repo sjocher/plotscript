@@ -135,6 +135,18 @@ private:
   Expression discrete_plot(Environment & env);
   Expression continuous_plot(Environment & env);
   Expression eval_lambda(const Atom & op, const std::vector<Expression> & args, const Environment & env);
+  void populatePoints(std::list<Expression> &list, const Expression & exp);
+  void findMaxMinPoints(double &AL, double &AU, double &OL, double &OU, const std::list<Expression> points);
+  Expression makePExpression(const double x, const double y);
+  std::list<Expression> makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
+  Expression makeLine(const double x1, const double y1, const double x2, const double y2);
+  //graphics scales
+  double P = 0.5;
+  double D = 2;
+  double C = 2;
+  double B = 3;
+  double A = 3;
+  double N = 20;
 };
 
 /// Render expression to output stream

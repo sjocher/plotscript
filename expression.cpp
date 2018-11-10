@@ -372,13 +372,90 @@ Expression Expression::get_prop(const Expression & key, const Expression & value
     return result;
 }
 
-Expression Expression::discrete_plot(Environment & env) {
-    return Expression();
+void Expression::populatePoints(std::list<Expression> &list, const Expression & exp) {
+    for(auto e = exp.m_list.begin(); e != exp.m_list.end(); ++e) {
+        Expression a(*e);
+        list.push_back(a);
+    }
 }
 
-Expression Expression::continuous_plot(Environment & env) {
-    return Expression();
+void Expression::findMaxMinPoints(double &AL, double &AU, double &OL, double &OU, const std::list<Expression> points) {
+    //x min and max values
+    for(auto e = points.begin(); e !=  points.end(); ++e) {
+        Expression pt = *e;
+        double x = pt.listConstBegin()->head().asNumber();
+        double y = std::next(pt.listConstBegin())->head().asNumber();
+        if(x < AL) AL = x;
+        if(x > AU) AU = x;
+        if(y < OL) OL = y;
+        if(y > OU) OU = y;
+    }
 }
+
+Expression Expression::makePExpression(const double x, const double y) {
+    Atom ax(x);
+    Atom ay(y);
+    Expression xp(ax);
+    Expression yp(ay);
+    std::list<Expression> pointform;
+    pointform.push_back(xp);
+    pointform.push_back(yp);
+    Expression result(pointform);
+    return result;
+}
+
+Expression Expression::makeLine(const double x1, const double y1, const double x2, const double y2) {
+    Expression point1 = makePExpression(x1, y1);
+    Expression point2 = makePExpression(x2, y2);
+    std::list<Expression> l1;
+    l1.push_back(point1);
+    l1.push_back(point2);
+    Expression line(l1);
+    line.set_prop(Expression(Atom("object-name\"")), Expression(Atom("line\"")));
+    line.set_prop(Expression(Atom("thickness\"")), Expression(Atom(0)));
+    return line;
+}
+
+std::list<Expression> Expression::makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+    double relXAxis = (((fabs(OU) - (fabs(OU) + fabs(OL)) / 2)) * yscale);
+    double relYAxis = (((fabs(AU) - (fabs(AU) + fabs(AL)) / 2)) * xscale);
+    double M = N / 2;
+    Expression bottom = makeLine(-M, M, M, M);
+    Expression top = makeLine(-M, -M, M, -M);
+    Expression left = makeLine(-M, M, -M, -M);
+    Expression right = makeLine(M, -M, M, M);
+    Expression abscissa = makeLine(-M, relXAxis, M, relXAxis);
+    Expression ordinate = makeLine(relYAxis, -M, relYAxis, M);
+    std::list<Expression> lines;
+    lines.push_back(bottom);
+    lines.push_back(top);
+    lines.push_back(left);
+    lines.push_back(right);
+    lines.push_back(abscissa);
+    lines.push_back(ordinate);
+    return lines;
+}
+
+Expression Expression::discrete_plot(Environment & env) {
+    if(m_tail.size() != 2)
+        throw SemanticError("Error: wrong number of arguments to discrete plot");
+    double AL = std::numeric_limits<double>::max(), AU = -std::numeric_limits<double>::max(), OL = std::numeric_limits<double>::max(), OU = -std::numeric_limits<double>::max();
+    Expression DATA = m_tail[0].eval(env);
+    Expression OPTIONS = m_tail[1].eval(env);
+    std::list<Expression> points;
+    populatePoints(points, DATA);
+    findMaxMinPoints(AL, AU, OL, OU, points);
+    double xscale = (N / (fabs(AU) + fabs(AL)));
+    double yscale = (N / (fabs(OU) + fabs(OL)));
+    std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
+    
+    Expression result(gridlines);
+    return result;
+}
+
+//Expression Expression::continuous_plot(Environment & env) {
+  //  return Expression();
+//}
 
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
@@ -415,7 +492,7 @@ Expression Expression::eval(Environment & env){
       return property_get(env);
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "discrete-plot") {
-      
+      return discrete_plot(env);
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "continuous-plot") {
       
@@ -430,6 +507,7 @@ Expression Expression::eval(Environment & env){
         return result;
     } else return apply(m_head, results, env);
   }
+  return Expression();
 }
 
 std::ostream & operator<<(std::ostream & out, const Expression & exp){

@@ -21,6 +21,7 @@ void OutputWidget::recievePlotscript(Expression result) {
     scene->clear();
     m_result = result;
     eval(m_result);
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::recieveError(std::string error) {
@@ -28,6 +29,7 @@ void OutputWidget::recieveError(std::string error) {
     QGraphicsTextItem * display = new QGraphicsTextItem(QString::fromStdString(error));
     scene->addItem(display);
     display->setPos(QPointF());
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::eval(Expression exp) {
@@ -58,7 +60,7 @@ void OutputWidget::printExpression(Expression exp) {
 
 void OutputWidget::printPoint(Expression exp) {
     Expression sizeExp = exp.get_prop(Expression(Atom("size\"")), exp);
-    int size = 0;
+    double size = 0;
     if(!sizeExp.isHeadNone()) {
         size = sizeExp.head().asNumber();
         if(size < 0) {
@@ -66,13 +68,14 @@ void OutputWidget::printPoint(Expression exp) {
             return;
         }
     }
-    QRectF rect(QPointF(), QSize(size, size));
+    QRectF rect(QPointF(), QSizeF(size, size));
     QPointF loc = makePoint(exp);
     rect.moveCenter(loc);
     QGraphicsEllipseItem *point = new QGraphicsEllipseItem(rect);
     scene->addItem(point);
-    point->setBrush(QBrush(Qt::black, Qt::BrushStyle(Qt::SolidPattern)));
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    point->setPen(QPen(Qt::PenStyle(Qt::NoBrush)));
+    point->setBrush(QBrush(Qt::BrushStyle(Qt::SolidPattern)));
+    
 }
 
 void OutputWidget::printLine(Expression exp) {
@@ -91,7 +94,6 @@ void OutputWidget::printLine(Expression exp) {
     line->setPen(QPen(QBrush(QColor(Qt::black)), thickness));
     scene->addItem(line);
     line->setLine(QLineF(start, end));
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void OutputWidget::printText(Expression exp) {
