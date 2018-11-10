@@ -541,7 +541,7 @@ std::list<Expression> Expression::handleOptions(const Expression options) {
 Expression Expression::discrete_plot(Environment & env) {
     if(m_tail.size() != 2)
         throw SemanticError("Error: wrong number of arguments to discrete plot");
-    double AL = std::numeric_limits<double>::max(), AU = -std::numeric_limits<double>::max(), OL = std::numeric_limits<double>::max(), OU = -std::numeric_limits<double>::max();
+    double AL = 999999, AU = -999999, OL = 999999, OU = -999999;
     Expression DATA = m_tail[0].eval(env);
     Expression OPTIONS = m_tail[1].eval(env);
     std::list<Expression> points;

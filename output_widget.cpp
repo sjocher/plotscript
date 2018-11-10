@@ -175,5 +175,8 @@ QString OutputWidget::makeQExpression(Expression exp) {
 }
 
 void OutputWidget::resizeEvent(QResizeEvent* event) {
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    QResizeEvent * p = event;
+    if(p == event) {
+        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    }
 }
