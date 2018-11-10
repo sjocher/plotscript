@@ -27,7 +27,7 @@ private:
     enum Type {Point, Line, Text, List, None, Define, Discrete, Continuos};
     Type m_type;
     void getType(Expression exp);
-    QPoint makePoint(Expression exp);
+    QPointF makePoint(Expression exp);
     QString makeString(Expression exp);
     QString makeQExpression(Expression exp);
     void resizeEvent(QResizeEvent* event);

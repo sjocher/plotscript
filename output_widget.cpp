@@ -78,8 +78,8 @@ void OutputWidget::printPoint(Expression exp) {
 }
 
 void OutputWidget::printLine(Expression exp) {
-    QPoint start = makePoint(*exp.listConstBegin());
-    QPoint end = makePoint(*std::next(exp.listConstBegin()));
+    QPointF start = makePoint(*exp.listConstBegin());
+    QPointF end = makePoint(*std::next(exp.listConstBegin()));
     auto *line = new QGraphicsLineItem(QLineF(start, end));
     int thickness = 1;
     Expression thickExp = exp.get_prop(Expression(Atom("thickness\"")), exp);
@@ -120,7 +120,7 @@ void OutputWidget::printText(Expression exp) {
             recieveError("Error: scale is invalid");
             return;
         }
-        font.setPixelSize(scale);
+        display->setScale(scale);
     }
     display->setFont(font);
     display->setPos(pos);
@@ -155,8 +155,8 @@ void OutputWidget::getType(Expression exp) {
         } else m_type = None;
     }}
 
-QPoint OutputWidget::makePoint(Expression exp) {
-    QPoint result(exp.listConstBegin()->head().asNumber(), std::next(exp.listConstBegin())->head().asNumber());
+QPointF OutputWidget::makePoint(Expression exp) {
+    QPointF result(exp.listConstBegin()->head().asNumber(), std::next(exp.listConstBegin())->head().asNumber());
     return result;
 }
 
