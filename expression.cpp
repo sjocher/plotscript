@@ -487,18 +487,20 @@ Expression Expression::dbltoString(const double num) {
 
 std::list<Expression> Expression::sigpointlabels(const double AL, const double AU, const double OL, const double OU) {
     std::list<Expression> result;
+    double xscale = (N / ((AU) - (AL)));
+    double yscale = (N / ((OU) - (OL)));
     Expression eAL = dbltoString(AL);
     eAL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eAL.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2), (N/2) + C));
+    eAL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale), -(OL*yscale) + C));
     Expression eAU = dbltoString(AU);
     eAU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eAU.set_prop(Expression(Atom("position\"")), makePExpression((N/2), (N/2) + C));
+    eAU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) + N, -(OL*yscale) + C));
     Expression eOL = dbltoString(OL);
     eOL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eOL.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - D, (N/2)));
+    eOL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - D, -(OL*yscale)));
     Expression eOU = dbltoString(OU);
     eOU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eOU.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - D, -(N/2)));
+    eOU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - D, -(OL*yscale) - N));
     result.push_back(eAL);
     result.push_back(eAU);
     result.push_back(eOL);
@@ -511,9 +513,11 @@ Expression makeText(const std::string text) {
     return Expression(Atom(temp));
 }
 
-std::list<Expression> Expression::handleOptions(const Expression options) {
+std::list<Expression> Expression::handleOptions(const Expression options, const double AL, const double AU, const double OL, const double OU) {
     std::list<Expression> yes;
     double scale = 1;
+    double xscale = (N / ((AU) - (AL)));
+    double yscale = (N / ((OU) - (OL)));
     for(auto e = options.listConstBegin(); e != options.listConstEnd(); ++e) {
         Expression label = *e;
         std::string id = label.listConstBegin()->head().asString();
@@ -524,21 +528,21 @@ std::list<Expression> Expression::handleOptions(const Expression options) {
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
-            result.set_prop(Expression(Atom("position\"")), makePExpression(0, -(N/2) - A));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OU * yscale) - A));
             yes.push_back(result);
         } else if(id == "abscissa-label") {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
-            result.set_prop(Expression(Atom("position\"")), makePExpression(0, (N/2) + A));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OL * yscale) + A));
             yes.push_back(result);
         } else if(id == "ordinate-label") {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(-(M_PI/2))));
-            result.set_prop(Expression(Atom("position\"")), makePExpression(-(N/2) - B, 0));
+            result.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - B, -((OL + OU) / 2) * yscale));
             yes.push_back(result);
         } else if(id == "text-scale") {
             scale = std::next(label.listConstBegin())->head().asNumber();
@@ -569,7 +573,7 @@ Expression Expression::discrete_plot(Environment & env) {
     std::list<Expression> plotdata = combineLists(gridlines, scaledPoints);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
-    std::list<Expression> labels = handleOptions(OPTIONS);
+    std::list<Expression> labels = handleOptions(OPTIONS, AL, AU, OL, OU);
     plotdata = combineLists(plotdata, labels);
     Expression result(plotdata);
     return result;

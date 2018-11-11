@@ -144,7 +144,7 @@ private:
   std::list<Expression> combineLists(const std::list<Expression> list1, const std::list<Expression> list2);
   std::list<Expression> sigpointlabels(const double AL, const double AU, const double OL, const double OU);
   Expression dbltoString(const double num);
-  std::list<Expression> handleOptions(const Expression options);
+  std::list<Expression> handleOptions(const Expression options, const double AL, const double AU, const double OL, const double OU);
   //graphics scales
   double P = 0.5;
   double D = 2;
