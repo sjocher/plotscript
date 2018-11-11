@@ -424,9 +424,9 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
     bool y = true;
     if(OU < 0 || OL > 0) x = false;
     if(AU < 0 || AL > 0) y = false;
-    Expression bottom = makeLine(-(AL * xscale), -(OL*yscale), -(AL * xscale) - N, -(OL*yscale));
-    Expression top = makeLine(-(AL * xscale), -(OU*yscale), -(AL * xscale) - N, -(OU*yscale));
-    Expression right = makeLine(-(AL * xscale), -(OL*yscale), -(AL * xscale), -(OU*yscale));
+    Expression bottom = makeLine(AL * xscale, -(OL*yscale), (AL * xscale) + N, -(OL*yscale));
+    Expression top = makeLine(AL * xscale, -(OU*yscale), (AL * xscale) + N, -(OU*yscale));
+    Expression right = makeLine((AU * xscale), -(OL*yscale), (AU * xscale), -(OU*yscale));
     Expression left = makeLine((AL * xscale), -(OL*yscale), (AL * xscale), -(OU*yscale));
     if(x) {
         Expression abscissa = makeLine(-(AL * xscale), 0, -(AL * xscale) - N, 0);
@@ -444,19 +444,17 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
 }
 
 std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
-    double relYAxis = 0; //(((fabs(AU) - ((AU) - (AL)) / 2)) * xscale)
-    double relXAxis = 0; //(((fabs(OU) - ((OU) - (OL)) / 2)) * yscale)
     std::list<Expression> spoints;
     for(auto e = points.begin(); e != points.end(); ++e) {
         Expression pt = *e;
-        double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale) - relYAxis);
-        double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale) - relXAxis);
+        double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale));
+        double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale));
         Expression newPt = makePExpression(xpt, ypt);
         Expression lolliLine;
         if(OU < 0 || OL > 0) {
             lolliLine = makeLine(xpt, ypt, xpt, -(OL*yscale));
         } else {
-            lolliLine = makeLine(xpt, ypt, xpt, relXAxis);
+            lolliLine = makeLine(xpt, ypt, xpt, 0);
         }
         newPt.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
         newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(P)));
