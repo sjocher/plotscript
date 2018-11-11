@@ -420,23 +420,20 @@ Expression Expression::makeLine(const double x1, const double y1, const double x
 
 std::list<Expression> Expression::makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
     std::list<Expression> lines;
-    double relXAxis = (((fabs(OU) - (fabs(OU) + fabs(OL)) / 2)) * yscale);
-    double relYAxis = (((fabs(AU) - (fabs(AU) + fabs(AL)) / 2)) * xscale);
     bool x = true;
     bool y = true;
     if(OU < 0 || OL > 0) x = false;
     if(AU < 0 || AL > 0) y = false;
-    double M = N / 2;
-    Expression bottom = makeLine(-M, M, M, M);
-    Expression top = makeLine(-M, -M, M, -M);
-    Expression left = makeLine(-M, M, -M, -M);
-    Expression right = makeLine(M, -M, M, M);
+    Expression bottom = makeLine(-(AL * xscale), -(OL*yscale), -(AL * xscale) - N, -(OL*yscale));
+    Expression top = makeLine(-(AL * xscale), -(OU*yscale), -(AL * xscale) - N, -(OU*yscale));
+    Expression right = makeLine(-(AL * xscale), -(OL*yscale), -(AL * xscale), -(OU*yscale));
+    Expression left = makeLine((AL * xscale), -(OL*yscale), (AL * xscale), -(OU*yscale));
     if(x) {
-        Expression abscissa = makeLine(-M, relXAxis, M, relXAxis);
+        Expression abscissa = makeLine(-(AL * xscale), 0, -(AL * xscale) - N, 0);
         lines.push_back(abscissa);
     }
     if(y) {
-        Expression ordinate = makeLine(relYAxis, -M, relYAxis, M);
+        Expression ordinate = makeLine(0, -(OL * yscale), 0, -(OL * yscale) - N);
         lines.push_back(ordinate);
     }
     lines.push_back(bottom);
