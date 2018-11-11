@@ -447,7 +447,6 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
 }
 
 std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
-    std::cout << yscale << std::endl;
     double relYAxis = (((fabs(AU) - ((AU) - (AL)) / 2)) * xscale);
     double relXAxis = (((fabs(OU) - ((OU) - (OL)) / 2)) * yscale);
     std::list<Expression> spoints;
@@ -465,7 +464,6 @@ std::list<Expression> Expression::scalePoints(const std::list<Expression> points
         newPt.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
         newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(P)));
         spoints.push_back(newPt);
-        std::cout << newPt << std::endl;
         spoints.push_back(lolliLine);
     }
     return spoints;
