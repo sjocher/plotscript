@@ -447,8 +447,8 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
 }
 
 std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
-    double relYAxis = (((fabs(AU) - ((AU) - (AL)) / 2)) * xscale);
-    double relXAxis = (((fabs(OU) - ((OU) - (OL)) / 2)) * yscale);
+    double relYAxis = 0; //(((fabs(AU) - ((AU) - (AL)) / 2)) * xscale)
+    double relXAxis = 0; //(((fabs(OU) - ((OU) - (OL)) / 2)) * yscale)
     std::list<Expression> spoints;
     for(auto e = points.begin(); e != points.end(); ++e) {
         Expression pt = *e;
@@ -526,12 +526,14 @@ std::list<Expression> Expression::handleOptions(const Expression options) {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+            result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
             result.set_prop(Expression(Atom("position\"")), makePExpression(0, -(N/2) - A));
             yes.push_back(result);
         } else if(id == "abscissa-label") {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
+            result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
             result.set_prop(Expression(Atom("position\"")), makePExpression(0, (N/2) + A));
             yes.push_back(result);
         } else if(id == "ordinate-label") {
@@ -545,10 +547,13 @@ std::list<Expression> Expression::handleOptions(const Expression options) {
             scale = std::next(label.listConstBegin())->head().asNumber();
         }
     }
-    for(auto e : yes) {
-        e.set_prop(Expression(Atom("scale\"")), Expression(Atom(scale)));
+    std::list<Expression> result;
+    for(auto e = yes.begin(); e != yes.end(); ++e) {
+        Expression label = *e;
+        label.set_prop(Expression(Atom("scale\"")), Expression(Atom(scale)));
+        result.push_back(label);
     }
-    return yes;
+    return result;
 }
 
 Expression Expression::discrete_plot(Environment & env) {

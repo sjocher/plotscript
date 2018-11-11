@@ -112,6 +112,12 @@ void OutputWidget::printText(Expression exp) {
          }
          pos = makePoint(posExp);
      }
+    display->setFont(font);
+    display->setPos(pos);
+    //center the position of the text
+    double xoffset = -((display->boundingRect().width()) / 2);
+    double yoffset = -((display->boundingRect().height()) / 2);
+    display->moveBy(xoffset, yoffset);
     //scale
     Expression scaleExp = exp.get_prop(Expression(Atom("scale\"")), exp);
     if(!scaleExp.isHeadNone()) {
@@ -122,12 +128,6 @@ void OutputWidget::printText(Expression exp) {
         }
         display->setScale(scale);
     }
-    display->setFont(font);
-    display->setPos(pos);
-    //center the position of the text
-    double xoffset = -((display->boundingRect().width()) / 2);
-    double yoffset = -((display->boundingRect().height()) / 2);
-    display->moveBy(xoffset, yoffset);
     //rotation
     Expression rotExp = exp.get_prop(Expression(Atom("rotation\"")), exp);
     if(!rotExp.isHeadNone()) {
