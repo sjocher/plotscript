@@ -419,40 +419,53 @@ Expression Expression::makeLine(const double x1, const double y1, const double x
 }
 
 std::list<Expression> Expression::makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+    std::list<Expression> lines;
     double relXAxis = (((fabs(OU) - (fabs(OU) + fabs(OL)) / 2)) * yscale);
     double relYAxis = (((fabs(AU) - (fabs(AU) + fabs(AL)) / 2)) * xscale);
-    if(OU < 0 || OL > 0) relXAxis = 10;
+    bool x = true;
+    bool y = true;
+    if(OU < 0 || OL > 0) x = false;
+    if(AU < 0 || AL > 0) y = false;
     double M = N / 2;
     Expression bottom = makeLine(-M, M, M, M);
     Expression top = makeLine(-M, -M, M, -M);
     Expression left = makeLine(-M, M, -M, -M);
     Expression right = makeLine(M, -M, M, M);
-    Expression abscissa = makeLine(-M, relXAxis, M, relXAxis);
-    Expression ordinate = makeLine(relYAxis, -M, relYAxis, M);
-    std::list<Expression> lines;
+    if(x) {
+        Expression abscissa = makeLine(-M, relXAxis, M, relXAxis);
+        lines.push_back(abscissa);
+    }
+    if(y) {
+        Expression ordinate = makeLine(relYAxis, -M, relYAxis, M);
+        lines.push_back(ordinate);
+    }
     lines.push_back(bottom);
     lines.push_back(top);
     lines.push_back(left);
     lines.push_back(right);
-    lines.push_back(abscissa);
-    lines.push_back(ordinate);
     return lines;
 }
 
 std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
-    double relXAxis = (((fabs(OU) - (fabs(OU) + fabs(OL)) / 2)) * yscale);
-    double relYAxis = (((fabs(AU) - (fabs(AU) + fabs(AL)) / 2)) * xscale);
+    std::cout << yscale << std::endl;
+    double relYAxis = (((fabs(AU) - ((AU) - (AL)) / 2)) * xscale);
+    double relXAxis = (((fabs(OU) - ((OU) - (OL)) / 2)) * yscale);
     std::list<Expression> spoints;
     for(auto e = points.begin(); e != points.end(); ++e) {
         Expression pt = *e;
         double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale) - relYAxis);
         double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale) - relXAxis);
         Expression newPt = makePExpression(xpt, ypt);
-        Expression lolliLine = makeLine(xpt, ypt, xpt, relXAxis);
+        Expression lolliLine;
+        if(OU < 0 || OL > 0) {
+            lolliLine = makeLine(xpt, ypt, xpt, 10);
+        } else {
+            lolliLine = makeLine(xpt, ypt, xpt, relXAxis);
+        }
         newPt.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
         newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(P)));
-        std::cout << newPt << std::endl;
         spoints.push_back(newPt);
+        std::cout << newPt << std::endl;
         spoints.push_back(lolliLine);
     }
     return spoints;
@@ -549,8 +562,8 @@ Expression Expression::discrete_plot(Environment & env) {
     std::list<Expression> points;
     populatePoints(points, DATA);
     findMaxMinPoints(AL, AU, OL, OU, points);
-    double xscale = (N / (fabs(AU) + fabs(AL)));
-    double yscale = (N / (fabs(OU) + fabs(OL)));
+    double xscale = (N / ((AU) - (AL)));
+    double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
     std::list<Expression> scaledPoints = scalePoints(points, xscale, yscale, AL, AU, OL, OU);
     std::list<Expression> plotdata = combineLists(gridlines, scaledPoints);
