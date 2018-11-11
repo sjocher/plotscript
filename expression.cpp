@@ -454,7 +454,7 @@ std::list<Expression> Expression::scalePoints(const std::list<Expression> points
         Expression newPt = makePExpression(xpt, ypt);
         Expression lolliLine;
         if(OU < 0 || OL > 0) {
-            lolliLine = makeLine(xpt, ypt, xpt, 10);
+            lolliLine = makeLine(xpt, ypt, xpt, -(OL*yscale));
         } else {
             lolliLine = makeLine(xpt, ypt, xpt, relXAxis);
         }
