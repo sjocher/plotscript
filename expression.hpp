@@ -149,6 +149,7 @@ private:
   void continuousPoints(std::list<Expression> &points, const Expression FUNC, const Expression BOUNDS, Environment & env);
   std::list<Expression> scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
   std::list<Expression> convP2Lines(const std::list<Expression> points);
+  std::list<Expression> splitLines(const std::list<Expression> lines);
   //graphics scales
   double dP = 0.5;
   double dD = 2;

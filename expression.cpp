@@ -580,9 +580,9 @@ Expression Expression::discrete_plot(Environment & env) {
 std::vector<Expression> Expression::fillBounds(const Expression BOUNDS) {
     double low = BOUNDS.listConstBegin()->head().asNumber();
     double high = std::next(BOUNDS.listConstBegin())->head().asNumber();
-    double samplesize = ((high - low) / (cM + 0));
+    double samplesize = ((high - low) / (cM + 1));
     std::vector<Expression> result;
-    for(auto i = low; i <= (high + samplesize); i += samplesize) {
+    for(auto i = low; i <= high; i += samplesize) {
         result.push_back(Expression(Atom(i)));
     }
     return result;
@@ -611,6 +611,13 @@ std::list<Expression> Expression::scaleCPoints(const std::list<Expression> point
     return spoints;
 }
 
+std::list<Expression> Expression::splitLines(const std::list<Expression> lines) {
+    std::list<Expression> splits;
+    for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
+        
+    }
+}
+
 std::list<Expression> Expression::convP2Lines(const std::list<Expression> points) {
     std::list<Expression> lines;
     for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
@@ -619,11 +626,12 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
         Expression line = makeLine(p1.listConstBegin()->head().asNumber(), std::next(p1.listConstBegin())->head().asNumber(), p2.listConstBegin()->head().asNumber(), std::next(p2.listConstBegin())->head().asNumber());
         lines.push_back(line);
     }
+    //std::list<Expression> splits = splitLines(lines);
     return lines;
 }
 
 Expression Expression::continuous_plot(Environment & env) {
-    if(m_tail.size() != 3)
+    if(m_tail.size() < 2)
         throw SemanticError("Error: wrong number of arguments to continuous plot");
     double AL = 999999, AU = -999999, OL = 999999, OU = -999999;
     Expression FUNC = m_tail[0];
