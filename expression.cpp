@@ -614,8 +614,14 @@ std::list<Expression> Expression::scaleCPoints(const std::list<Expression> point
 std::list<Expression> Expression::splitLines(const std::list<Expression> lines) {
     std::list<Expression> splits;
     for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
-        
+        Expression l1 = *e;
+        Expression l2 = *(std::next(e));
     }
+    int counter = 0;
+    if(counter < cMAX) {
+        //do nothing
+    }
+    return splits;
 }
 
 std::list<Expression> Expression::convP2Lines(const std::list<Expression> points) {
