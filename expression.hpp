@@ -145,13 +145,18 @@ private:
   std::list<Expression> sigpointlabels(const double AL, const double AU, const double OL, const double OU);
   Expression dbltoString(const double num);
   std::list<Expression> handleOptions(const Expression options, const double AL, const double AU, const double OL, const double OU);
+  std::vector<Expression> fillBounds(const Expression BOUNDS);
+  void continuousPoints(std::list<Expression> &points, const Expression FUNC, const Expression BOUNDS, Environment & env);
+  std::list<Expression> scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
   //graphics scales
-  double P = 0.5;
-  double D = 2;
-  double C = 2;
-  double B = 3;
-  double A = 3;
+  double dP = 0.5;
+  double dD = 2;
+  double dC = 2;
+  double dB = 3;
+  double dA = 3;
   double N = 20;
+  double cMAX = 10;
+  double cM = 50;
 };
 
 /// Render expression to output stream

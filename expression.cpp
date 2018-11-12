@@ -457,7 +457,7 @@ std::list<Expression> Expression::scalePoints(const std::list<Expression> points
             lolliLine = makeLine(xpt, ypt, xpt, 0);
         }
         newPt.set_prop(Expression(Atom("object-name\"")), Expression(Atom("point\"")));
-        newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(P)));
+        newPt.set_prop(Expression(Atom("size\"")), Expression(Atom(dP)));
         spoints.push_back(newPt);
         spoints.push_back(lolliLine);
     }
@@ -489,16 +489,16 @@ std::list<Expression> Expression::sigpointlabels(const double AL, const double A
     double yscale = (N / ((OU) - (OL)));
     Expression eAL = dbltoString(AL);
     eAL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eAL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale), -(OL*yscale) + C));
+    eAL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale), -(OL*yscale) + dC));
     Expression eAU = dbltoString(AU);
     eAU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eAU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) + N, -(OL*yscale) + C));
+    eAU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) + N, -(OL*yscale) + dC));
     Expression eOL = dbltoString(OL);
     eOL.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eOL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - D, -(OL*yscale)));
+    eOL.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - dD, -(OL*yscale)));
     Expression eOU = dbltoString(OU);
     eOU.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
-    eOU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - D, -(OL*yscale) - N));
+    eOU.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - dD, -(OL*yscale) - N));
     result.push_back(eAL);
     result.push_back(eAU);
     result.push_back(eOL);
@@ -526,21 +526,21 @@ std::list<Expression> Expression::handleOptions(const Expression options, const 
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
-            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OU * yscale) - A));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OU * yscale) - dA));
             yes.push_back(result);
         } else if(id == "abscissa-label") {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(0)));
-            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OL * yscale) + A));
+            result.set_prop(Expression(Atom("position\"")), makePExpression(((AL + AU) / 2) * xscale, -(OL * yscale) + dA));
             yes.push_back(result);
         } else if(id == "ordinate-label") {
             data = std::next(label.listConstBegin())->head().asString();
             result = makeText(data);
             result.set_prop(Expression(Atom("object-name\"")), Expression(Atom("text\"")));
             result.set_prop(Expression(Atom("rotation\"")), Expression(Atom(-(M_PI/2))));
-            result.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - B, -((OL + OU) / 2) * yscale));
+            result.set_prop(Expression(Atom("position\"")), makePExpression((AL * xscale) - dB, -((OL + OU) / 2) * yscale));
             yes.push_back(result);
         } else if(id == "text-scale") {
             scale = std::next(label.listConstBegin())->head().asNumber();
@@ -577,9 +577,71 @@ Expression Expression::discrete_plot(Environment & env) {
     return result;
 }
 
-//Expression Expression::continuous_plot(Environment & env) {
-  //  return Expression();
-//}
+std::vector<Expression> Expression::fillBounds(const Expression BOUNDS) {
+    double low = BOUNDS.listConstBegin()->head().asNumber();
+    double high = std::next(BOUNDS.listConstBegin())->head().asNumber();
+    double samplesize = ((high - low) / (cM + 0));
+    std::vector<Expression> result;
+    for(auto i = low; i <= (high + samplesize); i += samplesize) {
+        result.push_back(Expression(Atom(i)));
+    }
+    return result;
+}
+
+void Expression::continuousPoints(std::list<Expression> &points, const Expression FUNC, const Expression BOUNDS, Environment & env) {
+    std::vector<Expression> args = fillBounds(BOUNDS);
+    for(auto e : args) {
+        std::vector<Expression> singlearg;
+        singlearg.push_back(e);
+        Expression yval = eval_lambda(FUNC.head(), singlearg, env);
+        Expression pt = makePExpression(e.head().asNumber(), yval.head().asNumber());
+        points.push_back(pt);
+    }
+}
+
+std::list<Expression> Expression::scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+    std::list<Expression> spoints;
+    for(auto e = points.begin(); e != points.end(); ++e) {
+        Expression pt = *e;
+        double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale));
+        double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale));
+        Expression newPt = makePExpression(xpt, ypt);
+        spoints.push_back(newPt);
+    }
+    return spoints;
+}
+
+std::list<Expression> convP2Lines(const std::list<Expression> points) {
+    std::list<Expression> lines;
+    for(auto e = points.begin(); e != points.end(); ++e) {
+        Expression p1 = *e;
+    }
+    return lines;
+}
+
+Expression Expression::continuous_plot(Environment & env) {
+    if(m_tail.size() != 3)
+        throw SemanticError("Error: wrong number of arguments to continuous plot");
+    double AL = 999999, AU = -999999, OL = 999999, OU = -999999;
+    Expression FUNC = m_tail[0];
+    Expression BOUNDS = m_tail[1].eval(env);
+    Expression OPTIONS = m_tail[2].eval(env);
+    std::list<Expression> points;
+    continuousPoints(points, FUNC, BOUNDS, env);
+    findMaxMinPoints(AL, AU, OL, OU, points);
+    double xscale = (N / ((AU) - (AL)));
+    double yscale = (N / ((OU) - (OL)));
+    std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
+    std::list<Expression> scaledPoints = scaleCPoints(points, xscale, yscale, AL, AU, OL, OU);
+    std::list<Expression> functionLines = convP2Lines(scaledPoints);
+    std::list<Expression> plotdata = combineLists(gridlines, functionLines);
+    std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
+    plotdata = combineLists(plotdata, numLabels);
+    std::list<Expression> labels = handleOptions(OPTIONS, AL, AU, OL, OU);
+    plotdata = combineLists(plotdata, labels);
+    Expression result(plotdata);
+    return result;
+}
 
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
@@ -619,7 +681,8 @@ Expression Expression::eval(Environment & env){
       return discrete_plot(env);
   }
   else if(m_head.isSymbol() && m_head.asSymbol() == "continuous-plot") {
-      
+      return continuous_plot(env);
+
   }
   // else attempt to treat as procedure
   else{ 
