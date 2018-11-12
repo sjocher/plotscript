@@ -637,12 +637,13 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
 }
 
 Expression Expression::continuous_plot(Environment & env) {
-    if(m_tail.size() < 2)
-        throw SemanticError("Error: wrong number of arguments to continuous plot");
     double AL = 999999, AU = -999999, OL = 999999, OU = -999999;
     Expression FUNC = m_tail[0];
     Expression BOUNDS = m_tail[1].eval(env);
-    Expression OPTIONS = m_tail[2].eval(env);
+    Expression OPTIONS;
+    if(m_tail.size() == 3) {
+        OPTIONS = m_tail[2].eval(env);
+    }
     std::list<Expression> points;
     continuousPoints(points, FUNC, BOUNDS, env);
     findMaxMinPoints(AL, AU, OL, OU, points);
