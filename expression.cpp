@@ -611,10 +611,13 @@ std::list<Expression> Expression::scaleCPoints(const std::list<Expression> point
     return spoints;
 }
 
-std::list<Expression> convP2Lines(const std::list<Expression> points) {
+std::list<Expression> Expression::convP2Lines(const std::list<Expression> points) {
     std::list<Expression> lines;
-    for(auto e = points.begin(); e != points.end(); ++e) {
+    for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
         Expression p1 = *e;
+        Expression p2 = *(std::next(e));
+        Expression line = makeLine(p1.listConstBegin()->head().asNumber(), std::next(p1.listConstBegin())->head().asNumber(), p2.listConstBegin()->head().asNumber(), std::next(p2.listConstBegin())->head().asNumber());
+        lines.push_back(line);
     }
     return lines;
 }
