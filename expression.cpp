@@ -556,7 +556,7 @@ std::list<Expression> Expression::handleOptions(const Expression options, const 
 }
 
 Expression Expression::discrete_plot(Environment & env) {
-    if(m_tail.size() != 2)
+    if(m_tail.size() < 1)
         throw SemanticError("Error: wrong number of arguments to discrete plot");
     double AL = 999999, AU = -999999, OL = 999999, OU = -999999;
     Expression DATA = m_tail[0].eval(env);
@@ -580,9 +580,9 @@ Expression Expression::discrete_plot(Environment & env) {
 std::vector<Expression> Expression::fillBounds(const Expression BOUNDS) {
     double low = BOUNDS.listConstBegin()->head().asNumber();
     double high = std::next(BOUNDS.listConstBegin())->head().asNumber();
-    double samplesize = ((high - low) / (cM + 1));
+    double samplesize = ((high - low) / (cM + 0));
     std::vector<Expression> result;
-    for(auto i = low; i <= high; i += samplesize) {
+    for(auto i = low; i <= (high + samplesize); i += samplesize) {
         result.push_back(Expression(Atom(i)));
     }
     return result;
