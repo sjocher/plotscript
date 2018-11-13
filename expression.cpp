@@ -698,6 +698,9 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
         lines.push_back(line);
     }
     std::list<Expression> splits = splitLines(lines, FUNC, env, xscale, yscale);
+    for(int i = 0; i < 4; i++) {
+        splits = splitLines(splits, FUNC, env, xscale, yscale);
+    }
     return splits;
 }
 
