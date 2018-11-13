@@ -631,47 +631,65 @@ bool checksplit(const Expression line1, const Expression line2) {
     return false;
 }
 
-std::list<Expression> Expression::makeSplitLine(Expression l1, Expression l2, const Expression FUNC, Environment & env) {
+Expression Expression::getLambdaYValue(const Expression x, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
+    std::vector<Expression> args;
+    args.push_back(x);
+    Expression yval = eval_lambda(FUNC.head(), args, env);
+    Expression pt = makePExpression(x.head().asNumber() * xscale, -(yval.head().asNumber() * yscale));
+    return pt;
+}
+
+std::list<Expression> Expression::makeSplitLine(const Expression l1, const Expression l2, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
     std::list<Expression> splitLines;
-    Environment place = env;
-    Expression pFunc = FUNC;
-    Expression test1 = l1;
-    Expression test2 = l2;
+    Expression p1 = *l1.listConstBegin();
+        double x1 = p1.listConstBegin()->head().asNumber();
+        double y1 = std::next(p1.listConstBegin())->head().asNumber();
+    Expression p2 = *std::next(l1.listConstBegin());
+        double x2 = p2.listConstBegin()->head().asNumber();
+        double y2 = std::next(p2.listConstBegin())->head().asNumber();
+    Expression p3 = *l2.listConstBegin();
+        double x3 = p3.listConstBegin()->head().asNumber();
+        double y3 = std::next(p3.listConstBegin())->head().asNumber();
+    Expression p4 = *std::next(l2.listConstBegin());
+        double x4 = p4.listConstBegin()->head().asNumber();
+        double y4 = std::next(p4.listConstBegin())->head().asNumber();
+    //x1,y1 -> x1+x2/2,newY
+    //x1+x2/2,newY -> x2,y2
+    Expression x1half= getLambdaYValue(Expression(Atom(((x1+x2)/2)/xscale)), FUNC, env, xscale, yscale);
+        double x1split = x1half.listConstBegin()->head().asNumber();
+        double y1split = std::next(x1half.listConstBegin())->head().asNumber();
+    Expression line1 = makeLine(x1, y1, x1split, y1split);
+    Expression line2 = makeLine(x1split, y1split, x2, y2);
+    Expression x2half= getLambdaYValue(Expression(Atom(((x3+x4)/2)/xscale)), FUNC, env, xscale, yscale);
+        double x2split = x2half.listConstBegin()->head().asNumber();
+        double y2split = std::next(x2half.listConstBegin())->head().asNumber();
+    Expression line3 = makeLine(x3, y3, x2split, y2split);
+    Expression line4 = makeLine(x2split, y2split, x4, y4);
+    splitLines.push_back(line1);
+    splitLines.push_back(line2);
+    splitLines.push_back(line3);
+    splitLines.push_back(line4);
     return splitLines;
 }
 
-std::list<Expression> Expression::splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env) {
+std::list<Expression> Expression::splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
     std::list<Expression> splits;
-    int counter = 0;
-    Environment place = env;
-    Expression pFunc = FUNC;
     for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
         Expression l1 = *e;
         Expression l2 = *(std::next(e));
         if(checksplit(l1, l2)) {
-            counter++;
-            //std::cout << counter << std::endl;
-            /*
-             if(counter <= cMAX) {
-             std::list<Expression> newLines = makeSplitLine(l1, l2, FUNC, env);
-             for(auto e : newLines)
-             splits.push_back(e);
-             } else {
-             splits.push_back(l1);
-             splits.push_back(l2);
-             }
-             */
-            splits.push_back(l1);
-            splits.push_back(l2);
+            std::list<Expression> placeholder = makeSplitLine(l1, l2, FUNC, env, xscale, yscale);
+            for(auto e : placeholder)
+                splits.push_back(e);
         } else {
             splits.push_back(l1);
             splits.push_back(l2);
         }
-    }
+     }
     return splits;
 }
 
-std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env) {
+std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
     std::list<Expression> lines;
     for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
         Expression p1 = *e;
@@ -679,8 +697,8 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
         Expression line = makeLine(p1.listConstBegin()->head().asNumber(), std::next(p1.listConstBegin())->head().asNumber(), p2.listConstBegin()->head().asNumber(), std::next(p2.listConstBegin())->head().asNumber());
         lines.push_back(line);
     }
-    std::list<Expression> splits = splitLines(lines, FUNC, env);
-    return lines;
+    std::list<Expression> splits = splitLines(lines, FUNC, env, xscale, yscale);
+    return splits;
 }
 
 Expression Expression::continuous_plot(Environment & env) {
@@ -698,7 +716,7 @@ Expression Expression::continuous_plot(Environment & env) {
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
     std::list<Expression> scaledPoints = scaleCPoints(points, xscale, yscale);
-    std::list<Expression> functionLines = convP2Lines(scaledPoints, FUNC, env);
+    std::list<Expression> functionLines = convP2Lines(scaledPoints, FUNC, env, xscale, yscale);
     std::list<Expression> plotdata = combineLists(gridlines, functionLines);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
