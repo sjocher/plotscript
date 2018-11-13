@@ -673,19 +673,20 @@ std::list<Expression> Expression::makeSplitLine(const Expression l1, const Expre
 }
 
 std::list<Expression> Expression::splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
+    std::cout << "initial" << lines.size() << std::endl;
     std::list<Expression> splits;
     for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
         Expression l1 = *e;
         Expression l2 = *(std::next(e));
         if(checksplit(l1, l2)) {
             std::list<Expression> placeholder = makeSplitLine(l1, l2, FUNC, env, xscale, yscale);
-            for(auto e : placeholder)
-                splits.push_back(e);
+            for(auto i : placeholder)
+                splits.push_back(i);
         } else {
             splits.push_back(l1);
-            splits.push_back(l2);
         }
      }
+    //std::cout << "post" << splits.size() << std::endl;
     return splits;
 }
 
@@ -698,10 +699,9 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
         lines.push_back(line);
     }
     std::list<Expression> splits = splitLines(lines, FUNC, env, xscale, yscale);
-    for(int i = 0; i < 4; i++) {
-        splits = splitLines(splits, FUNC, env, xscale, yscale);
-    }
-    return splits;
+    //for(int i = 0; i < 2; i++)
+      //  splits = splitLines(splits, FUNC, env, xscale, yscale);
+    return lines;
 }
 
 Expression Expression::continuous_plot(Environment & env) {
@@ -726,8 +726,6 @@ Expression Expression::continuous_plot(Environment & env) {
     std::list<Expression> labels = handleOptions(OPTIONS, AL, AU, OL, OU);
     plotdata = combineLists(plotdata, labels);
     Expression result(plotdata);
-    std::cout << plotdata.size() << std::endl;
-    std::cout << result << std::endl;
     return result;
 }
 
