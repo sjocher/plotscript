@@ -686,7 +686,7 @@ std::list<Expression> Expression::splitLines(const std::list<Expression> lines, 
             splits.push_back(l1);
         }
      }
-    //std::cout << "post" << splits.size() << std::endl;
+    std::cout << "post" << splits.size() << std::endl;
     return splits;
 }
 
