@@ -140,16 +140,17 @@ private:
   Expression makePExpression(const double x, const double y);
   std::list<Expression> makeGrid(const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
   Expression makeLine(const double x1, const double y1, const double x2, const double y2);
-  std::list<Expression> scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
+  std::list<Expression> scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double OL, const double OU);
   std::list<Expression> combineLists(const std::list<Expression> list1, const std::list<Expression> list2);
   std::list<Expression> sigpointlabels(const double AL, const double AU, const double OL, const double OU);
   Expression dbltoString(const double num);
   std::list<Expression> handleOptions(const Expression options, const double AL, const double AU, const double OL, const double OU);
   std::vector<Expression> fillBounds(const Expression BOUNDS);
   void continuousPoints(std::list<Expression> &points, const Expression FUNC, const Expression BOUNDS, Environment & env);
-  std::list<Expression> scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU);
-  std::list<Expression> convP2Lines(const std::list<Expression> points);
-  std::list<Expression> splitLines(const std::list<Expression> lines);
+  std::list<Expression> scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale);
+  std::list<Expression> convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env);
+  std::list<Expression> splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env);
+  std::list<Expression> makeSplitLine(Expression l1, Expression l2, const Expression FUNC, Environment & env);
   //graphics scales
   double dP = 0.5;
   double dD = 2;
@@ -157,7 +158,7 @@ private:
   double dB = 3;
   double dA = 3;
   double N = 20;
-  double cMAX = 10;
+  //double cMAX = 10;
   double cM = 50;
 };
 

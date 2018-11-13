@@ -20,6 +20,7 @@ private slots:
     void testFindPoints();
     void testCenterText();
     void testDiscretePlotLayout();
+    void testContinuousPlotLayout();
 private:
     NotebookApp notebook;
     
@@ -277,6 +278,35 @@ void NotebookTest::testDiscretePlotLayout() {
     QCOMPARE(findPoints(scene, QPointF(-10, 10), 0.6), 1);
     // check the point at (1,1)
     QCOMPARE(findPoints(scene, QPointF(10, -10), 0.6), 1);
+}
+
+void NotebookTest::testContinuousPlotLayout() {
+    std::string program = R"(
+    (begin
+     (define f (lambda (x) (/ 1 (+ 1 (^ e (- (* 5 x)))))))
+     (continuous-plot f (list -1 1) ))
+    )";
+    
+    NotebookApp notebook;
+    
+    auto inputWidget = notebook.findChild<InputWidget *>("input");
+    
+    auto outputWidget = notebook.findChild<OutputWidget *>("output");
+    
+    inputWidget->setPlainText(QString::fromStdString(program));
+    QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
+    
+    auto view = outputWidget->findChild<QGraphicsView *>();
+    QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
+    
+    auto scene = view->scene();
+    
+    // first check total number of items
+    // 55 lines + 0 points + 4 text = 59
+    auto items = scene->items();
+    QCOMPARE(items.size(), 59);
+    
+    
 }
 
 QTEST_MAIN(NotebookTest)

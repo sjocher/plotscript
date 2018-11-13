@@ -1250,4 +1250,55 @@ TEST_CASE("Milestone 2 test cases", "[Milestone 2]") {
         //REQUIRE(result == result2);
         REQUIRE(result.head().asString() == "a complex number");
     }
+    
+}
+
+TEST_CASE("Milestone 3 test cases", "[Milestone 3]") {
+    {
+        std::string program = R"(
+        (discrete-plot (list (list -1 -1) (list 1 1))
+         (list (list "title" "The Title")
+          (list "abscissa-label" "X Label")
+          (list "ordinate-label" "Y Label") ))
+        )";
+        Expression result = run(program);
+    }
+    {
+        std::string program = R"(
+        (begin
+         (define f (lambda (x) (^ e x)))
+         (continuous-plot f (list -1 1)
+          (list
+           (list "title" "A continuous linear function")
+           (list "abscissa-label" "x")
+           (list "ordinate-label" "y"))))
+        )";
+        Expression result = run(program);
+    }
+    {
+        std::string program = R"(
+        (begin
+         (define f (lambda (x) (sin x)))
+         (continuous-plot f (list (- pi) pi)
+          (list
+           (list "title" "A continuous linear function")
+           (list "abscissa-label" "x")
+           (list "ordinate-label" "y"))))
+        )";
+        Expression result = run(program);
+    }
+    {
+        std::string program = R"(
+        (begin
+         (define f (lambda (x) (sin x)))
+         (continuous-plot f (list (- (* 10 pi)) (* 10 pi))
+          (list
+           (list "title" "A continuous linear function")
+           (list "abscissa-label" "x")
+           (list "ordinate-label" "y"))))
+        )";
+        Expression result = run(program);
+    }
+    
+    
 }

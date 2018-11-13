@@ -5,6 +5,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <iomanip>
+#include <cmath>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -443,7 +444,7 @@ std::list<Expression> Expression::makeGrid(const double xscale, const double ysc
     return lines;
 }
 
-std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+std::list<Expression> Expression::scalePoints(const std::list<Expression> points, const double xscale, const double yscale, const double OL, const double OU) {
     std::list<Expression> spoints;
     for(auto e = points.begin(); e != points.end(); ++e) {
         Expression pt = *e;
@@ -567,7 +568,7 @@ Expression Expression::discrete_plot(Environment & env) {
     double xscale = (N / ((AU) - (AL)));
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
-    std::list<Expression> scaledPoints = scalePoints(points, xscale, yscale, AL, AU, OL, OU);
+    std::list<Expression> scaledPoints = scalePoints(points, xscale, yscale, OL, OU);
     std::list<Expression> plotdata = combineLists(gridlines, scaledPoints);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
@@ -599,7 +600,7 @@ void Expression::continuousPoints(std::list<Expression> &points, const Expressio
     }
 }
 
-std::list<Expression> Expression::scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale, const double AL, const double AU, const double OL, const double OU) {
+std::list<Expression> Expression::scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale) {
     std::list<Expression> spoints;
     for(auto e = points.begin(); e != points.end(); ++e) {
         Expression pt = *e;
@@ -611,20 +612,66 @@ std::list<Expression> Expression::scaleCPoints(const std::list<Expression> point
     return spoints;
 }
 
-std::list<Expression> Expression::splitLines(const std::list<Expression> lines) {
+
+bool checksplit(const Expression line1, const Expression line2) {
+    Expression point1 = *line1.listConstBegin();
+        double x1 = point1.listConstBegin()->head().asNumber();
+        double y1 = std::next(point1.listConstBegin())->head().asNumber();
+    Expression point2 = *line2.listConstBegin();
+        double x2 = point2.listConstBegin()->head().asNumber();
+        double y2 = std::next(point2.listConstBegin())->head().asNumber();
+    Expression point3 = *(std::next(line2.listConstBegin()));
+        double x3 = point3.listConstBegin()->head().asNumber();
+        double y3 = std::next(point3.listConstBegin())->head().asNumber();
+    double angle1 = (atan2((y2-y1), (x2-x1)))*(180/M_PI);
+    double angle2 = (atan2((y3-y2), (x3-x2)))*(180/M_PI);
+    if(fabs(angle2 - angle1) >= 5) {
+        return true;
+    }
+    return false;
+}
+
+std::list<Expression> Expression::makeSplitLine(Expression l1, Expression l2, const Expression FUNC, Environment & env) {
+    std::list<Expression> splitLines;
+    Environment place = env;
+    Expression pFunc = FUNC;
+    Expression test1 = l1;
+    Expression test2 = l2;
+    return splitLines;
+}
+
+std::list<Expression> Expression::splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env) {
     std::list<Expression> splits;
+    int counter = 0;
+    Environment place = env;
+    Expression pFunc = FUNC;
     for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
         Expression l1 = *e;
         Expression l2 = *(std::next(e));
-    }
-    int counter = 0;
-    if(counter < cMAX) {
-        //do nothing
+        if(checksplit(l1, l2)) {
+            counter++;
+            //std::cout << counter << std::endl;
+            /*
+             if(counter <= cMAX) {
+             std::list<Expression> newLines = makeSplitLine(l1, l2, FUNC, env);
+             for(auto e : newLines)
+             splits.push_back(e);
+             } else {
+             splits.push_back(l1);
+             splits.push_back(l2);
+             }
+             */
+            splits.push_back(l1);
+            splits.push_back(l2);
+        } else {
+            splits.push_back(l1);
+            splits.push_back(l2);
+        }
     }
     return splits;
 }
 
-std::list<Expression> Expression::convP2Lines(const std::list<Expression> points) {
+std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env) {
     std::list<Expression> lines;
     for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
         Expression p1 = *e;
@@ -632,7 +679,7 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
         Expression line = makeLine(p1.listConstBegin()->head().asNumber(), std::next(p1.listConstBegin())->head().asNumber(), p2.listConstBegin()->head().asNumber(), std::next(p2.listConstBegin())->head().asNumber());
         lines.push_back(line);
     }
-    //std::list<Expression> splits = splitLines(lines);
+    std::list<Expression> splits = splitLines(lines, FUNC, env);
     return lines;
 }
 
@@ -650,14 +697,16 @@ Expression Expression::continuous_plot(Environment & env) {
     double xscale = (N / ((AU) - (AL)));
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
-    std::list<Expression> scaledPoints = scaleCPoints(points, xscale, yscale, AL, AU, OL, OU);
-    std::list<Expression> functionLines = convP2Lines(scaledPoints);
+    std::list<Expression> scaledPoints = scaleCPoints(points, xscale, yscale);
+    std::list<Expression> functionLines = convP2Lines(scaledPoints, FUNC, env);
     std::list<Expression> plotdata = combineLists(gridlines, functionLines);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
     std::list<Expression> labels = handleOptions(OPTIONS, AL, AU, OL, OU);
     plotdata = combineLists(plotdata, labels);
     Expression result(plotdata);
+    std::cout << plotdata.size() << std::endl;
+    std::cout << result << std::endl;
     return result;
 }
 
