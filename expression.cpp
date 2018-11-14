@@ -632,7 +632,7 @@ bool checksplit(const Expression line1, const Expression line2) {
     double m13 = sqrt(dx31*dx31 + dy31*dy31);
     double theta = acos((dx21*dx31 + dy21*dy31) / (m12 * m13));
     double angle = theta * (180/M_PI);
-    if((int)angle < 175 && !isnan(angle)) {
+    if((int)angle < 175 && !std::isnan(angle)) {
         return true;
     }
     return false;
