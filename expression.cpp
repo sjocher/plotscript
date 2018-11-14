@@ -645,7 +645,7 @@ std::list<Expression> Expression::makeSplitLine(const Expression p1, const Expre
     return newPoints;
 }
 
-std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
+std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const double xscale, const double yscale) {
     std::list<Expression> lines;
     for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
         Expression p1 = *e;
@@ -692,7 +692,7 @@ Expression Expression::continuous_plot(Environment & env) {
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
     std::list<Expression> smoothed = smoothedLines(points, FUNC, env);
-    std::list<Expression> functionLines = convP2Lines(smoothed, FUNC, env, xscale, yscale);
+    std::list<Expression> functionLines = convP2Lines(smoothed, xscale, yscale);
     std::list<Expression> plotdata = combineLists(gridlines, functionLines);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
