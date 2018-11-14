@@ -600,29 +600,13 @@ void Expression::continuousPoints(std::list<Expression> &points, const Expressio
     }
 }
 
-std::list<Expression> Expression::scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale) {
-    std::list<Expression> spoints;
-    for(auto e = points.begin(); e != points.end(); ++e) {
-        Expression pt = *e;
-        double xpt = (((pt.listConstBegin()->head().asNumber()) * xscale));
-        double ypt = -(((std::next(pt.listConstBegin()))->head().asNumber() * yscale));
-        Expression newPt = makePExpression(xpt, ypt);
-        spoints.push_back(newPt);
-    }
-    return spoints;
-}
-
-
-bool checksplit(const Expression line1, const Expression line2) {
-    Expression point1 = *line1.listConstBegin();
-        double x2 = point1.listConstBegin()->head().asNumber();
-        double y2 = std::next(point1.listConstBegin())->head().asNumber();
-    Expression point2 = *line2.listConstBegin();
-        double x1 = point2.listConstBegin()->head().asNumber();
-        double y1 = std::next(point2.listConstBegin())->head().asNumber();
-    Expression point3 = *(std::next(line2.listConstBegin()));
-        double x3 = point3.listConstBegin()->head().asNumber();
-        double y3 = std::next(point3.listConstBegin())->head().asNumber();
+bool checksplit(const Expression p1, const Expression p2, const Expression p3) {
+    double x2 = p1.listConstBegin()->head().asNumber();
+    double y2 = std::next(p1.listConstBegin())->head().asNumber();
+    double x1 = p2.listConstBegin()->head().asNumber();
+    double y1 = std::next(p2.listConstBegin())->head().asNumber();
+    double x3 = p3.listConstBegin()->head().asNumber();
+    double y3 = std::next(p3.listConstBegin())->head().asNumber();
     //x1 is the center point
     double dx21 = x2-x1;
     double dx31 = x3-x1;
@@ -632,69 +616,33 @@ bool checksplit(const Expression line1, const Expression line2) {
     double m13 = sqrt(dx31*dx31 + dy31*dy31);
     double theta = acos((dx21*dx31 + dy21*dy31) / (m12 * m13));
     double angle = theta * (180/M_PI);
-    if((int)angle < 175 && !std::isnan(angle)) {
+    if(angle < 175 && !std::isnan(angle)) {
         return true;
     }
     return false;
 }
 
-Expression Expression::getLambdaYValue(const Expression x, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
+Expression Expression::getLambdaYValue(const Expression x, const Expression FUNC, Environment & env) {
     std::vector<Expression> args;
     args.push_back(x);
     Expression yval = eval_lambda(FUNC.head(), args, env);
-    Expression pt = makePExpression(x.head().asNumber() * xscale, -(yval.head().asNumber() * yscale));
+    Expression pt = makePExpression(x.head().asNumber(), (yval.head().asNumber()));
     return pt;
 }
 
-std::list<Expression> Expression::makeSplitLine(const Expression l1, const Expression l2, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
-    std::list<Expression> splitLines;
-    Expression p1 = *l1.listConstBegin();
-        double x1 = p1.listConstBegin()->head().asNumber();
-        double y1 = std::next(p1.listConstBegin())->head().asNumber();
-    Expression p2 = *std::next(l1.listConstBegin());
-        double x2 = p2.listConstBegin()->head().asNumber();
-        double y2 = std::next(p2.listConstBegin())->head().asNumber();
-    Expression p3 = *std::next(l2.listConstBegin());
-        double x3 = p3.listConstBegin()->head().asNumber();
-        double y3 = std::next(p3.listConstBegin())->head().asNumber();
-    Expression split1half = getLambdaYValue(Expression(Atom(((x1+x2)/2)/xscale)), FUNC, env, xscale, yscale);
-    Expression split2half = getLambdaYValue(Expression(Atom(((x2+x3)/2)/xscale)), FUNC, env, xscale, yscale);
-        double x1split = split1half.listConstBegin()->head().asNumber();
-        double y1split = std::next(split1half.listConstBegin())->head().asNumber();
-    Expression line1 = makeLine(x1, y1, x1split, y1split);
-    Expression line2 = makeLine(x1split, y1split, x2, y2);
-        double x2split = split2half.listConstBegin()->head().asNumber();
-        double y2split = std::next(split2half.listConstBegin())->head().asNumber();
-    Expression line3 = makeLine(x2, y2, x2split, y2split);
-    Expression line4 = makeLine(x2split, y2split, x3, y3);
-    splitLines.push_back(line1);
-    splitLines.push_back(line2);
-    splitLines.push_back(line3);
-    splitLines.push_back(line4);
-    return splitLines;
-}
-
-std::list<Expression> Expression::splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env, const double xscale, const double yscale, bool & split) {
-    std::cout << "initial" <<lines.size() << std::endl;
-    std::list<Expression> splits;
-    int counter = 0;
-    for(auto e = lines.begin(); e != std::prev(lines.end()); ++e) {
-        Expression l1 = *e;
-        Expression l2 = *(std::next(e));
-        if(checksplit(l1, l2)) {
-            counter++;
-            std::list<Expression> newsplits = makeSplitLine(l1, l2, FUNC, env, xscale, yscale);
-            for(auto e : newsplits)
-                splits.push_back(e);
-        } else {
-            if(splits.back() != l1)
-                splits.push_back(l1);
-            splits.push_back(l2);
-        }
-    }
-    if(counter == 0) split = false;
-    std::cout << "after: " << splits.size() << std::endl;
-    return splits;
+std::list<Expression> Expression::makeSplitLine(const Expression p1, const Expression p2, const Expression p3, const Expression FUNC, Environment & env) {
+    std::list<Expression> newPoints;
+    double x1 = p1.listConstBegin()->head().asNumber();
+    double x2 = p2.listConstBegin()->head().asNumber();
+    double x3 = p3.listConstBegin()->head().asNumber();
+    Expression split1half = getLambdaYValue(Expression(Atom(((x1+x2)/2))), FUNC, env);
+    Expression split2half = getLambdaYValue(Expression(Atom(((x2+x3)/2))), FUNC, env);
+    newPoints.push_back(p1);
+    newPoints.push_back(split1half);
+    newPoints.push_back(p2);
+    newPoints.push_back(split2half);
+    newPoints.push_back(p3);
+    return newPoints;
 }
 
 std::list<Expression> Expression::convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env, const double xscale, const double yscale) {
@@ -702,17 +650,32 @@ std::list<Expression> Expression::convP2Lines(const std::list<Expression> points
     for(auto e = points.begin(); e != std::prev(points.end()); ++e) {
         Expression p1 = *e;
         Expression p2 = *(std::next(e));
-        Expression line = makeLine(p1.listConstBegin()->head().asNumber(), std::next(p1.listConstBegin())->head().asNumber(), p2.listConstBegin()->head().asNumber(), std::next(p2.listConstBegin())->head().asNumber());
+        Expression line = makeLine((p1.listConstBegin()->head().asNumber()) * xscale, -(std::next(p1.listConstBegin())->head().asNumber()) * yscale, (p2.listConstBegin()->head().asNumber()) * xscale, -(std::next(p2.listConstBegin())->head().asNumber())* yscale);
         lines.push_back(line);
     }
-    bool split = true;
-    int counter = 0;
-    std::list<Expression> splits = splitLines(lines, FUNC, env, xscale, yscale, split);
-    while(split && (counter <= 10)) {
-       splits = splitLines(splits, FUNC, env, xscale, yscale, split);
-       counter++;
+    return lines;
+}
+
+std::list<Expression> Expression::smoothedLines(const std::list<Expression> points, const Expression FUNC, Environment & env) {
+    std::list<Expression> smoothies;
+    for(auto e = points.begin(); e != std::prev(std::prev(points.end())); ++e) {
+        Expression p1 = *e;
+        Expression p2 = *(std::next(e));
+        Expression p3 = *(std::next(std::next(e)));
+        if(checksplit(p1, p2, p3)) {
+            std::list<Expression> additionalPoints = makeSplitLine(p1, p2, p3, FUNC, env);
+            for(auto i : additionalPoints)
+                smoothies.push_back(i);
+            e = std::next(std::next(e));
+        } else {
+            smoothies.push_back(p1);
+            if(e == std::prev(std::prev(std::prev(points.end())))) {
+                smoothies.push_back(p2);
+                smoothies.push_back(p3);
+            }
+        }
     }
-    return splits;
+    return smoothies;
 }
 
 Expression Expression::continuous_plot(Environment & env) {
@@ -720,17 +683,16 @@ Expression Expression::continuous_plot(Environment & env) {
     Expression FUNC = m_tail[0];
     Expression BOUNDS = m_tail[1].eval(env);
     Expression OPTIONS;
-    if(m_tail.size() == 3) {
+    if(m_tail.size() == 3)
         OPTIONS = m_tail[2].eval(env);
-    }
     std::list<Expression> points;
     continuousPoints(points, FUNC, BOUNDS, env);
     findMaxMinPoints(AL, AU, OL, OU, points);
     double xscale = (N / ((AU) - (AL)));
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
-    std::list<Expression> scaledPoints = scaleCPoints(points, xscale, yscale);
-    std::list<Expression> functionLines = convP2Lines(scaledPoints, FUNC, env, xscale, yscale);
+    std::list<Expression> smoothed = smoothedLines(points, FUNC, env);
+    std::list<Expression> functionLines = convP2Lines(smoothed, FUNC, env, xscale, yscale);
     std::list<Expression> plotdata = combineLists(gridlines, functionLines);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);

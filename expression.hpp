@@ -149,9 +149,9 @@ private:
   void continuousPoints(std::list<Expression> &points, const Expression FUNC, const Expression BOUNDS, Environment & env);
   std::list<Expression> scaleCPoints(const std::list<Expression> points, const double xscale, const double yscale);
   std::list<Expression> convP2Lines(const std::list<Expression> points, const Expression FUNC, Environment & env, const double xscale, const double yscale);
-  std::list<Expression> splitLines(const std::list<Expression> lines, const Expression FUNC, Environment & env, const double xscale, const double yscale, bool & split);
-  std::list<Expression> makeSplitLine(const Expression l1, const Expression l2, const Expression FUNC, Environment & env, const double xscale, const double yscale);
-  Expression getLambdaYValue(const Expression x, const Expression FUNC, Environment & env, const double xscale, const double yscale);
+  std::list<Expression> makeSplitLine(const Expression p1, const Expression p2, const Expression p3, const Expression FUNC, Environment & env);
+  Expression getLambdaYValue(const Expression x, const Expression FUNC, Environment & env);
+  std::list<Expression> smoothedLines(const std::list<Expression> points, const Expression FUNC, Environment & env);
   //graphics scales
   double dP = 0.5;
   double dD = 2;
