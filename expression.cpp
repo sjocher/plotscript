@@ -666,7 +666,7 @@ std::list<Expression> Expression::smoothedLines(const std::list<Expression> poin
             std::list<Expression> additionalPoints = makeSplitLine(p1, p2, p3, FUNC, env);
             for(auto i : additionalPoints)
                 smoothies.push_back(i);
-            e = std::next(std::next(e));
+            e = (std::next(e));
         } else {
             smoothies.push_back(p1);
             if(e == std::prev(std::prev(std::prev(points.end())))) {
@@ -676,6 +676,21 @@ std::list<Expression> Expression::smoothedLines(const std::list<Expression> poin
         }
     }
     return smoothies;
+}
+
+std::list<Expression> removePointLines(const std::list<Expression> lines) {
+    std::list<Expression> result;
+    for(auto e = lines.begin(); e != lines.end(); ++e) {
+        Expression l = *e;
+        Expression p1 = *l.listConstBegin();
+        double x1 = p1.listConstBegin()->head().asNumber();
+        Expression p2 = *std::next(l.listConstBegin());
+        double x2 = p2.listConstBegin()->head().asNumber();
+        if(x1 != x2) {
+            result.push_back(l);
+        }
+    }
+    return result;
 }
 
 Expression Expression::continuous_plot(Environment & env) {
@@ -693,7 +708,8 @@ Expression Expression::continuous_plot(Environment & env) {
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
     std::list<Expression> functionLines = convP2Lines(smoothed, xscale, yscale);
-    std::list<Expression> plotdata = combineLists(gridlines, functionLines);
+    std::list<Expression> rest = removePointLines(functionLines);
+    std::list<Expression> plotdata = combineLists(gridlines, rest);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
     plotdata = combineLists(plotdata, numLabels);
     std::list<Expression> labels = handleOptions(OPTIONS, AL, AU, OL, OU);
