@@ -687,11 +687,11 @@ Expression Expression::continuous_plot(Environment & env) {
         OPTIONS = m_tail[2].eval(env);
     std::list<Expression> points;
     continuousPoints(points, FUNC, BOUNDS, env);
-    findMaxMinPoints(AL, AU, OL, OU, points);
+    std::list<Expression> smoothed = smoothedLines(points, FUNC, env);
+    findMaxMinPoints(AL, AU, OL, OU, smoothed);
     double xscale = (N / ((AU) - (AL)));
     double yscale = (N / ((OU) - (OL)));
     std::list<Expression> gridlines = makeGrid(xscale, yscale, AL, AU, OL, OU);
-    std::list<Expression> smoothed = smoothedLines(points, FUNC, env);
     std::list<Expression> functionLines = convP2Lines(smoothed, xscale, yscale);
     std::list<Expression> plotdata = combineLists(gridlines, functionLines);
     std::list<Expression> numLabels = sigpointlabels(AL, AU, OL, OU);
