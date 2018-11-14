@@ -21,6 +21,7 @@ private slots:
     void testCenterText();
     void testDiscretePlotLayout();
     void testContinuousPlotLayout();
+    void testSineSplitting();
 private:
     NotebookApp notebook;
     
@@ -286,27 +287,38 @@ void NotebookTest::testContinuousPlotLayout() {
      (define f (lambda (x) (/ 1 (+ 1 (^ e (- (* 5 x)))))))
      (continuous-plot f (list -1 1) ))
     )";
-    
     NotebookApp notebook;
-    
     auto inputWidget = notebook.findChild<InputWidget *>("input");
-    
     auto outputWidget = notebook.findChild<OutputWidget *>("output");
-    
     inputWidget->setPlainText(QString::fromStdString(program));
     QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
-    
     auto view = outputWidget->findChild<QGraphicsView *>();
     QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
-    
     auto scene = view->scene();
-    
     // first check total number of items
     // 55 lines + 0 points + 4 text = 59
     auto items = scene->items();
     QCOMPARE(items.size(), 59);
-    
-    
+}
+
+void NotebookTest::testSineSplitting() {
+    std::string program = R"(
+    (begin
+     (define f (lambda (x) (sin x)))
+     (continuous-plot f (list (- pi) pi)))
+    )";
+    NotebookApp notebook;
+    auto inputWidget = notebook.findChild<InputWidget *>("input");
+    auto outputWidget = notebook.findChild<OutputWidget *>("output");
+    inputWidget->setPlainText(QString::fromStdString(program));
+    QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
+    auto view = outputWidget->findChild<QGraphicsView *>();
+    QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
+    auto scene = view->scene();
+    // first check total number of items
+    // 66 lines + 0 points + 4 text + 4 gridlines + 2 axis = 76
+    auto items = scene->items();
+    QCOMPARE(items.size(), 76);
 }
 
 QTEST_MAIN(NotebookTest)

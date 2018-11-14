@@ -1299,6 +1299,16 @@ TEST_CASE("Milestone 3 test cases", "[Milestone 3]") {
         )";
         Expression result = run(program);
     }
-    
-    
+    {
+        std::string program = R"(
+        (begin
+         (define f (lambda (x) (/ 1 (+ 1 (^ e (- (* 5 x)))))))
+         (continuous-plot f (list -1 1)
+          (list
+           (list "title" "A continuous linear function")
+           (list "abscissa-label" "x")
+           (list "ordinate-label" "y"))))
+        )";
+        Expression result = run(program);
+    }
 }

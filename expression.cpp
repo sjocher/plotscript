@@ -607,7 +607,6 @@ bool checksplit(const Expression p1, const Expression p2, const Expression p3) {
     double y1 = std::next(p2.listConstBegin())->head().asNumber();
     double x3 = p3.listConstBegin()->head().asNumber();
     double y3 = std::next(p3.listConstBegin())->head().asNumber();
-    //x1 is the center point
     double dx21 = x2-x1;
     double dx31 = x3-x1;
     double dy21 = y2-y1;
