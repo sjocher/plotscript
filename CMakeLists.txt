@@ -97,16 +97,16 @@ add_test(unit_tests unit_tests)
 
 # In the reference environment enable coverage on tests
 if(DEFINED ENV{ECE3574_REFERENCE_ENV})
-  message("-- Enabling test coverage")
-  set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-  set_target_properties(interpreter PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
-  set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
-  target_link_libraries(unit_tests interpreter gcov)
-  target_link_libraries(plotscript interpreter gcov)
-  add_custom_target(coverage
-    COMMAND ${CMAKE_COMMAND} -E env "ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/coverage.sh)
+   set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+   set_target_properties(interpreter PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
+   set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
+   target_link_libraries(unit_tests interpreter pthread gcov)
+   target_link_libraries(plotscript interpreter pthread gcov)
+   add_custom_target(coverage
+     COMMAND ${CMAKE_COMMAND} -E env "ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
+     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/coverage.sh)
 endif()
+
 
 # In the reference environment enable memory checking on tests
 if(DEFINED ENV{ECE3574_REFERENCE_ENV})
@@ -171,3 +171,5 @@ endif (DOXYGEN_FOUND)
 set(STARTUP_FILE ${CMAKE_SOURCE_DIR}/startup.pls)
 configure_file(${CMAKE_SOURCE_DIR}/startup_config.hpp.in ${CMAKE_BINARY_DIR}/startup_config.hpp)
 include_directories(${CMAKE_BINARY_DIR})
+
+

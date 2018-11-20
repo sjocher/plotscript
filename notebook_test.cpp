@@ -175,7 +175,6 @@ int findPoints(QGraphicsScene * scene, QPointF center, qreal radius){
             numpoints += 1;
         }
     }
-    
     return numpoints;
 }
 
@@ -184,7 +183,6 @@ int findPoints(QGraphicsScene * scene, QPointF center, qreal radius){
  rotation and string contents
  */
 int findText(QGraphicsScene * scene, QPointF center, qreal rotation, QString contents){
-    
     int numtext(0);
     foreach(auto item, scene->items(center)){
         if(item->type() == QGraphicsTextItem::Type){
