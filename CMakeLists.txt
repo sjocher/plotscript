@@ -30,6 +30,7 @@ set(unittest_src
 # EDIT
 # add source for any TUI modules here
 set(tui_src
+    tsQueue.hpp
   )
 
 # EDIT

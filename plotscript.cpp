@@ -6,6 +6,7 @@
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
 #include "startup_config.hpp"
+#include "tsQueue.hpp"
 
 void prompt(){
   std::cout << "\nplotscript> ";
