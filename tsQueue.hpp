@@ -1,5 +1,9 @@
+#ifndef TSQUEUE_HPP
+#define TSQUEUE_HPP
+
 #include <queue>
 #include <mutex>
+#include <condition_variable>
 
 template<typename T>
 class tsQueue {
@@ -40,3 +44,6 @@ private:
     mutable std::mutex the_mutex;
     std::condition_variable the_condition_variable;
 };
+
+
+#endif

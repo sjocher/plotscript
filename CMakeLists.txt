@@ -31,6 +31,7 @@ set(unittest_src
 # add source for any TUI modules here
 set(tui_src
     tsQueue.hpp
+    parseInterp.hpp
   )
 
 # EDIT
