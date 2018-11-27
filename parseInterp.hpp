@@ -1,7 +1,13 @@
 #ifndef PARSEINTERP_HPP
 #define PARSEINTERP_HPP
 
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <fstream>
+
 #include "interpreter.hpp"
+#include "startup_config.hpp"
 #include "tsQueue.hpp"
 
 typedef tsQueue<std::string> parseQueue;
@@ -13,22 +19,34 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, Interpreter *interpreter) {
+    parseInterp(parseQueue *parseQ, resultQueue *resultQ) {
         pQ = parseQ;
         rQ = resultQ;
-        interp = interpreter;
     }
     void operator()() const {
+        //load startup file
+        Interpreter interp;
+        std::ifstream startup(STARTUP_FILE);
+        if(!interp.parseStream(startup)) {
+            error("Invalid Startup. Could not parse.");
+        } else {
+            try {
+                Expression exp = interp.evaluate();
+            } catch (const SemanticError & ex){
+                std::cerr << ex.what() << std::endl;
+            }
+        }
+        //keep thread alive
         while(1) {
             std::string line;
             pQ->wait_and_pop(line);
             std::istringstream expression(line);
-            if(!interp->parseStream(expression)){
+            if(!interp.parseStream(expression)){
                 error("Invalid Expression. Could not parse.");
             }
             else{
                 try{
-                    Expression exp = interp->evaluate();
+                    Expression exp = interp.evaluate();
                     rQ->push(exp);
                 }
                 catch(const SemanticError & ex){
@@ -40,7 +58,6 @@ public:
 private:
     parseQueue * pQ;
     resultQueue * rQ;
-    Interpreter * interp;
 };
 
 #endif
