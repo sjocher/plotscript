@@ -55,6 +55,9 @@ public:
             }
         }
     }
+    void reset() {
+        
+    }
 private:
     parseQueue * pQ;
     resultQueue * rQ;
