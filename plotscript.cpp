@@ -59,18 +59,13 @@ int eval_from_command(std::string argexp){
 
 
 // A REPL is a repeated read-eval-print loop
-void repl(){
-    Interpreter interp;
-    parseQueue pQ;
-    resultQueue rQ;
-    parseInterp pI(&pQ, &rQ, &interp);
-    bool kernalRunning = false;
+void repl(parseQueue * pQ, resultQueue * rQ, Interpreter * interp){
     std::ifstream startup(STARTUP_FILE);
-    if(!interp.parseStream(startup)) {
+    if(!interp->parseStream(startup)) {
         error("Invalid Startup. Could not parse.");
     } else {
         try {
-            Expression exp = interp.evaluate();
+            Expression exp = interp->evaluate();
         } catch (const SemanticError & ex){
             std::cerr << ex.what() << std::endl;
         }
@@ -80,31 +75,19 @@ void repl(){
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
-        /*
-         if(line.front() == '%') {
-         if(line == "%start") {
-         kernalRunning = true;
-         continue;
-         } else if(line == "%stop") {
-         kernalRunning = false;
-         continue;
-         }
-         }
-         */
-        //if(kernalRunning) {
-        std::thread newThread(pI);
-            pQ.push(line);
-            Expression exp;
-            rQ.wait_and_pop(exp);
-            std::cout << exp << std::endl;
-        newThread.join();
-        //} else {
-          //  error("interpreter kernel not running");
-        //}
+        pQ->push(line);
+        Expression exp;
+        rQ->wait_and_pop(exp);
+        std::cout << exp << std::endl;
     }
 }
 
 int main(int argc, char *argv[]) {
+    Interpreter interp;
+    parseQueue pQ;
+    resultQueue rQ;
+    parseInterp pI(&pQ, &rQ, &interp);
+    std::thread newThread(pI);
     if(argc == 2){
         return eval_from_file(argv[1]);
     }
@@ -117,7 +100,8 @@ int main(int argc, char *argv[]) {
         }
     }
     else{
-        repl();
+        repl(&pQ, &rQ, &interp);
     }
+    newThread.join();
     return EXIT_SUCCESS;
 }

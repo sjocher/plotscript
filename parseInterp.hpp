@@ -13,25 +13,27 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, Interpreter * interpreter) {
+    parseInterp(parseQueue *parseQ, resultQueue *resultQ, Interpreter *interpreter) {
         pQ = parseQ;
         rQ = resultQ;
         interp = interpreter;
     }
     void operator()() const {
-        std::string line;
-        pQ->wait_and_pop(line);
-        std::istringstream expression(line);
-        if(!interp->parseStream(expression)){
-            error("Invalid Expression. Could not parse.");
-        }
-        else{
-            try{
-                Expression exp = interp->evaluate();
-                rQ->push(exp);
+        while(1) {
+            std::string line;
+            pQ->wait_and_pop(line);
+            std::istringstream expression(line);
+            if(!interp->parseStream(expression)){
+                error("Invalid Expression. Could not parse.");
             }
-            catch(const SemanticError & ex){
-                std::cerr << ex.what() << std::endl;
+            else{
+                try{
+                    Expression exp = interp->evaluate();
+                    rQ->push(exp);
+                }
+                catch(const SemanticError & ex){
+                    std::cerr << ex.what() << std::endl;
+                }
             }
         }
     }
