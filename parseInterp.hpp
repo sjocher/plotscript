@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-
+#include <atomic>
 #include "interpreter.hpp"
 #include "startup_config.hpp"
 #include "tsQueue.hpp"
@@ -19,9 +19,10 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ) {
+    parseInterp(parseQueue *parseQ, resultQueue *resultQ, bool *state) {
         pQ = parseQ;
         rQ = resultQ;
+        run = state;
     }
     void operator()() const {
         //load startup file
@@ -37,9 +38,10 @@ public:
             }
         }
         //keep thread alive
-        while(1) {
+        while(run) {
             std::string line;
             pQ->wait_and_pop(line);
+            if(line == "%stop" || line == "%reset") break;
             std::istringstream expression(line);
             if(!interp.parseStream(expression)){
                 error("Invalid Expression. Could not parse.");
@@ -51,16 +53,14 @@ public:
                 }
                 catch(const SemanticError & ex){
                     std::cerr << ex.what() << std::endl;
+                    rQ->push(Expression(Atom("ERROR")));
                 }
             }
         }
     }
-    void reset() {
-        
-    }
 private:
     parseQueue * pQ;
     resultQueue * rQ;
+    bool * run;
 };
-
 #endif

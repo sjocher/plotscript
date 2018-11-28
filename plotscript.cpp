@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <atomic>
 
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
@@ -63,28 +64,41 @@ void repl(std::thread *thread){
     bool kernalRunning = false;
     parseQueue pQ;
     resultQueue rQ;
-    parseInterp pI(&pQ, &rQ);
+    parseInterp pI(&pQ, &rQ, &kernalRunning);
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
         if(line.front() == '%') {
             if(line == "%start") {
-                kernalRunning = true;
-                *thread = std::thread(pI);
+                if(!kernalRunning) {
+                    kernalRunning = true;
+                    *thread = std::thread(pI);
+                }
                 continue;
             } else if (line == "%stop") {
                 kernalRunning = false;
+                if(thread->joinable()) {
+                    pQ.push(line);
+                    thread->join();
+                }
                 continue;
             } else if (line == "%reset") {
-                
+                if(thread->joinable()) {
+                    pQ.push(line);
+                    thread->join();
+                    *thread = std::thread(pI);
+                }
+                continue;
             }
         }
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
             rQ.wait_and_pop(exp);
-            std::cout << exp << std::endl;
+            //weird fix but w/e
+            if(exp.head().asSymbol() != "ERROR")
+                std::cout << exp << std::endl;
         } else {
             error("interpreter kernel not running");
         }
