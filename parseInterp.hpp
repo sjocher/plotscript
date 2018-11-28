@@ -19,12 +19,10 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, bool *state) {
-        pQ = parseQ;
-        rQ = resultQ;
-        run = state;
+    parseInterp() {
+        
     }
-    void operator()() const {
+    void pni(parseQueue *pQ, resultQueue *rQ, bool *run) {
         //load startup file
         Interpreter interp;
         std::ifstream startup(STARTUP_FILE);
@@ -59,8 +57,8 @@ public:
         }
     }
 private:
-    parseQueue * pQ;
+    /*parseQueue * pQ;
     resultQueue * rQ;
-    bool * run;
+    bool * run;*/
 };
 #endif

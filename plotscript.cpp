@@ -64,7 +64,6 @@ void repl(){
     bool kernalRunning = false;
     parseQueue pQ;
     resultQueue rQ;
-    parseInterp pI(&pQ, &rQ, &kernalRunning);
     std::thread thread;
     while(!std::cin.eof()){
         prompt();
@@ -74,7 +73,7 @@ void repl(){
             if(line == "%start") {
                 if(!kernalRunning) {
                     kernalRunning = true;
-                    thread = std::thread(pI);
+                    thread = std::thread(&parseInterp::pni, parseInterp(), &pQ, &rQ, &kernalRunning);
                 }
                 continue;
             } else if (line == "%stop") {
@@ -88,7 +87,7 @@ void repl(){
                 if(thread.joinable()) {
                     pQ.push(line);
                     thread.join();
-                    thread = std::thread(pI);
+                    thread = std::thread(&parseInterp::pni, parseInterp(), &pQ, &rQ, &kernalRunning);
                 }
                 continue;
             }
@@ -97,7 +96,6 @@ void repl(){
             pQ.push(line);
             Expression exp;
             rQ.wait_and_pop(exp);
-            //weird fix but w/e
             if(exp.head().asSymbol() != "ERROR")
                 std::cout << exp << std::endl;
         } else {
