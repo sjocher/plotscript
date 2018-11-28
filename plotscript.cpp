@@ -60,11 +60,11 @@ int eval_from_command(std::string argexp){
 
 
 // A REPL is a repeated read-eval-print loop
-void repl(){
+void repl(std::thread *thread){
     bool kernalRunning = false;
     parseQueue pQ;
     resultQueue rQ;
-    std::thread thread;
+    parseInterp pI(&pQ, &rQ, &kernalRunning);
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
@@ -73,21 +73,21 @@ void repl(){
             if(line == "%start") {
                 if(!kernalRunning) {
                     kernalRunning = true;
-                    thread = std::thread(&parseInterp::pni, parseInterp(), &pQ, &rQ, &kernalRunning);
+                    *thread = std::thread(pI);
                 }
                 continue;
             } else if (line == "%stop") {
                 kernalRunning = false;
-                if(thread.joinable()) {
+                if(thread->joinable()) {
                     pQ.push(line);
-                    thread.join();
+                    thread->join();
                 }
                 continue;
             } else if (line == "%reset") {
-                if(thread.joinable()) {
+                if(thread->joinable()) {
                     pQ.push(line);
-                    thread.join();
-                    thread = std::thread(&parseInterp::pni, parseInterp(), &pQ, &rQ, &kernalRunning);
+                    thread->join();
+                    *thread = std::thread(pI);
                 }
                 continue;
             }
@@ -96,6 +96,7 @@ void repl(){
             pQ.push(line);
             Expression exp;
             rQ.wait_and_pop(exp);
+            //weird fix but w/e
             if(exp.head().asSymbol() != "ERROR")
                 std::cout << exp << std::endl;
         } else {
@@ -105,6 +106,7 @@ void repl(){
 }
 
 int main(int argc, char *argv[]) {
+    std::thread newThread;
     if(argc == 2){
         return eval_from_file(argv[1]);
     }
@@ -117,7 +119,10 @@ int main(int argc, char *argv[]) {
         }
     }
     else{
-        repl();
+        repl(&newThread);
+    }
+    if(newThread.joinable()) {
+        newThread.join();
     }
     return EXIT_SUCCESS;
 }
