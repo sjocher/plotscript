@@ -60,11 +60,12 @@ int eval_from_command(std::string argexp){
 
 
 // A REPL is a repeated read-eval-print loop
-void repl(std::thread *thread){
+void repl(){
     bool kernalRunning = false;
     parseQueue pQ;
     resultQueue rQ;
     parseInterp pI(&pQ, &rQ, &kernalRunning);
+    std::thread thread;
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
@@ -73,21 +74,21 @@ void repl(std::thread *thread){
             if(line == "%start") {
                 if(!kernalRunning) {
                     kernalRunning = true;
-                    *thread = std::thread(pI);
+                    thread = std::thread(pI);
                 }
                 continue;
             } else if (line == "%stop") {
                 kernalRunning = false;
-                if(thread->joinable()) {
+                if(thread.joinable()) {
                     pQ.push(line);
-                    thread->join();
+                    thread.join();
                 }
                 continue;
             } else if (line == "%reset") {
-                if(thread->joinable()) {
+                if(thread.joinable()) {
                     pQ.push(line);
-                    thread->join();
-                    *thread = std::thread(pI);
+                    thread.join();
+                    thread = std::thread(pI);
                 }
                 continue;
             }
@@ -106,7 +107,6 @@ void repl(std::thread *thread){
 }
 
 int main(int argc, char *argv[]) {
-    std::thread newThread;
     if(argc == 2){
         return eval_from_file(argv[1]);
     }
@@ -119,8 +119,7 @@ int main(int argc, char *argv[]) {
         }
     }
     else{
-        repl(&newThread);
+        repl();
     }
-    newThread.join();
     return EXIT_SUCCESS;
 }
