@@ -19,38 +19,37 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, std::atomic_bool *state, std::atomic_bool *sol) {
+    parseInterp(parseQueue *parseQ, resultQueue *resultQ, std::atomic_bool *sol, Interpreter * interpreter) {
         pQ = parseQ;
         rQ = resultQ;
-        run = state;
         solved = sol;
+        interp = interpreter;
     }
     void operator()() const {
         //load startup file
-        Interpreter interp;
         std::ifstream startup(STARTUP_FILE);
-        if(!interp.parseStream(startup)) {
+        if(!interp->parseStream(startup)) {
             error("Invalid Startup. Could not parse.");
         } else {
             try {
-                Expression exp = interp.evaluate();
+                Expression exp = interp->evaluate();
             } catch (const SemanticError & ex){
                 std::cerr << ex.what() << std::endl;
             }
         }
         //keep thread alive
-        while(run) {
+        while(1) {
             std::string line;
             pQ->wait_and_pop(line);
             if(line == "%stop" || line == "%reset") break;
             std::istringstream expression(line);
-            if(!interp.parseStream(expression)){
+            if(!interp->parseStream(expression)){
                 error("Invalid Expression. Could not parse.");
                 solved->store(false);
             }
             else{
                 try{
-                    Expression exp = interp.evaluate();
+                    Expression exp = interp->evaluate();
                     solved->store(true);
                     rQ->push(exp);
                 }
@@ -64,7 +63,7 @@ public:
 private:
     parseQueue * pQ;
     resultQueue * rQ;
-    std::atomic_bool * run;
     std::atomic_bool * solved;
+    Interpreter * interp;
 };
 #endif
