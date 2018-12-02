@@ -86,6 +86,18 @@ void repl(std::thread *thread){
                     thread->~thread();
                 }
                 continue;
+            } else if(line == "%reset") {
+                if(thread->joinable()) {
+                    pQ.push(line);
+                    thread->join();
+                    thread->~thread();
+                    interp.reset();
+                }
+            } else if(line == "%exit") {
+                if(thread->joinable()) {
+                    pQ.push("%stop");
+                }
+                return;
             }
         }
         if(kernalRunning) {

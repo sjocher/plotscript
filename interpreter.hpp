@@ -36,6 +36,8 @@ public:
     \throws SemanticError when a semantic error is encountered
    */
   Expression evaluate();
+    
+  void reset();
 
 private:
 
