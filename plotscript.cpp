@@ -61,14 +61,17 @@ int eval_from_command(std::string argexp){
 
 // A REPL is a repeated read-eval-print loop
 void repl(std::thread *thread){
-    bool kernalRunning = false;
+    std::atomic_bool kernalRunning(true);
+    std::atomic_bool solved(true);
     parseQueue pQ;
     resultQueue rQ;
-    parseInterp pI(&pQ, &rQ, &kernalRunning);
+    parseInterp pI(&pQ, &rQ, &kernalRunning, &solved);
+    *thread = std::thread(pI);
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
+        /*
         if(line.front() == '%') {
             if(line == "%start") {
                 if(!kernalRunning) {
@@ -92,13 +95,18 @@ void repl(std::thread *thread){
                 continue;
             }
         }
+         */
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
-            rQ.wait_and_pop(exp);
-            //weird fix but w/e
-            if(exp.head().asSymbol() != "ERROR")
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if(solved) {
+                rQ.try_pop(exp);
                 std::cout << exp << std::endl;
+            } else {
+                continue;
+            }
+            //weird fix but w/e
         } else {
             error("interpreter kernel not running");
         }

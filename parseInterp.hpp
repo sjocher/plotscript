@@ -19,10 +19,11 @@ void error(const std::string & err_str){
 
 class parseInterp {
 public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, bool *state) {
+    parseInterp(parseQueue *parseQ, resultQueue *resultQ, std::atomic_bool *state, std::atomic_bool *sol) {
         pQ = parseQ;
         rQ = resultQ;
         run = state;
+        solved = sol;
     }
     void operator()() const {
         //load startup file
@@ -45,15 +46,17 @@ public:
             std::istringstream expression(line);
             if(!interp.parseStream(expression)){
                 error("Invalid Expression. Could not parse.");
+                solved->store(false);
             }
             else{
                 try{
                     Expression exp = interp.evaluate();
+                    solved->store(true);
                     rQ->push(exp);
                 }
                 catch(const SemanticError & ex){
+                    solved->store(false);
                     std::cerr << ex.what() << std::endl;
-                    rQ->push(Expression(Atom("ERROR")));
                 }
             }
         }
@@ -61,6 +64,7 @@ public:
 private:
     parseQueue * pQ;
     resultQueue * rQ;
-    bool * run;
+    std::atomic_bool * run;
+    std::atomic_bool * solved;
 };
 #endif
