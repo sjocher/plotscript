@@ -66,7 +66,6 @@ void repl(std::thread *thread){
     parseQueue pQ;
     resultQueue rQ;
     parseInterp pI(&pQ, &rQ, &kernalRunning, &solved);
-    //*thread = std::thread(pI);
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
@@ -83,13 +82,7 @@ void repl(std::thread *thread){
                 if(thread->joinable()) {
                     pQ.push(line);
                     thread->join();
-                }
-                continue;
-            } else if (line == "%reset") {
-                if(thread->joinable()) {
-                    pQ.push(line);
-                    thread->join();
-                    *thread = std::thread(pI);
+                    thread->~thread();
                 }
                 continue;
             }
@@ -104,7 +97,6 @@ void repl(std::thread *thread){
             } else {
                 continue;
             }
-            //weird fix but w/e
         } else {
             error("interpreter kernel not running");
         }
