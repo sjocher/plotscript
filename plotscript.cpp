@@ -67,13 +67,13 @@ void repl(std::thread *thread){
     parseQueue pQ;
     resultQueue rQ;
     parseInterp pI(&pQ, &rQ, &solved, &interp);
-    *thread = std::thread(pI);
+    std::string kill = "%%%%%";
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
         if(line.front() == '%') {
-            /*if(line == "%start") {
+            if(line == "%start") {
                 if(!thread->joinable()) {
                     kernalRunning = true;
                     *thread = std::thread(pI);
@@ -82,19 +82,19 @@ void repl(std::thread *thread){
             } else if(line == "%stop") {
                 if(thread->joinable()) {
                     kernalRunning = false;
-                    pQ.push(line);
+                    pQ.push(kill);
                     thread->join();
                 }
                 continue;
             } else if(line == "%reset") {
                 if(thread->joinable()) {
-                    pQ.push(line);
+                    pQ.push(kill);
                     thread->join();
                     interp.reset();
                 }
-            } else */if(line == "%exit") {
+            } else if(line == "%exit") {
                 if(thread->joinable()) {
-                    pQ.push("%stop");
+                    pQ.push(kill);
                 }
                 return;
             }

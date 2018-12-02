@@ -41,7 +41,7 @@ public:
         while(1) {
             std::string line;
             pQ->wait_and_pop(line);
-            if(line == "%stop" || line == "%reset") break;
+            if(line == "%%%%%") return;
             std::istringstream expression(line);
             if(!interp->parseStream(expression)){
                 error("Invalid Expression. Could not parse.");
