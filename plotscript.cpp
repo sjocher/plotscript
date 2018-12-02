@@ -92,6 +92,7 @@ void repl(std::thread *thread){
                     thread->join();
                     interp.reset();
                 }
+                continue;
             } else if(line == "%exit") {
                 if(thread->joinable()) {
                     pQ.push(kill);
