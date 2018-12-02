@@ -64,12 +64,19 @@ void repl(std::thread *thread){
     Interpreter interp;
     bool kernalRunning(true);
     std::atomic_bool solved(false);
-    parseQueue pQ;
-    resultQueue rQ;
+    parseQueue pQ; resultQueue rQ;
     parseInterp pI(&pQ, &rQ, &solved, &interp);
     *thread = std::thread(pI);
     std::string kill = "%%%%%";
+    bool setup = true;
     while(!std::cin.eof()){
+        if(setup) {
+            setup = false;
+            if(thread->joinable())
+                pQ.push(kill);
+            thread->join();
+            kernalRunning = false;
+        }
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
@@ -79,6 +86,19 @@ void repl(std::thread *thread){
                     pQ.push(kill);
                 }
                 return;
+            } else if(line == "%start") {
+                if(!thread->joinable()) {
+                    *thread = std::thread(pI);
+                }
+                kernalRunning = true;
+                continue;
+            } else if(line == "%stop") {
+                if(thread->joinable()) {
+                    pQ.push(kill);
+                }
+                thread->join();
+                kernalRunning = false;
+                continue;
             }
         }
         if(kernalRunning) {
