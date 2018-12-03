@@ -8,6 +8,7 @@
 #include "semantic_error.hpp"
 #include "startup_config.hpp"
 #include "parseInterp.hpp"
+#include "interrupt.hpp"
 
 void prompt(){
     std::cout << "\nplotscript> ";
@@ -56,6 +57,14 @@ int eval_from_command(std::string argexp){
     return eval_from_stream(expression);
 }
 
+bool checkInterrupt() {
+    if (global_status_flag > 0){
+        error("interpreter kernel interrupted");
+        return true;
+    }
+    return false;
+}
+
 // A REPL is a repeated read-eval-print loop
 void repl(){
     Interpreter interp;
@@ -66,8 +75,15 @@ void repl(){
     pI.startThread(&pQ, &rQ, &solved, &interp);
     std::string kill = "%%%%%";
     while(!std::cin.eof()){
+        global_status_flag = 0;
         prompt();
         std::string line = readline();
+        if (std::cin.fail() || std::cin.eof()) {
+            std::cin.clear();
+            line.clear();
+            error("Interrupted.");
+            continue;
+        }
         if(line.empty()) continue;
         if(line.front() == '%') {
             if(line == "%exit") {
@@ -100,7 +116,9 @@ void repl(){
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
+            if(checkInterrupt()) continue;
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if(checkInterrupt()) continue;
             if(solved) {
                 rQ.try_pop(exp);
                 std::cout << exp << std::endl;
@@ -115,6 +133,7 @@ void repl(){
 }
 
 int main(int argc, char *argv[]) {
+    install_handler();
     if(argc == 2){
         return eval_from_file(argv[1]);
     }
