@@ -8,7 +8,7 @@ cPanel::cPanel() {
     stop = new QPushButton("Stop Kernel");
     stop->setObjectName("stop");
     reset = new QPushButton("Reset Kernel");
-    reset->setObjectName("stop");
+    reset->setObjectName("reset");
     itrpt = new QPushButton("Interrupt");
     itrpt->setObjectName("interrupt");
     auto layout = new QHBoxLayout();

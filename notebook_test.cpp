@@ -323,11 +323,28 @@ void NotebookTest::testSineSplitting() {
 
 void NotebookTest::testResetKernel() {
     NotebookApp notebook;
-    /*auto inputWidget = notebook.findChild<InputWidget *>("input");
+    auto inputWidget = notebook.findChild<InputWidget *>("input");
     auto outputWidget = notebook.findChild<OutputWidget *>("output");
-    auto reset = notebook.findChild<QPushButton *>("reset");
-    auto start = notebook.findChild<QPushButton *>("start");
-    auto stop = notebook.findChild<QPushButton *>("stop");*/
+    auto controlpanel = notebook.findChild<cPanel *>();
+    auto reset = controlpanel->findChild<QPushButton *>("reset");
+    QVERIFY2(reset, "Could not find reset button");
+    std::string program = R"(
+    (begin
+     (define f (lambda (x) (sin x)))
+     (continuous-plot f (list (- pi) pi)))
+    )";
+    inputWidget->setPlainText(QString::fromStdString(program));
+    QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto view = outputWidget->findChild<QGraphicsView *>();
+    QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
+    auto scene = view->scene();
+    // first check total number of items
+    // 66 lines + 0 points + 4 text + 4 gridlines + 2 axis = 76
+    auto items = scene->items();
+    QCOMPARE(items.size(), 76);
+    //QTest::KeyAction(reset, QTest::Click);
+    
 }
 
 QTEST_MAIN(NotebookTest)
