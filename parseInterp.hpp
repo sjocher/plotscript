@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <atomic>
+#include <thread>
 #include "interpreter.hpp"
 #include "startup_config.hpp"
 #include "tsQueue.hpp"
@@ -17,53 +18,54 @@ void error(const std::string & err_str){
     std::cerr << "Error: " << err_str << std::endl;
 }
 
-class parseInterp {
-public:
-    parseInterp(parseQueue *parseQ, resultQueue *resultQ, std::atomic_bool *solv, Interpreter * interpreter) {
-        pQ = parseQ;
-        rQ = resultQ;
-        solved = solv;
-        interp = interpreter;
+void pI(parseQueue *pQ, resultQueue *rQ, std::atomic_bool *solved, Interpreter * interp) {
+    //load startup file
+    std::ifstream startup(STARTUP_FILE);
+    if(!interp->parseStream(startup)) {
+        error("Invalid Startup. Could not parse.");
+    } else {
+        try {
+            Expression exp = interp->evaluate();
+        } catch (const SemanticError & ex){
+            std::cerr << ex.what() << std::endl;
+        }
     }
-    void operator()() const  {
-        //load startup file
-        std::ifstream startup(STARTUP_FILE);
-        if(!interp->parseStream(startup)) {
-            error("Invalid Startup. Could not parse.");
-        } else {
-            try {
+    //keep thread alive
+    while(1) {
+        std::string line;
+        pQ->wait_and_pop(line);
+        if(line == "%%%%%") return;
+        std::istringstream expression(line);
+        if(!interp->parseStream(expression)){
+            error("Invalid Expression. Could not parse.");
+            solved->store(false);
+        }
+        else{
+            try{
                 Expression exp = interp->evaluate();
-            } catch (const SemanticError & ex){
+                solved->store(true);
+                rQ->push(exp);
+            }
+            catch(const SemanticError & ex){
+                solved->store(false);
                 std::cerr << ex.what() << std::endl;
             }
         }
-        //keep thread alive
-        while(1) {
-            std::string line;
-            pQ->wait_and_pop(line);
-            if(line == "%%%%%") return;
-            std::istringstream expression(line);
-            if(!interp->parseStream(expression)){
-                error("Invalid Expression. Could not parse.");
-                solved->store(false);
-            }
-            else{
-                try{
-                    Expression exp = interp->evaluate();
-                    solved->store(true);
-                    rQ->push(exp);
-                }
-                catch(const SemanticError & ex){
-                    solved->store(false);
-                    std::cerr << ex.what() << std::endl;
-                }
-            }
-        }
+    }
+}
+
+class parseInterp {
+public:
+    parseInterp() {
+        
+    }
+    void startThread(parseQueue *pQ, resultQueue *rQ, std::atomic_bool *solved, Interpreter * interp) {
+        pool.emplace_back(std::thread(&pI, pQ, rQ, solved, interp));
+    }
+    void joinAll() {
+        for(auto &t : pool) t.join();
     }
 private:
-    parseQueue *pQ;
-    resultQueue *rQ;
-    std::atomic_bool *solved;
-    Interpreter *interp;
+    std::vector<std::thread> pool;
 };
 #endif

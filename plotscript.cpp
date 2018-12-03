@@ -62,23 +62,27 @@ int eval_from_command(std::string argexp){
 // A REPL is a repeated read-eval-print loop
 void repl(){
     Interpreter interp;
-    bool kernalRunning(true);
+    bool kernalRunning(false);
     std::atomic_bool solved(false);
     parseQueue pQ; resultQueue rQ;
-    parseInterp pI(&pQ, &rQ, &solved, &interp);
+    parseInterp pI;
     std::string kill = "%%%%%";
-    std::thread thread(pI);
     while(!std::cin.eof()){
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
         if(line.front() == '%') {
             if(line == "%exit") {
-                if(thread.joinable()) {
-                    pQ.push(kill);
-                    thread.join();
-                }
                 return;
+            } else if(line == "%start") {
+                kernalRunning = true;
+                pI.startThread(&pQ, &rQ, &solved, &interp);
+                continue;
+            } else if(line == "%stop") {
+                kernalRunning = false;
+                pQ.push(kill);
+                pI.joinAll();
+                continue;
             }
         }
         if(kernalRunning) {
