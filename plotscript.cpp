@@ -82,7 +82,7 @@ void repl(){
         global_status_flag = 0;
         prompt();
         std::string line = readline();
-        if (std::cin.fail()) {
+        if (std::cin.fail() && kernalRunning) {
             if(checkInterrupt(&interp, &pQ, &rQ)) {
                 std::cin.clear();
                 line.clear();
@@ -127,9 +127,17 @@ void repl(){
             if(checkInterrupt(&interp, &pQ, &rQ))
                 continue;
             if(solved) {
+                if(checkInterrupt(&interp, &pQ, &rQ))
+                    continue;
                 rQ.try_pop(exp);
+                if(checkInterrupt(&interp, &pQ, &rQ))
+                    continue;
                 std::cout << exp << std::endl;
+                if(checkInterrupt(&interp, &pQ, &rQ))
+                    continue;
             } else {
+                if(checkInterrupt(&interp, &pQ, &rQ))
+                    continue;
                 continue;
             }
         } else {
