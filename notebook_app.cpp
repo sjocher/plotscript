@@ -52,9 +52,8 @@ void NotebookApp::handleReset() {
         pQ.push(QString("%%%%%"));
         pI.joinAll();
     }
-    output->scene->clear();
-    input->clear();
     interp.reset();
+    loadStartup();
     pI.startThread(&mQ, &pQ, &rQ, &solved, &interp);
 }
 
