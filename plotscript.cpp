@@ -73,6 +73,8 @@ void repl(){
         if(line.empty()) continue;
         if(line.front() == '%') {
             if(line == "%exit") {
+                pQ.push(kill);
+                pI.joinAll();
                 return;
             } else if(line == "%start") {
                 kernalRunning = true;
