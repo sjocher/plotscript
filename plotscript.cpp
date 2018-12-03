@@ -60,45 +60,25 @@ int eval_from_command(std::string argexp){
 
 
 // A REPL is a repeated read-eval-print loop
-void repl(std::thread *thread){
+void repl(){
     Interpreter interp;
     bool kernalRunning(true);
     std::atomic_bool solved(false);
     parseQueue pQ; resultQueue rQ;
     parseInterp pI(&pQ, &rQ, &solved, &interp);
-    *thread = std::thread(pI);
     std::string kill = "%%%%%";
-    bool setup = true;
+    std::thread thread(pI);
     while(!std::cin.eof()){
-        if(setup) {
-            setup = false;
-            if(thread->joinable())
-                pQ.push(kill);
-            thread->join();
-            kernalRunning = false;
-        }
         prompt();
         std::string line = readline();
         if(line.empty()) continue;
         if(line.front() == '%') {
             if(line == "%exit") {
-                if(thread->joinable()) {
+                if(thread.joinable()) {
                     pQ.push(kill);
+                    thread.join();
                 }
                 return;
-            } else if(line == "%start") {
-                if(!thread->joinable()) {
-                    *thread = std::thread(pI);
-                }
-                kernalRunning = true;
-                continue;
-            } else if(line == "%stop") {
-                if(thread->joinable()) {
-                    pQ.push(kill);
-                }
-                thread->join();
-                kernalRunning = false;
-                continue;
             }
         }
         if(kernalRunning) {
@@ -118,7 +98,6 @@ void repl(std::thread *thread){
 }
 
 int main(int argc, char *argv[]) {
-    std::thread newThread;
     if(argc == 2){
         return eval_from_file(argv[1]);
     }
@@ -131,10 +110,7 @@ int main(int argc, char *argv[]) {
         }
     }
     else{
-        repl(&newThread);
-    }
-    if(newThread.joinable()) {
-        newThread.join();
+        repl();
     }
     return EXIT_SUCCESS;
 }
