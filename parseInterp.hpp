@@ -56,14 +56,19 @@ void pI(parseQueue *pQ, resultQueue *rQ, std::atomic_bool *solved, Interpreter *
 
 class parseInterp {
 public:
-    parseInterp() {
-        
-    }
+    parseInterp() {}
     void startThread(parseQueue *pQ, resultQueue *rQ, std::atomic_bool *solved, Interpreter * interp) {
         pool.emplace_back(std::thread(&pI, pQ, rQ, solved, interp));
     }
+    int size() {
+        return pool.size();
+    }
     void joinAll() {
-        for(auto &t : pool) t.join();
+        for(auto &t : pool) {
+            if(t.joinable()) {
+                t.join();
+            }
+        }
     }
 private:
     std::vector<std::thread> pool;

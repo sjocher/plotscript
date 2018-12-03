@@ -78,12 +78,16 @@ void repl(){
                 return;
             } else if(line == "%start") {
                 kernalRunning = true;
-                pI.startThread(&pQ, &rQ, &solved, &interp);
+                if(pI.size() == 0) {
+                    pI.startThread(&pQ, &rQ, &solved, &interp);
+                }
                 continue;
             } else if(line == "%stop") {
                 kernalRunning = false;
-                pQ.push(kill);
-                pI.joinAll();
+                if(pI.size() > 0) {
+                    pQ.push(kill);
+                    pI.joinAll();
+                }
                 continue;
             }
         }
