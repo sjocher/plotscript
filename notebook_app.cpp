@@ -53,6 +53,8 @@ void NotebookApp::handleReset() {
         pI.joinAll();
     }
     interp.reset();
+    output->scene->clear();
+    input->clear();
     loadStartup();
     pI.startThread(&mQ, &pQ, &rQ, &solved, &interp);
 }
@@ -83,7 +85,7 @@ void NotebookApp::repl(QString data) {
     if(kernalRunning) {
         pQ.push(data);
         Expression exp;
-        std::this_thread::sleep_for(std::chrono::milliseconds(95));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         if(solved) {
             rQ.try_pop(exp);
             emit plotscriptResult(exp);

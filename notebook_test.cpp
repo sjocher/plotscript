@@ -323,11 +323,11 @@ void NotebookTest::testSineSplitting() {
 
 void NotebookTest::testResetKernel() {
     NotebookApp notebook;
-    auto inputWidget = notebook.findChild<InputWidget *>("input");
+    /*auto inputWidget = notebook.findChild<InputWidget *>("input");
     auto outputWidget = notebook.findChild<OutputWidget *>("output");
     auto reset = notebook.findChild<QPushButton *>("reset");
     auto start = notebook.findChild<QPushButton *>("start");
-    auto stop = notebook.findChild<QPushButton *>("stop");
+    auto stop = notebook.findChild<QPushButton *>("stop");*/
 }
 
 QTEST_MAIN(NotebookTest)
