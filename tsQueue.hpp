@@ -30,6 +30,13 @@ public:
         return true;
     }
     
+    void clear() {
+        while(!empty()) {
+            T temp;
+            try_pop(temp);
+        }
+    }
+    
     void wait_and_pop(T &popped_value) {
         std::unique_lock<std::mutex> lock(the_mutex);
         while (the_queue.empty()) {

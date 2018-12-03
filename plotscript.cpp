@@ -57,9 +57,13 @@ int eval_from_command(std::string argexp){
     return eval_from_stream(expression);
 }
 
-bool checkInterrupt() {
+bool checkInterrupt(Interpreter *interp, parseQueue *pQ, resultQueue *rQ) {
     if (global_status_flag > 0){
         error("interpreter kernel interrupted");
+        pQ->clear();
+        rQ->clear();
+        interp->reset();
+        loadStartup(interp);
         return true;
     }
     return false;
@@ -78,12 +82,11 @@ void repl(){
         global_status_flag = 0;
         prompt();
         std::string line = readline();
-        if (std::cin.fail() || std::cin.eof()) {
-            std::cin.clear();
-            line.clear();
-            error("Interrupted.");
-            interp.reset();
-            loadStartup(&interp);
+        if (std::cin.fail()) {
+            if(checkInterrupt(&interp, &pQ, &rQ)) {
+                std::cin.clear();
+                line.clear();
+            }
             continue;
         }
         if(line.empty()) continue;
@@ -118,17 +121,11 @@ void repl(){
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
-            if(checkInterrupt()) {
-                interp.reset();
-                loadStartup(&interp);
+            if(checkInterrupt(&interp, &pQ, &rQ))
                 continue;
-            }
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            if(checkInterrupt()) {
-                interp.reset();
-                loadStartup(&interp);
+            if(checkInterrupt(&interp, &pQ, &rQ))
                 continue;
-            }
             if(solved) {
                 rQ.try_pop(exp);
                 std::cout << exp << std::endl;
