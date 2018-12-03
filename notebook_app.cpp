@@ -83,7 +83,7 @@ void NotebookApp::repl(QString data) {
     if(kernalRunning) {
         pQ.push(data);
         Expression exp;
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(85));
         if(solved) {
             rQ.try_pop(exp);
             emit plotscriptResult(exp);
