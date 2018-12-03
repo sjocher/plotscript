@@ -82,7 +82,7 @@ void NotebookApp::repl(QString data) {
     if(kernalRunning) {
         pQ.push(data);
         Expression exp;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         if(solved) {
             rQ.try_pop(exp);
             emit plotscriptResult(exp);
@@ -99,6 +99,16 @@ void NotebookApp::repl(QString data) {
 
 
 void NotebookApp::closeEvent(QCloseEvent *event) {
+    QCloseEvent *temp = event;
+    if(temp == event) {
+        if(pI.size() > 0) {
+            pQ.push(QString("%%%%%"));
+            pI.joinAll();
+        }
+    }
+}
+
+NotebookApp::~NotebookApp() {
     if(pI.size() > 0) {
         pQ.push(QString("%%%%%"));
         pI.joinAll();

@@ -16,6 +16,7 @@ class NotebookApp: public QWidget {
     Q_OBJECT
 public:
     NotebookApp();
+    ~NotebookApp();
     void repl(QString data);
 private:
     QString m_parseData;

@@ -282,13 +282,14 @@ void NotebookTest::testContinuousPlotLayout() {
     std::string program = R"(
     (begin
      (define f (lambda (x) (/ 1 (+ 1 (^ e (- (* 5 x)))))))
-     (continuous-plot f (list -1 1) ))
+     (continuous-plot f (list -1 1)))
     )";
     NotebookApp notebook;
     auto inputWidget = notebook.findChild<InputWidget *>("input");
     auto outputWidget = notebook.findChild<OutputWidget *>("output");
     inputWidget->setPlainText(QString::fromStdString(program));
     QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto view = outputWidget->findChild<QGraphicsView *>();
     QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
     auto scene = view->scene();
@@ -309,6 +310,7 @@ void NotebookTest::testSineSplitting() {
     auto outputWidget = notebook.findChild<OutputWidget *>("output");
     inputWidget->setPlainText(QString::fromStdString(program));
     QTest::keyClick(inputWidget, Qt::Key_Return, Qt::ShiftModifier);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto view = outputWidget->findChild<QGraphicsView *>();
     QVERIFY2(view, "Could not find QGraphicsView as child of OutputWidget");
     auto scene = view->scene();
