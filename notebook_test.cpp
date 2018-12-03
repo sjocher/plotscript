@@ -23,6 +23,7 @@ private slots:
     void testDiscretePlotLayout();
     void testContinuousPlotLayout();
     void testSineSplitting();
+    void testResetKernel();
 private:
     NotebookApp notebook;
     
@@ -318,6 +319,15 @@ void NotebookTest::testSineSplitting() {
     // 66 lines + 0 points + 4 text + 4 gridlines + 2 axis = 76
     auto items = scene->items();
     QCOMPARE(items.size(), 76);
+}
+
+void NotebookTest::testResetKernel() {
+    NotebookApp notebook;
+    auto inputWidget = notebook.findChild<InputWidget *>("input");
+    auto outputWidget = notebook.findChild<OutputWidget *>("output");
+    auto reset = notebook.findChild<QPushButton *>("reset");
+    auto start = notebook.findChild<QPushButton *>("start");
+    auto stop = notebook.findChild<QPushButton *>("stop");
 }
 
 QTEST_MAIN(NotebookTest)
