@@ -39,7 +39,7 @@ set(tui_src
 set(gui_src input_widget.cpp input_widget.hpp
     notebook_app.cpp notebook_app.hpp
     output_widget.cpp output_widget.hpp cpanel.hpp
-    cpanel.cpp parseInterp.hpp
+    cpanel.cpp tsQueue.hpp guiParseInterp.hpp
   )
 
 # EDIT

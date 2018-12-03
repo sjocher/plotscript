@@ -4,11 +4,9 @@
 #include <fstream>
 #include <thread>
 #include <atomic>
-
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
 #include "startup_config.hpp"
-#include "tsQueue.hpp"
 #include "parseInterp.hpp"
 
 void prompt(){

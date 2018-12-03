@@ -5,6 +5,7 @@
 #include "notebook_app.hpp"
 #include "input_widget.hpp"
 #include "output_widget.hpp"
+#include "cpanel.hpp"
 
 class NotebookTest : public QObject {
   Q_OBJECT
@@ -164,11 +165,9 @@ int findLines(QGraphicsScene * scene, QRectF bbox, qreal margin){
  findPoints - find points in a scene contained within a specified rectangle
  */
 int findPoints(QGraphicsScene * scene, QPointF center, qreal radius){
-    
     QPainterPath selectPath;
     selectPath.addRect(QRectF(center.x()-radius, center.y()-radius, 2*radius, 2*radius));
     scene->setSelectionArea(selectPath, Qt::ContainsItemShape);
-    
     int numpoints(0);
     foreach(auto item, scene->selectedItems()){
         if(item->type() == QGraphicsEllipseItem::Type){
