@@ -55,8 +55,8 @@ void NotebookApp::handleReset() {
     interp.reset();
     output->scene->clear();
     input->clear();
-    loadStartup();
     pI.startThread(&mQ, &pQ, &rQ, &solved, &interp);
+    loadStartup();
 }
 
 void NotebookApp::loadStartup() {
