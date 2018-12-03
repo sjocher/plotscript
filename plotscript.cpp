@@ -58,7 +58,6 @@ int eval_from_command(std::string argexp){
     return eval_from_stream(expression);
 }
 
-
 // A REPL is a repeated read-eval-print loop
 void repl(){
     Interpreter interp;
@@ -77,7 +76,7 @@ void repl(){
                 pQ.push(kill);
                 pI.joinAll();
                 return;
-            } /*else if(line == "%start") {
+            } else if(line == "%start") {
                 kernalRunning = true;
                 if(pI.size() == 0) {
                     pI.startThread(&pQ, &rQ, &solved, &interp);
@@ -90,7 +89,15 @@ void repl(){
                     pI.joinAll();
                 }
                 continue;
-            }*/
+            } else if(line == "%reset") {
+                if(pI.size() > 0) {
+                    pQ.push(kill);
+                    pI.joinAll();
+                }
+                interp.reset();
+                pI.startThread(&pQ, &rQ, &solved, &interp);
+                continue;
+            }
         }
         if(kernalRunning) {
             pQ.push(line);
@@ -106,6 +113,7 @@ void repl(){
             error("interpreter kernel not running");
         }
     }
+    pI.joinAll();
 }
 
 int main(int argc, char *argv[]) {

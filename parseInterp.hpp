@@ -65,10 +65,10 @@ public:
     }
     void joinAll() {
         for(auto &t : pool) {
-            if(t.joinable()) {
+            if(t.joinable())
                 t.join();
-            }
         }
+        pool.clear();
     }
 private:
     std::vector<std::thread> pool;
