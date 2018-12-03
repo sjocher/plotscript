@@ -125,14 +125,6 @@ void repl(){
                 continue;
             }
         }
-        if(checkInterrupt(&interp, &pQ, &rQ)) {
-            if(pI.size() > 0) {
-                pQ.push(kill);
-                pI.joinAll();
-            }
-            pI.startThread(&pQ, &rQ, &solved, &interp);
-            continue;
-        }
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
@@ -145,14 +137,6 @@ void repl(){
                 continue;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            if(checkInterrupt(&interp, &pQ, &rQ)) {
-                if(pI.size() > 0) {
-                    pQ.push(kill);
-                    pI.joinAll();
-                }
-                pI.startThread(&pQ, &rQ, &solved, &interp);
-                continue;
-            }
             if(solved) {
                 rQ.try_pop(exp);
                 std::cout << exp << std::endl;
