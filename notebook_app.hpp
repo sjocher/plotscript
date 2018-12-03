@@ -37,6 +37,7 @@ public slots:
     void handleStart();
     void handleStop();
     void handleReset();
+    void handleinterrupt();
 signals:
     void plotscriptResult(Expression result);
     void plotscriptError(std::string error);

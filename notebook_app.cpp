@@ -26,6 +26,7 @@ NotebookApp::NotebookApp() {
      connect(controlpanel->start, SIGNAL(clicked()), this, SLOT(handleStart()));
      connect(controlpanel->stop, SIGNAL(clicked()), this, SLOT(handleStop()));
      connect(controlpanel->reset, SIGNAL(clicked()), this, SLOT(handleReset()));
+     connect(controlpanel->itrpt, SIGNAL(clicked()), this, SLOT(handleinterrupt()));
     layout->addWidget(controlpanel);
     layout->addWidget(input);
     layout->addWidget(output);
@@ -57,6 +58,13 @@ void NotebookApp::handleReset() {
     input->clear();
     pI.startThread(&mQ, &pQ, &rQ, &solved, &interp);
     loadStartup();
+}
+
+void NotebookApp::handleinterrupt() {
+    if(kernalRunning) {
+        handleReset();
+        emit plotscriptError("Error: interpreter kernel interrupted");
+    }
 }
 
 void NotebookApp::loadStartup() {
