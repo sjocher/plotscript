@@ -60,10 +60,9 @@ int eval_from_command(std::string argexp){
 bool checkInterrupt(Interpreter *interp, parseQueue *pQ, resultQueue *rQ) {
     if (global_status_flag > 0){
         error("interpreter kernel interrupted");
+        interp->reset();
         pQ->clear();
         rQ->clear();
-        interp->reset();
-        loadStartup(interp);
         return true;
     }
     return false;
@@ -83,10 +82,18 @@ void repl(){
         prompt();
         std::string line = readline();
         if (std::cin.fail() && kernalRunning) {
-            if(checkInterrupt(&interp, &pQ, &rQ)) {
-                std::cin.clear();
-                line.clear();
+            //cntrl-c here
+            error("interpreter kernel interrupted");
+            std::cin.clear();
+            line.clear();
+            if(pI.size() > 0) {
+                pQ.push(kill);
+                pI.joinAll();
             }
+            interp.reset();
+            pQ.clear();
+            rQ.clear();
+            pI.startThread(&pQ, &rQ, &solved, &interp);
             continue;
         }
         if(line.empty()) continue;
@@ -118,26 +125,38 @@ void repl(){
                 continue;
             }
         }
+        if(checkInterrupt(&interp, &pQ, &rQ)) {
+            if(pI.size() > 0) {
+                pQ.push(kill);
+                pI.joinAll();
+            }
+            pI.startThread(&pQ, &rQ, &solved, &interp);
+            continue;
+        }
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
-            if(checkInterrupt(&interp, &pQ, &rQ))
+            if(checkInterrupt(&interp, &pQ, &rQ)) {
+                if(pI.size() > 0) {
+                    pQ.push(kill);
+                    pI.joinAll();
+                }
+                pI.startThread(&pQ, &rQ, &solved, &interp);
                 continue;
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            if(checkInterrupt(&interp, &pQ, &rQ))
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            if(checkInterrupt(&interp, &pQ, &rQ)) {
+                if(pI.size() > 0) {
+                    pQ.push(kill);
+                    pI.joinAll();
+                }
+                pI.startThread(&pQ, &rQ, &solved, &interp);
                 continue;
+            }
             if(solved) {
-                if(checkInterrupt(&interp, &pQ, &rQ))
-                    continue;
                 rQ.try_pop(exp);
-                if(checkInterrupt(&interp, &pQ, &rQ))
-                    continue;
                 std::cout << exp << std::endl;
-                if(checkInterrupt(&interp, &pQ, &rQ))
-                    continue;
             } else {
-                if(checkInterrupt(&interp, &pQ, &rQ))
-                    continue;
                 continue;
             }
         } else {
