@@ -18,6 +18,19 @@ void error(const std::string & err_str) {
     std::cerr << "Error: " << err_str << std::endl;
 }
 
+void loadStartup(Interpreter *interp) {
+    std::ifstream startup(STARTUP_FILE);
+    if(!interp->parseStream(startup)) {
+        error("Invalid Startup. Could not parse.");
+    } else {
+        try {
+            Expression exp = interp->evaluate();
+        } catch (const SemanticError & ex){
+            std::cerr << ex.what() << std::endl;
+        }
+    }
+}
+
 class parseInterp {
 public:
     parseInterp() {}
@@ -38,16 +51,7 @@ private:
     std::vector<std::thread> pool;
     void pI(parseQueue *pQ, resultQueue *rQ, std::atomic_bool *solved, Interpreter * interp) {
         //load startup file
-        std::ifstream startup(STARTUP_FILE);
-        if(!interp->parseStream(startup)) {
-            error("Invalid Startup. Could not parse.");
-        } else {
-            try {
-                Expression exp = interp->evaluate();
-            } catch (const SemanticError & ex){
-                std::cerr << ex.what() << std::endl;
-            }
-        }
+        loadStartup(interp);
         //keep thread alive
         while(1) {
             std::string line;

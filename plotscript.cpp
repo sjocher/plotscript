@@ -82,6 +82,8 @@ void repl(){
             std::cin.clear();
             line.clear();
             error("Interrupted.");
+            interp.reset();
+            loadStartup(&interp);
             continue;
         }
         if(line.empty()) continue;
@@ -116,9 +118,17 @@ void repl(){
         if(kernalRunning) {
             pQ.push(line);
             Expression exp;
-            if(checkInterrupt()) continue;
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            if(checkInterrupt()) continue;
+            if(checkInterrupt()) {
+                interp.reset();
+                loadStartup(&interp);
+                continue;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            if(checkInterrupt()) {
+                interp.reset();
+                loadStartup(&interp);
+                continue;
+            }
             if(solved) {
                 rQ.try_pop(exp);
                 std::cout << exp << std::endl;
