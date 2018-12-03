@@ -96,3 +96,11 @@ void NotebookApp::repl(QString data) {
     }
     input->setEnabled(true);
 }
+
+
+void NotebookApp::closeEvent(QCloseEvent *event) {
+    if(pI.size() > 0) {
+        pQ.push(QString("%%%%%"));
+        pI.joinAll();
+    }
+}

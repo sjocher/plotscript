@@ -30,6 +30,7 @@ private:
     messageQueue mQ;
     guiParseInterp pI;
     std::atomic_bool solved;
+    void closeEvent(QCloseEvent *event);
 public slots:
     void setData(QString data);
     void handleStart();
